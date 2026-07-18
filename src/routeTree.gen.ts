@@ -9,38 +9,306 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
+import { Route as EcosystemRouteImport } from './routes/ecosystem'
+import { Route as DocsRouteImport } from './routes/docs'
+import { Route as ContributingRouteImport } from './routes/contributing'
+import { Route as ChangelogRouteImport } from './routes/changelog'
+import { Route as BenchmarksRouteImport } from './routes/benchmarks'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
+import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as ExamplesSlugRouteImport } from './routes/examples.$slug'
+import { Route as DocsReportsRouteImport } from './routes/docs.reports'
+import { Route as DocsQuickstartRouteImport } from './routes/docs.quickstart'
+import { Route as DocsProfilingRouteImport } from './routes/docs.profiling'
+import { Route as DocsInstallationRouteImport } from './routes/docs.installation'
+import { Route as DocsFixingRouteImport } from './routes/docs.fixing'
+import { Route as DocsExamplesRouteImport } from './routes/docs.examples'
+import { Route as DocsAssessmentRouteImport } from './routes/docs.assessment'
+import { Route as DocsReferenceIndexRouteImport } from './routes/docs.reference.index'
+import { Route as DocsReferenceFnRouteImport } from './routes/docs.reference.$fn'
 
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EcosystemRoute = EcosystemRouteImport.update({
+  id: '/ecosystem',
+  path: '/ecosystem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContributingRoute = ContributingRouteImport.update({
+  id: '/contributing',
+  path: '/contributing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BenchmarksRoute = BenchmarksRouteImport.update({
+  id: '/benchmarks',
+  path: '/benchmarks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExamplesIndexRoute = ExamplesIndexRouteImport.update({
+  id: '/examples/',
+  path: '/examples/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DocsRoute,
+} as any)
+const ExamplesSlugRoute = ExamplesSlugRouteImport.update({
+  id: '/examples/$slug',
+  path: '/examples/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsReportsRoute = DocsReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsQuickstartRoute = DocsQuickstartRouteImport.update({
+  id: '/quickstart',
+  path: '/quickstart',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsProfilingRoute = DocsProfilingRouteImport.update({
+  id: '/profiling',
+  path: '/profiling',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsInstallationRoute = DocsInstallationRouteImport.update({
+  id: '/installation',
+  path: '/installation',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsFixingRoute = DocsFixingRouteImport.update({
+  id: '/fixing',
+  path: '/fixing',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsExamplesRoute = DocsExamplesRouteImport.update({
+  id: '/examples',
+  path: '/examples',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsAssessmentRoute = DocsAssessmentRouteImport.update({
+  id: '/assessment',
+  path: '/assessment',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsReferenceIndexRoute = DocsReferenceIndexRouteImport.update({
+  id: '/reference/',
+  path: '/reference/',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsReferenceFnRoute = DocsReferenceFnRouteImport.update({
+  id: '/reference/$fn',
+  path: '/reference/$fn',
+  getParentRoute: () => DocsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/benchmarks': typeof BenchmarksRoute
+  '/changelog': typeof ChangelogRoute
+  '/contributing': typeof ContributingRoute
+  '/docs': typeof DocsRouteWithChildren
+  '/ecosystem': typeof EcosystemRoute
+  '/roadmap': typeof RoadmapRoute
+  '/docs/assessment': typeof DocsAssessmentRoute
+  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/fixing': typeof DocsFixingRoute
+  '/docs/installation': typeof DocsInstallationRoute
+  '/docs/profiling': typeof DocsProfilingRoute
+  '/docs/quickstart': typeof DocsQuickstartRoute
+  '/docs/reports': typeof DocsReportsRoute
+  '/examples/$slug': typeof ExamplesSlugRoute
+  '/docs/': typeof DocsIndexRoute
+  '/examples/': typeof ExamplesIndexRoute
+  '/docs/reference/$fn': typeof DocsReferenceFnRoute
+  '/docs/reference/': typeof DocsReferenceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/benchmarks': typeof BenchmarksRoute
+  '/changelog': typeof ChangelogRoute
+  '/contributing': typeof ContributingRoute
+  '/ecosystem': typeof EcosystemRoute
+  '/roadmap': typeof RoadmapRoute
+  '/docs/assessment': typeof DocsAssessmentRoute
+  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/fixing': typeof DocsFixingRoute
+  '/docs/installation': typeof DocsInstallationRoute
+  '/docs/profiling': typeof DocsProfilingRoute
+  '/docs/quickstart': typeof DocsQuickstartRoute
+  '/docs/reports': typeof DocsReportsRoute
+  '/examples/$slug': typeof ExamplesSlugRoute
+  '/docs': typeof DocsIndexRoute
+  '/examples': typeof ExamplesIndexRoute
+  '/docs/reference/$fn': typeof DocsReferenceFnRoute
+  '/docs/reference': typeof DocsReferenceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/benchmarks': typeof BenchmarksRoute
+  '/changelog': typeof ChangelogRoute
+  '/contributing': typeof ContributingRoute
+  '/docs': typeof DocsRouteWithChildren
+  '/ecosystem': typeof EcosystemRoute
+  '/roadmap': typeof RoadmapRoute
+  '/docs/assessment': typeof DocsAssessmentRoute
+  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/fixing': typeof DocsFixingRoute
+  '/docs/installation': typeof DocsInstallationRoute
+  '/docs/profiling': typeof DocsProfilingRoute
+  '/docs/quickstart': typeof DocsQuickstartRoute
+  '/docs/reports': typeof DocsReportsRoute
+  '/examples/$slug': typeof ExamplesSlugRoute
+  '/docs/': typeof DocsIndexRoute
+  '/examples/': typeof ExamplesIndexRoute
+  '/docs/reference/$fn': typeof DocsReferenceFnRoute
+  '/docs/reference/': typeof DocsReferenceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/benchmarks'
+    | '/changelog'
+    | '/contributing'
+    | '/docs'
+    | '/ecosystem'
+    | '/roadmap'
+    | '/docs/assessment'
+    | '/docs/examples'
+    | '/docs/fixing'
+    | '/docs/installation'
+    | '/docs/profiling'
+    | '/docs/quickstart'
+    | '/docs/reports'
+    | '/examples/$slug'
+    | '/docs/'
+    | '/examples/'
+    | '/docs/reference/$fn'
+    | '/docs/reference/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/benchmarks'
+    | '/changelog'
+    | '/contributing'
+    | '/ecosystem'
+    | '/roadmap'
+    | '/docs/assessment'
+    | '/docs/examples'
+    | '/docs/fixing'
+    | '/docs/installation'
+    | '/docs/profiling'
+    | '/docs/quickstart'
+    | '/docs/reports'
+    | '/examples/$slug'
+    | '/docs'
+    | '/examples'
+    | '/docs/reference/$fn'
+    | '/docs/reference'
+  id:
+    | '__root__'
+    | '/'
+    | '/benchmarks'
+    | '/changelog'
+    | '/contributing'
+    | '/docs'
+    | '/ecosystem'
+    | '/roadmap'
+    | '/docs/assessment'
+    | '/docs/examples'
+    | '/docs/fixing'
+    | '/docs/installation'
+    | '/docs/profiling'
+    | '/docs/quickstart'
+    | '/docs/reports'
+    | '/examples/$slug'
+    | '/docs/'
+    | '/examples/'
+    | '/docs/reference/$fn'
+    | '/docs/reference/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BenchmarksRoute: typeof BenchmarksRoute
+  ChangelogRoute: typeof ChangelogRoute
+  ContributingRoute: typeof ContributingRoute
+  DocsRoute: typeof DocsRouteWithChildren
+  EcosystemRoute: typeof EcosystemRoute
+  RoadmapRoute: typeof RoadmapRoute
+  ExamplesSlugRoute: typeof ExamplesSlugRoute
+  ExamplesIndexRoute: typeof ExamplesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ecosystem': {
+      id: '/ecosystem'
+      path: '/ecosystem'
+      fullPath: '/ecosystem'
+      preLoaderRoute: typeof EcosystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contributing': {
+      id: '/contributing'
+      path: '/contributing'
+      fullPath: '/contributing'
+      preLoaderRoute: typeof ContributingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/benchmarks': {
+      id: '/benchmarks'
+      path: '/benchmarks'
+      fullPath: '/benchmarks'
+      preLoaderRoute: typeof BenchmarksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +316,131 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/examples/': {
+      id: '/examples/'
+      path: '/examples'
+      fullPath: '/examples/'
+      preLoaderRoute: typeof ExamplesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/': {
+      id: '/docs/'
+      path: '/'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof DocsIndexRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/examples/$slug': {
+      id: '/examples/$slug'
+      path: '/examples/$slug'
+      fullPath: '/examples/$slug'
+      preLoaderRoute: typeof ExamplesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/reports': {
+      id: '/docs/reports'
+      path: '/reports'
+      fullPath: '/docs/reports'
+      preLoaderRoute: typeof DocsReportsRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/quickstart': {
+      id: '/docs/quickstart'
+      path: '/quickstart'
+      fullPath: '/docs/quickstart'
+      preLoaderRoute: typeof DocsQuickstartRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/profiling': {
+      id: '/docs/profiling'
+      path: '/profiling'
+      fullPath: '/docs/profiling'
+      preLoaderRoute: typeof DocsProfilingRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/installation': {
+      id: '/docs/installation'
+      path: '/installation'
+      fullPath: '/docs/installation'
+      preLoaderRoute: typeof DocsInstallationRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/fixing': {
+      id: '/docs/fixing'
+      path: '/fixing'
+      fullPath: '/docs/fixing'
+      preLoaderRoute: typeof DocsFixingRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/examples': {
+      id: '/docs/examples'
+      path: '/examples'
+      fullPath: '/docs/examples'
+      preLoaderRoute: typeof DocsExamplesRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/assessment': {
+      id: '/docs/assessment'
+      path: '/assessment'
+      fullPath: '/docs/assessment'
+      preLoaderRoute: typeof DocsAssessmentRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/reference/': {
+      id: '/docs/reference/'
+      path: '/reference'
+      fullPath: '/docs/reference/'
+      preLoaderRoute: typeof DocsReferenceIndexRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/reference/$fn': {
+      id: '/docs/reference/$fn'
+      path: '/reference/$fn'
+      fullPath: '/docs/reference/$fn'
+      preLoaderRoute: typeof DocsReferenceFnRouteImport
+      parentRoute: typeof DocsRoute
+    }
   }
 }
 
+interface DocsRouteChildren {
+  DocsAssessmentRoute: typeof DocsAssessmentRoute
+  DocsExamplesRoute: typeof DocsExamplesRoute
+  DocsFixingRoute: typeof DocsFixingRoute
+  DocsInstallationRoute: typeof DocsInstallationRoute
+  DocsProfilingRoute: typeof DocsProfilingRoute
+  DocsQuickstartRoute: typeof DocsQuickstartRoute
+  DocsReportsRoute: typeof DocsReportsRoute
+  DocsIndexRoute: typeof DocsIndexRoute
+  DocsReferenceFnRoute: typeof DocsReferenceFnRoute
+  DocsReferenceIndexRoute: typeof DocsReferenceIndexRoute
+}
+
+const DocsRouteChildren: DocsRouteChildren = {
+  DocsAssessmentRoute: DocsAssessmentRoute,
+  DocsExamplesRoute: DocsExamplesRoute,
+  DocsFixingRoute: DocsFixingRoute,
+  DocsInstallationRoute: DocsInstallationRoute,
+  DocsProfilingRoute: DocsProfilingRoute,
+  DocsQuickstartRoute: DocsQuickstartRoute,
+  DocsReportsRoute: DocsReportsRoute,
+  DocsIndexRoute: DocsIndexRoute,
+  DocsReferenceFnRoute: DocsReferenceFnRoute,
+  DocsReferenceIndexRoute: DocsReferenceIndexRoute,
+}
+
+const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BenchmarksRoute: BenchmarksRoute,
+  ChangelogRoute: ChangelogRoute,
+  ContributingRoute: ContributingRoute,
+  DocsRoute: DocsRouteWithChildren,
+  EcosystemRoute: EcosystemRoute,
+  RoadmapRoute: RoadmapRoute,
+  ExamplesSlugRoute: ExamplesSlugRoute,
+  ExamplesIndexRoute: ExamplesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
