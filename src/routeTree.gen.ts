@@ -19,6 +19,8 @@ import { Route as DocsInstallationRouteImport } from './routes/docs.installation
 import { Route as DocsFixingRouteImport } from './routes/docs.fixing'
 import { Route as DocsExamplesRouteImport } from './routes/docs.examples'
 import { Route as DocsAssessmentRouteImport } from './routes/docs.assessment'
+import { Route as DocsReferenceIndexRouteImport } from './routes/docs.reference.index'
+import { Route as DocsReferenceFnRouteImport } from './routes/docs.reference.$fn'
 
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
@@ -70,6 +72,16 @@ const DocsAssessmentRoute = DocsAssessmentRouteImport.update({
   path: '/assessment',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsReferenceIndexRoute = DocsReferenceIndexRouteImport.update({
+  id: '/reference/',
+  path: '/reference/',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsReferenceFnRoute = DocsReferenceFnRouteImport.update({
+  id: '/reference/$fn',
+  path: '/reference/$fn',
+  getParentRoute: () => DocsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +94,8 @@ export interface FileRoutesByFullPath {
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/docs/reports': typeof DocsReportsRoute
   '/docs/': typeof DocsIndexRoute
+  '/docs/reference/$fn': typeof DocsReferenceFnRoute
+  '/docs/reference/': typeof DocsReferenceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,6 +107,8 @@ export interface FileRoutesByTo {
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/docs/reports': typeof DocsReportsRoute
   '/docs': typeof DocsIndexRoute
+  '/docs/reference/$fn': typeof DocsReferenceFnRoute
+  '/docs/reference': typeof DocsReferenceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,6 +122,8 @@ export interface FileRoutesById {
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/docs/reports': typeof DocsReportsRoute
   '/docs/': typeof DocsIndexRoute
+  '/docs/reference/$fn': typeof DocsReferenceFnRoute
+  '/docs/reference/': typeof DocsReferenceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,6 +138,8 @@ export interface FileRouteTypes {
     | '/docs/quickstart'
     | '/docs/reports'
     | '/docs/'
+    | '/docs/reference/$fn'
+    | '/docs/reference/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -131,6 +151,8 @@ export interface FileRouteTypes {
     | '/docs/quickstart'
     | '/docs/reports'
     | '/docs'
+    | '/docs/reference/$fn'
+    | '/docs/reference'
   id:
     | '__root__'
     | '/'
@@ -143,6 +165,8 @@ export interface FileRouteTypes {
     | '/docs/quickstart'
     | '/docs/reports'
     | '/docs/'
+    | '/docs/reference/$fn'
+    | '/docs/reference/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -222,6 +246,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsAssessmentRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/reference/': {
+      id: '/docs/reference/'
+      path: '/reference'
+      fullPath: '/docs/reference/'
+      preLoaderRoute: typeof DocsReferenceIndexRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/reference/$fn': {
+      id: '/docs/reference/$fn'
+      path: '/reference/$fn'
+      fullPath: '/docs/reference/$fn'
+      preLoaderRoute: typeof DocsReferenceFnRouteImport
+      parentRoute: typeof DocsRoute
+    }
   }
 }
 
@@ -234,6 +272,8 @@ interface DocsRouteChildren {
   DocsQuickstartRoute: typeof DocsQuickstartRoute
   DocsReportsRoute: typeof DocsReportsRoute
   DocsIndexRoute: typeof DocsIndexRoute
+  DocsReferenceFnRoute: typeof DocsReferenceFnRoute
+  DocsReferenceIndexRoute: typeof DocsReferenceIndexRoute
 }
 
 const DocsRouteChildren: DocsRouteChildren = {
@@ -245,6 +285,8 @@ const DocsRouteChildren: DocsRouteChildren = {
   DocsQuickstartRoute: DocsQuickstartRoute,
   DocsReportsRoute: DocsReportsRoute,
   DocsIndexRoute: DocsIndexRoute,
+  DocsReferenceFnRoute: DocsReferenceFnRoute,
+  DocsReferenceIndexRoute: DocsReferenceIndexRoute,
 }
 
 const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
