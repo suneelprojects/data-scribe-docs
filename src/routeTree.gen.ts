@@ -12,8 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as DocsReportsRouteImport } from './routes/docs.reports'
 import { Route as DocsQuickstartRouteImport } from './routes/docs.quickstart'
+import { Route as DocsProfilingRouteImport } from './routes/docs.profiling'
 import { Route as DocsInstallationRouteImport } from './routes/docs.installation'
+import { Route as DocsFixingRouteImport } from './routes/docs.fixing'
+import { Route as DocsExamplesRouteImport } from './routes/docs.examples'
+import { Route as DocsAssessmentRouteImport } from './routes/docs.assessment'
 
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
@@ -30,9 +35,19 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsReportsRoute = DocsReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => DocsRoute,
+} as any)
 const DocsQuickstartRoute = DocsQuickstartRouteImport.update({
   id: '/quickstart',
   path: '/quickstart',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsProfilingRoute = DocsProfilingRouteImport.update({
+  id: '/profiling',
+  path: '/profiling',
   getParentRoute: () => DocsRoute,
 } as any)
 const DocsInstallationRoute = DocsInstallationRouteImport.update({
@@ -40,26 +55,56 @@ const DocsInstallationRoute = DocsInstallationRouteImport.update({
   path: '/installation',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsFixingRoute = DocsFixingRouteImport.update({
+  id: '/fixing',
+  path: '/fixing',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsExamplesRoute = DocsExamplesRouteImport.update({
+  id: '/examples',
+  path: '/examples',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsAssessmentRoute = DocsAssessmentRouteImport.update({
+  id: '/assessment',
+  path: '/assessment',
+  getParentRoute: () => DocsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/docs/assessment': typeof DocsAssessmentRoute
+  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/fixing': typeof DocsFixingRoute
   '/docs/installation': typeof DocsInstallationRoute
+  '/docs/profiling': typeof DocsProfilingRoute
   '/docs/quickstart': typeof DocsQuickstartRoute
+  '/docs/reports': typeof DocsReportsRoute
   '/docs/': typeof DocsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/docs/assessment': typeof DocsAssessmentRoute
+  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/fixing': typeof DocsFixingRoute
   '/docs/installation': typeof DocsInstallationRoute
+  '/docs/profiling': typeof DocsProfilingRoute
   '/docs/quickstart': typeof DocsQuickstartRoute
+  '/docs/reports': typeof DocsReportsRoute
   '/docs': typeof DocsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/docs/assessment': typeof DocsAssessmentRoute
+  '/docs/examples': typeof DocsExamplesRoute
+  '/docs/fixing': typeof DocsFixingRoute
   '/docs/installation': typeof DocsInstallationRoute
+  '/docs/profiling': typeof DocsProfilingRoute
   '/docs/quickstart': typeof DocsQuickstartRoute
+  '/docs/reports': typeof DocsReportsRoute
   '/docs/': typeof DocsIndexRoute
 }
 export interface FileRouteTypes {
@@ -67,17 +112,36 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/docs'
+    | '/docs/assessment'
+    | '/docs/examples'
+    | '/docs/fixing'
     | '/docs/installation'
+    | '/docs/profiling'
     | '/docs/quickstart'
+    | '/docs/reports'
     | '/docs/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/docs/installation' | '/docs/quickstart' | '/docs'
+  to:
+    | '/'
+    | '/docs/assessment'
+    | '/docs/examples'
+    | '/docs/fixing'
+    | '/docs/installation'
+    | '/docs/profiling'
+    | '/docs/quickstart'
+    | '/docs/reports'
+    | '/docs'
   id:
     | '__root__'
     | '/'
     | '/docs'
+    | '/docs/assessment'
+    | '/docs/examples'
+    | '/docs/fixing'
     | '/docs/installation'
+    | '/docs/profiling'
     | '/docs/quickstart'
+    | '/docs/reports'
     | '/docs/'
   fileRoutesById: FileRoutesById
 }
@@ -109,11 +173,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/reports': {
+      id: '/docs/reports'
+      path: '/reports'
+      fullPath: '/docs/reports'
+      preLoaderRoute: typeof DocsReportsRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/docs/quickstart': {
       id: '/docs/quickstart'
       path: '/quickstart'
       fullPath: '/docs/quickstart'
       preLoaderRoute: typeof DocsQuickstartRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/profiling': {
+      id: '/docs/profiling'
+      path: '/profiling'
+      fullPath: '/docs/profiling'
+      preLoaderRoute: typeof DocsProfilingRouteImport
       parentRoute: typeof DocsRoute
     }
     '/docs/installation': {
@@ -123,18 +201,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsInstallationRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/fixing': {
+      id: '/docs/fixing'
+      path: '/fixing'
+      fullPath: '/docs/fixing'
+      preLoaderRoute: typeof DocsFixingRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/examples': {
+      id: '/docs/examples'
+      path: '/examples'
+      fullPath: '/docs/examples'
+      preLoaderRoute: typeof DocsExamplesRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/assessment': {
+      id: '/docs/assessment'
+      path: '/assessment'
+      fullPath: '/docs/assessment'
+      preLoaderRoute: typeof DocsAssessmentRouteImport
+      parentRoute: typeof DocsRoute
+    }
   }
 }
 
 interface DocsRouteChildren {
+  DocsAssessmentRoute: typeof DocsAssessmentRoute
+  DocsExamplesRoute: typeof DocsExamplesRoute
+  DocsFixingRoute: typeof DocsFixingRoute
   DocsInstallationRoute: typeof DocsInstallationRoute
+  DocsProfilingRoute: typeof DocsProfilingRoute
   DocsQuickstartRoute: typeof DocsQuickstartRoute
+  DocsReportsRoute: typeof DocsReportsRoute
   DocsIndexRoute: typeof DocsIndexRoute
 }
 
 const DocsRouteChildren: DocsRouteChildren = {
+  DocsAssessmentRoute: DocsAssessmentRoute,
+  DocsExamplesRoute: DocsExamplesRoute,
+  DocsFixingRoute: DocsFixingRoute,
   DocsInstallationRoute: DocsInstallationRoute,
+  DocsProfilingRoute: DocsProfilingRoute,
   DocsQuickstartRoute: DocsQuickstartRoute,
+  DocsReportsRoute: DocsReportsRoute,
   DocsIndexRoute: DocsIndexRoute,
 }
 
