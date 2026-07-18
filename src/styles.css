@@ -214,3 +214,13 @@
   border-radius: 0.25rem;
   border: 1px solid var(--color-border);
 }
+
+/* Syntax highlighting token classes (used by src/lib/highlight.ts) */
+.tk-comment { color: var(--color-syntax-comment); font-style: italic; }
+.tk-keyword { color: var(--color-syntax-keyword); }
+.tk-string { color: var(--color-syntax-string); }
+.tk-number { color: var(--color-syntax-number); }
+.tk-func { color: var(--color-syntax-func); }
+.tk-builtin { color: var(--color-syntax-builtin); }
+.tk-op { color: var(--color-syntax-op); }
+.tk-prompt { color: var(--color-syntax-prompt); font-weight: 600; }
