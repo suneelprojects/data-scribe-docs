@@ -53,7 +53,7 @@ function ExamplePage() {
             <span className="text-xs text-muted-foreground">{ex.dataset.rows}</span>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
-            {ex.dataset.columns.map((c) => (
+            {ex.dataset.columns.map((c: string) => (
               <span
                 key={c}
                 className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground"

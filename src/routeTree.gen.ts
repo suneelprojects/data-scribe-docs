@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as ExamplesSlugRouteImport } from './routes/examples.$slug'
 import { Route as DocsReportsRouteImport } from './routes/docs.reports'
 import { Route as DocsQuickstartRouteImport } from './routes/docs.quickstart'
 import { Route as DocsProfilingRouteImport } from './routes/docs.profiling'
@@ -32,10 +34,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExamplesIndexRoute = ExamplesIndexRouteImport.update({
+  id: '/examples/',
+  path: '/examples/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsIndexRoute = DocsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DocsRoute,
+} as any)
+const ExamplesSlugRoute = ExamplesSlugRouteImport.update({
+  id: '/examples/$slug',
+  path: '/examples/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DocsReportsRoute = DocsReportsRouteImport.update({
   id: '/reports',
@@ -93,7 +105,9 @@ export interface FileRoutesByFullPath {
   '/docs/profiling': typeof DocsProfilingRoute
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/docs/reports': typeof DocsReportsRoute
+  '/examples/$slug': typeof ExamplesSlugRoute
   '/docs/': typeof DocsIndexRoute
+  '/examples/': typeof ExamplesIndexRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference/': typeof DocsReferenceIndexRoute
 }
@@ -106,7 +120,9 @@ export interface FileRoutesByTo {
   '/docs/profiling': typeof DocsProfilingRoute
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/docs/reports': typeof DocsReportsRoute
+  '/examples/$slug': typeof ExamplesSlugRoute
   '/docs': typeof DocsIndexRoute
+  '/examples': typeof ExamplesIndexRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference': typeof DocsReferenceIndexRoute
 }
@@ -121,7 +137,9 @@ export interface FileRoutesById {
   '/docs/profiling': typeof DocsProfilingRoute
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/docs/reports': typeof DocsReportsRoute
+  '/examples/$slug': typeof ExamplesSlugRoute
   '/docs/': typeof DocsIndexRoute
+  '/examples/': typeof ExamplesIndexRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference/': typeof DocsReferenceIndexRoute
 }
@@ -137,7 +155,9 @@ export interface FileRouteTypes {
     | '/docs/profiling'
     | '/docs/quickstart'
     | '/docs/reports'
+    | '/examples/$slug'
     | '/docs/'
+    | '/examples/'
     | '/docs/reference/$fn'
     | '/docs/reference/'
   fileRoutesByTo: FileRoutesByTo
@@ -150,7 +170,9 @@ export interface FileRouteTypes {
     | '/docs/profiling'
     | '/docs/quickstart'
     | '/docs/reports'
+    | '/examples/$slug'
     | '/docs'
+    | '/examples'
     | '/docs/reference/$fn'
     | '/docs/reference'
   id:
@@ -164,7 +186,9 @@ export interface FileRouteTypes {
     | '/docs/profiling'
     | '/docs/quickstart'
     | '/docs/reports'
+    | '/examples/$slug'
     | '/docs/'
+    | '/examples/'
     | '/docs/reference/$fn'
     | '/docs/reference/'
   fileRoutesById: FileRoutesById
@@ -172,6 +196,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DocsRoute: typeof DocsRouteWithChildren
+  ExamplesSlugRoute: typeof ExamplesSlugRoute
+  ExamplesIndexRoute: typeof ExamplesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -190,12 +216,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/examples/': {
+      id: '/examples/'
+      path: '/examples'
+      fullPath: '/examples/'
+      preLoaderRoute: typeof ExamplesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs/': {
       id: '/docs/'
       path: '/'
       fullPath: '/docs/'
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof DocsRoute
+    }
+    '/examples/$slug': {
+      id: '/examples/$slug'
+      path: '/examples/$slug'
+      fullPath: '/examples/$slug'
+      preLoaderRoute: typeof ExamplesSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/docs/reports': {
       id: '/docs/reports'
@@ -294,6 +334,8 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DocsRoute: DocsRouteWithChildren,
+  ExamplesSlugRoute: ExamplesSlugRoute,
+  ExamplesIndexRoute: ExamplesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
