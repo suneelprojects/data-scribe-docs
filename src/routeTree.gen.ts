@@ -9,7 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
+import { Route as EcosystemRouteImport } from './routes/ecosystem'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as ContributingRouteImport } from './routes/contributing'
+import { Route as ChangelogRouteImport } from './routes/changelog'
+import { Route as BenchmarksRouteImport } from './routes/benchmarks'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
@@ -24,9 +29,34 @@ import { Route as DocsAssessmentRouteImport } from './routes/docs.assessment'
 import { Route as DocsReferenceIndexRouteImport } from './routes/docs.reference.index'
 import { Route as DocsReferenceFnRouteImport } from './routes/docs.reference.$fn'
 
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EcosystemRoute = EcosystemRouteImport.update({
+  id: '/ecosystem',
+  path: '/ecosystem',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContributingRoute = ContributingRouteImport.update({
+  id: '/contributing',
+  path: '/contributing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BenchmarksRoute = BenchmarksRouteImport.update({
+  id: '/benchmarks',
+  path: '/benchmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -97,7 +127,12 @@ const DocsReferenceFnRoute = DocsReferenceFnRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/benchmarks': typeof BenchmarksRoute
+  '/changelog': typeof ChangelogRoute
+  '/contributing': typeof ContributingRoute
   '/docs': typeof DocsRouteWithChildren
+  '/ecosystem': typeof EcosystemRoute
+  '/roadmap': typeof RoadmapRoute
   '/docs/assessment': typeof DocsAssessmentRoute
   '/docs/examples': typeof DocsExamplesRoute
   '/docs/fixing': typeof DocsFixingRoute
@@ -113,6 +148,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/benchmarks': typeof BenchmarksRoute
+  '/changelog': typeof ChangelogRoute
+  '/contributing': typeof ContributingRoute
+  '/ecosystem': typeof EcosystemRoute
+  '/roadmap': typeof RoadmapRoute
   '/docs/assessment': typeof DocsAssessmentRoute
   '/docs/examples': typeof DocsExamplesRoute
   '/docs/fixing': typeof DocsFixingRoute
@@ -129,7 +169,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/benchmarks': typeof BenchmarksRoute
+  '/changelog': typeof ChangelogRoute
+  '/contributing': typeof ContributingRoute
   '/docs': typeof DocsRouteWithChildren
+  '/ecosystem': typeof EcosystemRoute
+  '/roadmap': typeof RoadmapRoute
   '/docs/assessment': typeof DocsAssessmentRoute
   '/docs/examples': typeof DocsExamplesRoute
   '/docs/fixing': typeof DocsFixingRoute
@@ -147,7 +192,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/benchmarks'
+    | '/changelog'
+    | '/contributing'
     | '/docs'
+    | '/ecosystem'
+    | '/roadmap'
     | '/docs/assessment'
     | '/docs/examples'
     | '/docs/fixing'
@@ -163,6 +213,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/benchmarks'
+    | '/changelog'
+    | '/contributing'
+    | '/ecosystem'
+    | '/roadmap'
     | '/docs/assessment'
     | '/docs/examples'
     | '/docs/fixing'
@@ -178,7 +233,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/benchmarks'
+    | '/changelog'
+    | '/contributing'
     | '/docs'
+    | '/ecosystem'
+    | '/roadmap'
     | '/docs/assessment'
     | '/docs/examples'
     | '/docs/fixing'
@@ -195,18 +255,58 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BenchmarksRoute: typeof BenchmarksRoute
+  ChangelogRoute: typeof ChangelogRoute
+  ContributingRoute: typeof ContributingRoute
   DocsRoute: typeof DocsRouteWithChildren
+  EcosystemRoute: typeof EcosystemRoute
+  RoadmapRoute: typeof RoadmapRoute
   ExamplesSlugRoute: typeof ExamplesSlugRoute
   ExamplesIndexRoute: typeof ExamplesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ecosystem': {
+      id: '/ecosystem'
+      path: '/ecosystem'
+      fullPath: '/ecosystem'
+      preLoaderRoute: typeof EcosystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs': {
       id: '/docs'
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contributing': {
+      id: '/contributing'
+      path: '/contributing'
+      fullPath: '/contributing'
+      preLoaderRoute: typeof ContributingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/benchmarks': {
+      id: '/benchmarks'
+      path: '/benchmarks'
+      fullPath: '/benchmarks'
+      preLoaderRoute: typeof BenchmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -333,7 +433,12 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BenchmarksRoute: BenchmarksRoute,
+  ChangelogRoute: ChangelogRoute,
+  ContributingRoute: ContributingRoute,
   DocsRoute: DocsRouteWithChildren,
+  EcosystemRoute: EcosystemRoute,
+  RoadmapRoute: RoadmapRoute,
   ExamplesSlugRoute: ExamplesSlugRoute,
   ExamplesIndexRoute: ExamplesIndexRoute,
 }
