@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
         content:
           "Assess, fix and profile datasets with a Pythonic API. CSV, Excel and pandas.DataFrame support out of the box.",
       },
-      { property: "og:title", content: "EazyDataFix" },
+      { property: "og:title", content: "EazyDataFix — Open-source data quality & cleaning for Python" },
       {
         property: "og:description",
         content:

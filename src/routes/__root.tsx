@@ -80,21 +80,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EazyDataFix — Data Quality & Cleaning for Python" },
+      { title: "EazyDataFix — Open-source data quality & cleaning for Python" },
       {
         name: "description",
         content:
-          "Open-source Python library for automated data quality assessment, cleaning, profiling and reporting.",
+          "Assess, fix and profile datasets with a Pythonic API. CSV, Excel and pandas.DataFrame support out of the box.",
       },
       { name: "author", content: "Suneel Kumar Kola" },
-      { property: "og:title", content: "EazyDataFix — Data Quality & Cleaning for Python" },
+      { property: "og:title", content: "EazyDataFix — Open-source data quality & cleaning for Python" },
       {
         property: "og:description",
         content:
-          "Open-source Python library for automated data quality assessment, cleaning, profiling and reporting.",
+          "Assess, fix and profile datasets with a Pythonic API. CSV, Excel and pandas.DataFrame support out of the box.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "EazyDataFix — Open-source data quality & cleaning for Python" },
+      { name: "twitter:description", content: "Assess, fix and profile datasets with a Pythonic API. CSV, Excel and pandas.DataFrame support out of the box." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fb069550-00d5-4477-b3c3-44ccba187177/id-preview-fcd7c222--a1c93004-6948-443f-8cff-90bad9ac84ed.lovable.app-1784389587623.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fb069550-00d5-4477-b3c3-44ccba187177/id-preview-fcd7c222--a1c93004-6948-443f-8cff-90bad9ac84ed.lovable.app-1784389587623.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
