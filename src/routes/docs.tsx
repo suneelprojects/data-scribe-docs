@@ -14,8 +14,8 @@ function DocsLayout() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6">
-      <div className="grid gap-8 py-8 lg:grid-cols-[220px_minmax(0,1fr)_200px]">
+    <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8">
+      <div className="grid py-8 gap-6 lg:gap-8 lg:grid-cols-[220px_minmax(0,1fr)_220px] xl:grid-cols-[220px_minmax(0,1fr)_240px]">
         {/* Left sidebar (desktop) */}
         <aside className="hidden lg:block">
           <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-2">
