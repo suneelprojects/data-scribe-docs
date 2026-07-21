@@ -16,16 +16,16 @@ export function VersionSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-mono text-foreground transition-colors hover:bg-muted">
+      <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-mono text-foreground transition-colors hover:bg-muted">
         <span>{active.label}</span>
         {active.status === "latest" && (
-          <span className="ml-1 rounded bg-accent/15 px-1.5 py-0.5 text-[10px] font-sans font-medium text-accent">
-            latest
+          <span className="rounded bg-accent/15 px-1.5 py-0.5 text-[10px] font-sans font-medium text-accent">
+            Latest Stable
           </span>
         )}
         <ChevronDown className="h-3 w-3 opacity-60" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-48">
+      <DropdownMenuContent align="start" className="w-56">
         <DropdownMenuLabel className="text-xs">Version</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {versions.map((v) => (
@@ -44,7 +44,7 @@ export function VersionSwitcher() {
               {v.label}
             </span>
             <span className="text-[10px] font-sans text-muted-foreground">
-              {v.status === "latest" ? "stable" : "planned"}
+              {v.status === "latest" ? "Latest Stable" : "Planned"}
             </span>
           </DropdownMenuItem>
         ))}
