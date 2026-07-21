@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BadgeCheck, CheckCircle2, Cpu, Github, Sparkles, Timer } from "lucide-react";
+import { ArrowRight, BadgeCheck, CheckCircle2, Cpu, Github, Package, Sparkles, Timer } from "lucide-react";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ReplBlock } from "@/components/ReplBlock";
 import { InstallChip } from "@/components/InstallChip";
@@ -49,14 +49,22 @@ function Home() {
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-2.5 py-1 text-[11px] font-mono text-muted-foreground">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
-              v0.1.0 · initial release
+              v0.2.1
+              <span className="rounded bg-accent/15 px-1.5 py-0.5 text-[10px] font-sans font-medium text-accent">
+                latest
+              </span>
+              <span className="font-sans">· Latest Stable Release</span>
             </div>
             <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
               EazyDataFix
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Open-source Python library for data quality assessment and automated data cleaning.
-              Three functions, zero configuration, and a report you can trust.
+              Open-source Python library for data profiling, data quality assessment, validation,
+              and automated data cleaning. Generate professional reports with minimal code using
+              simple, intuitive APIs.
+            </p>
+            <p className="mt-3 max-w-xl text-xs text-muted-foreground/80">
+              Supports Console, HTML, PDF, Excel, CSV, JSON and Markdown reports.
             </p>
 
             <div className="mt-6">
@@ -80,24 +88,66 @@ function Home() {
                 <Github className="h-3.5 w-3.5" />
                 GitHub
               </a>
+              <a
+                href="https://pypi.org/project/eazydatafix/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              >
+                <Package className="h-3.5 w-3.5" />
+                PyPI
+              </a>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
-              <span>MIT License</span>
-              <span>·</span>
-              <span>Python 3.9+</span>
-              <span>·</span>
-              <span>Zero required dependencies beyond pandas</span>
+            <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+              {["MIT License", "Python 3.9+", "Zero configuration", "Pandas-based"].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
+                  {t}
+                </span>
+              ))}
             </div>
           </div>
 
           <CodeBlock
-            code={`import eazydatafix as edf\n\nreport = edf.assess("employees.csv")\nreport.summary()\n\nresult = edf.fix("employees.csv")\nresult.applied_fixes\nresult.to_csv("clean.csv")`}
+            code={`import eazydatafix as edf\n\nreport = edf.assess("employees.csv")\nreport.summary()\n\nresult = edf.fix("employees.csv")\nresult.save("clean.csv")`}
             filename="main.py"
             showLineNumbers
           />
         </div>
       </section>
+
+      {/* Core APIs (highlight) */}
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground">Core APIs</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Four functions cover the full profile → assess → fix → ship workflow.
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: "📊", name: "profile()", desc: "Understand your dataset structure." },
+              { icon: "✅", name: "assess()", desc: "Measure data quality." },
+              { icon: "🧹", name: "fix()", desc: "Automatically clean datasets." },
+              { icon: "🚀", name: "analysis_ready()", desc: "Prepare datasets for analytics and machine learning." },
+            ].map((c) => (
+              <div
+                key={c.name}
+                className="rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent"
+              >
+                <div className="text-lg leading-none">{c.icon}</div>
+                <div className="mt-3 font-mono text-sm">
+                  <span className="text-muted-foreground">edf.</span>
+                  <span className="text-accent">{c.name.replace("()", "")}</span>
+                  <span className="text-muted-foreground">()</span>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">{c.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
 
       {/* Why */}
       <section className="border-b border-border">
