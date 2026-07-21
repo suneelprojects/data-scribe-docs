@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BadgeCheck, CheckCircle2, Cpu, Github, Sparkles, Timer } from "lucide-react";
+import { ArrowRight, BadgeCheck, CheckCircle2, Cpu, Github, Package, Sparkles, Timer } from "lucide-react";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ReplBlock } from "@/components/ReplBlock";
 import { InstallChip } from "@/components/InstallChip";
