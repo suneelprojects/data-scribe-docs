@@ -35,8 +35,9 @@ export function SiteHeader() {
           </span>
           <span className="font-semibold tracking-tight">EazyDataFix</span>
           <span className="hidden font-mono text-[11px] text-muted-foreground sm:inline">
-            v0.1.0
+            v0.3.0
           </span>
+
         </Link>
 
         <div className="hidden lg:block">
