@@ -18,6 +18,7 @@ import { Route as BenchmarksRouteImport } from './routes/benchmarks'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as ReleasesV030RouteImport } from './routes/releases.v0-3-0'
 import { Route as ExamplesSlugRouteImport } from './routes/examples.$slug'
 import { Route as DocsReportsRouteImport } from './routes/docs.reports'
 import { Route as DocsQuickstartRouteImport } from './routes/docs.quickstart'
@@ -73,6 +74,11 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DocsRoute,
+} as any)
+const ReleasesV030Route = ReleasesV030RouteImport.update({
+  id: '/releases/v0-3-0',
+  path: '/releases/v0-3-0',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ExamplesSlugRoute = ExamplesSlugRouteImport.update({
   id: '/examples/$slug',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/docs/reports': typeof DocsReportsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
+  '/releases/v0-3-0': typeof ReleasesV030Route
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/docs/reports': typeof DocsReportsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
+  '/releases/v0-3-0': typeof ReleasesV030Route
   '/docs': typeof DocsIndexRoute
   '/examples': typeof ExamplesIndexRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/docs/quickstart': typeof DocsQuickstartRoute
   '/docs/reports': typeof DocsReportsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
+  '/releases/v0-3-0': typeof ReleasesV030Route
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/docs/quickstart'
     | '/docs/reports'
     | '/examples/$slug'
+    | '/releases/v0-3-0'
     | '/docs/'
     | '/examples/'
     | '/docs/reference/$fn'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/docs/quickstart'
     | '/docs/reports'
     | '/examples/$slug'
+    | '/releases/v0-3-0'
     | '/docs'
     | '/examples'
     | '/docs/reference/$fn'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/docs/quickstart'
     | '/docs/reports'
     | '/examples/$slug'
+    | '/releases/v0-3-0'
     | '/docs/'
     | '/examples/'
     | '/docs/reference/$fn'
@@ -262,6 +274,7 @@ export interface RootRouteChildren {
   EcosystemRoute: typeof EcosystemRoute
   RoadmapRoute: typeof RoadmapRoute
   ExamplesSlugRoute: typeof ExamplesSlugRoute
+  ReleasesV030Route: typeof ReleasesV030Route
   ExamplesIndexRoute: typeof ExamplesIndexRoute
 }
 
@@ -329,6 +342,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/docs/'
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof DocsRoute
+    }
+    '/releases/v0-3-0': {
+      id: '/releases/v0-3-0'
+      path: '/releases/v0-3-0'
+      fullPath: '/releases/v0-3-0'
+      preLoaderRoute: typeof ReleasesV030RouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/examples/$slug': {
       id: '/examples/$slug'
@@ -440,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   EcosystemRoute: EcosystemRoute,
   RoadmapRoute: RoadmapRoute,
   ExamplesSlugRoute: ExamplesSlugRoute,
+  ReleasesV030Route: ReleasesV030Route,
   ExamplesIndexRoute: ExamplesIndexRoute,
 }
 export const routeTree = rootRouteImport
