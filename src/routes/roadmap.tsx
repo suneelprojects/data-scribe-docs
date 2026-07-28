@@ -31,15 +31,20 @@ const milestones: {
   },
   {
     version: "v0.2",
-    title: "New data sources",
-    status: "Planned",
-    items: ["JSON support", "Parquet support", "SQLite connector"],
+    title: "Reports and formats",
+    status: "Shipped",
+    items: ["PDF, Excel, CSV, Markdown reports", "Console-friendly summary"],
   },
   {
     version: "v0.3",
-    title: "AI-assisted cleaning",
-    status: "Planned",
-    items: ["Smart recommendations", "Column semantic-type inference", "Natural-language rules"],
+    title: "Deterministic Agentic EDA",
+    status: "Shipped",
+    items: [
+      "edf.eda(), edf.plan_eda(), edf.execute_eda()",
+      "edf.run_agentic_eda() end-to-end workflow",
+      "Semantic role detection & traceable findings",
+      "HTML, JSON, Markdown and PNG report exports",
+    ],
   },
   {
     version: "v1.0",
@@ -47,6 +52,7 @@ const milestones: {
     status: "Later",
     items: ["Enterprise connectors", "Spark backend", "Cloud storage", "REST API"],
   },
+
 ];
 
 function statusColor(s: "Shipped" | "Planned" | "Later") {

@@ -21,7 +21,13 @@ export const searchIndex: SearchEntry[] = [
   { title: "assess()", section: "Reference", url: "/docs/reference/assess", description: "Assess dataset quality", keywords: ["quality", "score"] },
   { title: "fix()", section: "Reference", url: "/docs/reference/fix", description: "Automatically clean a dataset", keywords: ["clean", "repair"] },
   { title: "profile()", section: "Reference", url: "/docs/reference/profile", description: "Generate a full column profile", keywords: ["stats"] },
+  { title: "eda()", section: "Reference", url: "/releases/v0-3-0#deterministic-eda", description: "Deterministic exploratory data analysis", keywords: ["eda", "0.3"] },
+  { title: "plan_eda()", section: "Reference", url: "/releases/v0-3-0#planner", description: "Reproducible follow-up analysis plan", keywords: ["plan", "0.3"] },
+  { title: "execute_eda()", section: "Reference", url: "/releases/v0-3-0#executor", description: "Execute selected EDA steps", keywords: ["execute", "0.3"] },
+  { title: "run_agentic_eda()", section: "Reference", url: "/releases/v0-3-0#orchestrator", description: "Run the complete Agentic EDA workflow", keywords: ["agentic", "0.3"] },
+  { title: "export_agentic_eda_report()", section: "Reference", url: "/releases/v0-3-0#report-export", description: "Export HTML, JSON, Markdown and PNG reports", keywords: ["report", "0.3"] },
 
+  { title: "v0.3.0 Release Notes", section: "Meta", url: "/releases/v0-3-0", description: "Deterministic Agentic EDA release", keywords: ["release", "0.3", "agentic"] },
   { title: "Roadmap", section: "Meta", url: "/roadmap", description: "What's coming next" },
   { title: "Changelog", section: "Meta", url: "/changelog", description: "Release notes" },
   { title: "Benchmarks", section: "Meta", url: "/benchmarks", description: "Performance comparisons" },
