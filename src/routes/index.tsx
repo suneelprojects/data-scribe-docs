@@ -244,7 +244,8 @@ function Home() {
               <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
                 Analyse datasets, create deterministic execution plans, run reproducible EDA
                 workflows, generate traceable follow-up recommendations, and export HTML, JSON,
-                Markdown, and PNG reports.
+                Markdown, and PNG reports. EazyDataFix v0.3.0 does not require an LLM — optional
+                grounded AI explanations are planned for a future release.
               </p>
 
               <div className="mt-5 flex flex-wrap items-center gap-2">
