@@ -33,8 +33,8 @@ function DocsIndex() {
       <div id="doc-content" className="prose-doc">
         <h2 id="installation">Installation</h2>
         <p>
-          EazyDataFix is on PyPI and supports Python 3.9+. Install with pip in the environment of
-          your choice — a virtualenv is recommended.
+          EazyDataFix is on PyPI and requires Python 3.10 or later (tested with Python 3.10–3.13).
+          Install with pip in the environment of your choice — a virtualenv is recommended.
         </p>
         <pre className="not-prose overflow-hidden rounded-lg border border-border bg-[color:var(--color-syntax-bg)] p-4 font-mono text-sm text-[color:var(--color-syntax-fg)]">
           <span className="tk-prompt">$</span> pip install eazydatafix
@@ -48,7 +48,7 @@ function DocsIndex() {
         </p>
 
         <h2 id="core-apis">Core APIs</h2>
-        <p>Three public functions cover the entire cleaning surface:</p>
+        <p>The public API spans data quality, preparation and the deterministic Agentic EDA workflow:</p>
         <ul>
           <li>
             <Link to="/docs/reference/$fn" params={{ fn: "assess" }}>
@@ -68,6 +68,9 @@ function DocsIndex() {
             </Link>{" "}
             — column-level profiling.
           </li>
+          <li>
+            <code>edf.run_agentic_eda()</code> — end-to-end deterministic Agentic EDA (new in v0.3.0).
+          </li>
         </ul>
 
         <h2 id="examples">Examples</h2>
@@ -78,7 +81,7 @@ function DocsIndex() {
 
         <h2 id="roadmap">Roadmap</h2>
         <p>
-          v0.2 adds JSON, Parquet and SQLite connectors. v0.3 introduces AI-assisted cleaning.
+          v0.3.0 shipped Deterministic Agentic EDA. v0.4.0 is next; v0.5.0 and later are planned.
           Read the full <Link to="/roadmap">roadmap</Link>.
         </p>
 

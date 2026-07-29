@@ -24,7 +24,7 @@ const cols: { title: string; links: { label: string; to?: string; href?: string 
   {
     title: "Community",
     links: [
-      { label: "GitHub", href: "https://github.com/eazydatafix/eazydatafix" },
+      { label: "GitHub", href: "https://github.com/suneelprojects/eazydatafix" },
       { label: "PyPI", href: "https://pypi.org/project/eazydatafix/" },
       { label: "License", href: "https://opensource.org/licenses/MIT" },
       { label: "Contributing", to: "/contributing" },
@@ -90,13 +90,13 @@ export function SiteFooter() {
           <div className="flex items-center gap-4">
             <span className="font-mono">MIT License</span>
             <a
-              href="https://github.com/eazydatafix/eazydatafix"
+              href="https://github.com/suneelprojects/eazydatafix"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
             >
               <Github className="h-3 w-3" />
-              github.com/eazydatafix
+              github.com/suneelprojects/eazydatafix
             </a>
           </div>
         </div>

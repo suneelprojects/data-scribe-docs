@@ -70,7 +70,7 @@ export function SiteHeader() {
           </div>
 
           <a
-            href="https://github.com/eazydatafix/eazydatafix"
+            href="https://github.com/suneelprojects/eazydatafix"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"

@@ -20,7 +20,7 @@ const milestones: {
   items: string[];
 }[] = [
   {
-    version: "v0.1",
+    version: "v0.1.0",
     title: "Foundations",
     status: "Shipped",
     items: [
@@ -30,29 +30,42 @@ const milestones: {
     ],
   },
   {
-    version: "v0.2",
+    version: "v0.2.x",
     title: "Reports and formats",
     status: "Shipped",
     items: ["PDF, Excel, CSV, Markdown reports", "Console-friendly summary"],
   },
   {
-    version: "v0.3",
+    version: "v0.3.0",
     title: "Deterministic Agentic EDA",
     status: "Shipped",
     items: [
       "edf.eda(), edf.plan_eda(), edf.execute_eda()",
       "edf.run_agentic_eda() end-to-end workflow",
+      "edf.export_agentic_eda_report() — HTML, JSON, Markdown, PNG",
       "Semantic role detection & traceable findings",
-      "HTML, JSON, Markdown and PNG report exports",
+      "Python 3.10–3.13 support",
     ],
   },
   {
-    version: "v1.0",
-    title: "Enterprise",
-    status: "Later",
-    items: ["Enterprise connectors", "Spark backend", "Cloud storage", "REST API"],
+    version: "v0.4.0",
+    title: "Next",
+    status: "Planned",
+    items: [
+      "Broader dataset connectors and readers",
+      "Extended deterministic analyses",
+      "Report polish and additional export targets",
+    ],
   },
-
+  {
+    version: "v0.5.0+",
+    title: "Later",
+    status: "Later",
+    items: [
+      "Optional grounded AI explanations layered on top of deterministic findings",
+      "Enterprise connectors, Spark backend, cloud storage, REST API",
+    ],
+  },
 ];
 
 function statusColor(s: "Shipped" | "Planned" | "Later") {
