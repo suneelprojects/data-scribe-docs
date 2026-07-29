@@ -44,11 +44,7 @@ export function VersionSwitcher() {
               {v.label}
             </span>
             <span className="text-[10px] font-sans text-muted-foreground">
-              {v.status === "latest"
-                ? "Latest Stable"
-                : v.status === "previous"
-                  ? "Previous"
-                  : "Planned"}
+              {v.status === "latest" ? "Latest Stable" : "Planned"}
             </span>
           </DropdownMenuItem>
         ))}
