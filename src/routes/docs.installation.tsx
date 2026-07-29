@@ -7,9 +7,9 @@ export const Route = createFileRoute("/docs/installation")({
   head: () => ({
     meta: [
       { title: "Installation — EazyDataFix" },
-      { name: "description", content: "Install EazyDataFix with pip in Python 3.9+." },
+      { name: "description", content: "Install EazyDataFix with pip. Requires Python 3.10 or later; tested with Python 3.10–3.13." },
       { property: "og:title", content: "Installation — EazyDataFix" },
-      { property: "og:description", content: "Install EazyDataFix with pip." },
+      { property: "og:description", content: "Install EazyDataFix with pip. Requires Python 3.10 or later." },
     ],
   }),
   component: Installation,
@@ -21,25 +21,29 @@ function Installation() {
       <DocPageHeader
         breadcrumbs={[{ label: "Docs", to: "/docs" }, { label: "Installation" }]}
         title="Installation"
-        description="EazyDataFix is available on PyPI and supports Python 3.9 and above."
+        description="EazyDataFix is available on PyPI. Requires Python 3.10 or later; tested with Python 3.10–3.13."
       />
       <div id="doc-content" className="prose-doc">
         <h2 id="requirements">Requirements</h2>
         <ul>
-          <li>Python 3.9 or newer</li>
-          <li>pandas ≥ 1.5 (installed automatically)</li>
+          <li>Python 3.10 or later (tested on 3.10, 3.11, 3.12, 3.13)</li>
+          <li>pandas (installed automatically)</li>
           <li>openpyxl (only required for Excel input)</li>
+          <li>pyarrow (only required for Parquet input, via the optional extra)</li>
         </ul>
 
         <h2 id="install">Install with pip</h2>
         <CodeBlock code="pip install eazydatafix" language="bash" filename="terminal" showActions={false} />
+
+        <h3 id="install-parquet">With Parquet support</h3>
+        <CodeBlock code={`pip install "eazydatafix[parquet]"`} language="bash" filename="terminal" showActions={false} />
 
         <h2 id="verify">Verify the installation</h2>
         <ReplBlock
           lines={[
             { kind: "in", text: "import eazydatafix as edf" },
             { kind: "in", text: "edf.__version__" },
-            { kind: "out", text: "'0.1.0'" },
+            { kind: "out", text: "'0.3.0'" },
           ]}
         />
 

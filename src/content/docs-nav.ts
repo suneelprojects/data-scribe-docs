@@ -54,6 +54,6 @@ export const docsNav: NavGroup[] = [
 
 export const versions = [
   { label: "v0.3.0", value: "0.3.0", status: "latest" as const },
-  { label: "v0.2.1", value: "0.2.1", status: "previous" as const },
-  { label: "v1.0.0", value: "1.0.0", status: "planned" as const },
+  { label: "v0.4.0", value: "0.4.0", status: "planned" as const },
+  { label: "v0.5.0", value: "0.5.0", status: "planned" as const },
 ];
