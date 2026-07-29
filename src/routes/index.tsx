@@ -36,25 +36,25 @@ const GH_REPO_URL = "https://github.com/suneelprojects/eazydatafix";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EazyDataFix 0.3.0 — Deterministic Agentic EDA for Python" },
+      { title: "EazyDataFix | Deterministic Agentic EDA for Python" },
       {
         name: "description",
         content:
-          "EazyDataFix 0.3.0 provides deterministic EDA, semantic role detection, planning, execution, traceable recommendations, and HTML, JSON, Markdown and PNG report exports for Python.",
+          "EazyDataFix is a deterministic-first Python framework for data quality, exploratory data analysis, traceable execution, automated reporting, validation, and safe data preparation.",
       },
-      { property: "og:title", content: "EazyDataFix 0.3.0 — Deterministic Agentic EDA for Python" },
+      { property: "og:title", content: "EazyDataFix | Deterministic Agentic EDA for Python" },
       {
         property: "og:description",
         content:
-          "Deterministic Agentic EDA for Python: understand, plan, execute, decide and report — reproducibly and without an LLM.",
+          "Agentic EDA you can inspect, reproduce, and trust. Understand your dataset, plan the right analyses, execute them deterministically, and generate traceable reports — without requiring an LLM.",
       },
     ],
   }),
   component: Home,
 });
 
-const supported = ["CSV", "Excel", "pandas.DataFrame"];
-const comingSoon = ["JSON", "Parquet", "SQL", "Spark", "Polars"];
+const supported = ["CSV", "Excel", "JSON", "Parquet", "pandas.DataFrame"];
+const comingSoon = ["SQL", "Spark", "Polars"];
 
 const workflow = [
   {
@@ -159,15 +159,14 @@ function Home() {
               <span className="font-sans">· Latest Stable Release</span>
             </div>
             <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-              EazyDataFix
+              Agentic EDA you can inspect, reproduce, and trust.
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Open-source Python library for data profiling, data quality assessment, validation,
-              and automated data cleaning. Now with a deterministic Agentic EDA workflow — plan,
-              execute and report on your dataset with minimal code.
+              Understand your dataset, plan the right analyses, execute them deterministically,
+              and generate traceable reports — without requiring an LLM.
             </p>
             <p className="mt-3 max-w-xl text-xs text-muted-foreground/80">
-              Supports Console, HTML, PDF, Excel, CSV, JSON and Markdown reports.
+              EazyDataFix v0.3.0 is released. Supports Console, HTML, PDF, Excel, CSV, JSON and Markdown reports.
             </p>
 
             <div className="mt-6">
