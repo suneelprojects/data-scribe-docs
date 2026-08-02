@@ -140,7 +140,7 @@ export async function refreshPackageAnalytics() {
   const { error: cacheError } = await supabaseAdmin.from("package_analytics_cache").upsert(
     {
       package: PACKAGE,
-      data: payload as unknown as Record<string, unknown>,
+      data: payload as unknown as import("@/integrations/supabase/types").Json,
       refreshed_at: payload.refreshedAt,
     },
     { onConflict: "package" },
