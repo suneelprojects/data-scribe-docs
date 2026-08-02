@@ -15,6 +15,7 @@ import { Route as DocsRouteImport } from './routes/docs'
 import { Route as ContributingRouteImport } from './routes/contributing'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as BenchmarksRouteImport } from './routes/benchmarks'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
@@ -29,6 +30,7 @@ import { Route as DocsExamplesRouteImport } from './routes/docs.examples'
 import { Route as DocsAssessmentRouteImport } from './routes/docs.assessment'
 import { Route as DocsReferenceIndexRouteImport } from './routes/docs.reference.index'
 import { Route as DocsReferenceFnRouteImport } from './routes/docs.reference.$fn'
+import { Route as ApiPublicRefreshPackageAnalyticsRouteImport } from './routes/api/public/refresh-package-analytics'
 
 const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
@@ -58,6 +60,11 @@ const ChangelogRoute = ChangelogRouteImport.update({
 const BenchmarksRoute = BenchmarksRouteImport.update({
   id: '/benchmarks',
   path: '/benchmarks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -130,9 +137,16 @@ const DocsReferenceFnRoute = DocsReferenceFnRouteImport.update({
   path: '/reference/$fn',
   getParentRoute: () => DocsRoute,
 } as any)
+const ApiPublicRefreshPackageAnalyticsRoute =
+  ApiPublicRefreshPackageAnalyticsRouteImport.update({
+    id: '/api/public/refresh-package-analytics',
+    path: '/api/public/refresh-package-analytics',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/benchmarks': typeof BenchmarksRoute
   '/changelog': typeof ChangelogRoute
   '/contributing': typeof ContributingRoute
@@ -150,11 +164,13 @@ export interface FileRoutesByFullPath {
   '/releases/v0-3-0': typeof ReleasesV030Route
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
+  '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference/': typeof DocsReferenceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/benchmarks': typeof BenchmarksRoute
   '/changelog': typeof ChangelogRoute
   '/contributing': typeof ContributingRoute
@@ -171,12 +187,14 @@ export interface FileRoutesByTo {
   '/releases/v0-3-0': typeof ReleasesV030Route
   '/docs': typeof DocsIndexRoute
   '/examples': typeof ExamplesIndexRoute
+  '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference': typeof DocsReferenceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/benchmarks': typeof BenchmarksRoute
   '/changelog': typeof ChangelogRoute
   '/contributing': typeof ContributingRoute
@@ -194,6 +212,7 @@ export interface FileRoutesById {
   '/releases/v0-3-0': typeof ReleasesV030Route
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
+  '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference/': typeof DocsReferenceIndexRoute
 }
@@ -201,6 +220,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/analytics'
     | '/benchmarks'
     | '/changelog'
     | '/contributing'
@@ -218,11 +238,13 @@ export interface FileRouteTypes {
     | '/releases/v0-3-0'
     | '/docs/'
     | '/examples/'
+    | '/api/public/refresh-package-analytics'
     | '/docs/reference/$fn'
     | '/docs/reference/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/analytics'
     | '/benchmarks'
     | '/changelog'
     | '/contributing'
@@ -239,11 +261,13 @@ export interface FileRouteTypes {
     | '/releases/v0-3-0'
     | '/docs'
     | '/examples'
+    | '/api/public/refresh-package-analytics'
     | '/docs/reference/$fn'
     | '/docs/reference'
   id:
     | '__root__'
     | '/'
+    | '/analytics'
     | '/benchmarks'
     | '/changelog'
     | '/contributing'
@@ -261,12 +285,14 @@ export interface FileRouteTypes {
     | '/releases/v0-3-0'
     | '/docs/'
     | '/examples/'
+    | '/api/public/refresh-package-analytics'
     | '/docs/reference/$fn'
     | '/docs/reference/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
   BenchmarksRoute: typeof BenchmarksRoute
   ChangelogRoute: typeof ChangelogRoute
   ContributingRoute: typeof ContributingRoute
@@ -276,6 +302,7 @@ export interface RootRouteChildren {
   ExamplesSlugRoute: typeof ExamplesSlugRoute
   ReleasesV030Route: typeof ReleasesV030Route
   ExamplesIndexRoute: typeof ExamplesIndexRoute
+  ApiPublicRefreshPackageAnalyticsRoute: typeof ApiPublicRefreshPackageAnalyticsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -320,6 +347,13 @@ declare module '@tanstack/react-router' {
       path: '/benchmarks'
       fullPath: '/benchmarks'
       preLoaderRoute: typeof BenchmarksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -420,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsReferenceFnRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/api/public/refresh-package-analytics': {
+      id: '/api/public/refresh-package-analytics'
+      path: '/api/public/refresh-package-analytics'
+      fullPath: '/api/public/refresh-package-analytics'
+      preLoaderRoute: typeof ApiPublicRefreshPackageAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -453,6 +494,7 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
   BenchmarksRoute: BenchmarksRoute,
   ChangelogRoute: ChangelogRoute,
   ContributingRoute: ContributingRoute,
@@ -462,6 +504,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExamplesSlugRoute: ExamplesSlugRoute,
   ReleasesV030Route: ReleasesV030Route,
   ExamplesIndexRoute: ExamplesIndexRoute,
+  ApiPublicRefreshPackageAnalyticsRoute: ApiPublicRefreshPackageAnalyticsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
