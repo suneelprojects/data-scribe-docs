@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      package_analytics_cache: {
+        Row: {
+          created_at: string
+          data: Json
+          package: string
+          refreshed_at: string
+        }
+        Insert: {
+          created_at?: string
+          data: Json
+          package: string
+          refreshed_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          package?: string
+          refreshed_at?: string
+        }
+        Relationships: []
+      }
+      package_download_daily: {
+        Row: {
+          day: string
+          downloads: number
+          package: string
+          recorded_at: string
+        }
+        Insert: {
+          day: string
+          downloads?: number
+          package: string
+          recorded_at?: string
+        }
+        Update: {
+          day?: string
+          downloads?: number
+          package?: string
+          recorded_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
