@@ -14,6 +14,7 @@ const navLinks = [
   { to: "/docs/reference", label: "API Reference" },
   { to: "/examples", label: "Examples" },
   { to: "/roadmap", label: "Roadmap" },
+  { to: "/analytics", label: "Analytics" },
   { to: "/ecosystem", label: "Ecosystem" },
   { to: "/contributing", label: "Contributing" },
 ] as const;
