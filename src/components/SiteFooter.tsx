@@ -15,6 +15,7 @@ const cols: { title: string; links: { label: string; to?: string; href?: string 
   {
     title: "Project",
     links: [
+      { label: "Analytics", to: "/analytics" },
       { label: "Roadmap", to: "/roadmap" },
       { label: "Changelog", to: "/changelog" },
       { label: "Benchmarks", to: "/benchmarks" },
