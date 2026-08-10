@@ -46,7 +46,7 @@ export function SiteFooter() {
               <span className="font-semibold">EazyDataFix</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
-              Open-source Python library for automated data quality assessment and cleaning.
+              Open-source Python framework for auditable data quality, cleaning, validation and EDA.
             </p>
             <div className="mt-4">
               <InstallChip variant="compact" />
@@ -62,7 +62,10 @@ export function SiteFooter() {
                 {c.links.map((l) =>
                   l.to ? (
                     <li key={l.label}>
-                      <Link to={l.to} className="text-muted-foreground transition-colors hover:text-foreground">
+                      <Link
+                        to={l.to}
+                        className="text-muted-foreground transition-colors hover:text-foreground"
+                      >
                         {l.label}
                       </Link>
                     </li>
@@ -86,7 +89,8 @@ export function SiteFooter() {
 
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground md:flex-row md:items-center">
           <div>
-            Created &amp; Maintained by <span className="font-medium text-foreground">Suneel Kumar Kola</span>
+            Created &amp; Maintained by{" "}
+            <span className="font-medium text-foreground">Suneel Kumar Kola</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="font-mono">MIT License</span>

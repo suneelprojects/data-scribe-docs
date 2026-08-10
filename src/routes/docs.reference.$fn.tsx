@@ -26,7 +26,9 @@ export const Route = createFileRoute("/docs/reference/$fn")({
 });
 
 function RefPage() {
-  const { doc } = Route.useLoaderData();
+  const { fn } = Route.useParams();
+  const doc = allDocs.find((item) => item.slug === fn);
+  if (!doc) return null;
   return (
     <div>
       <DocPageHeader

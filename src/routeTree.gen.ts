@@ -19,6 +19,7 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as ReleasesV100RouteImport } from './routes/releases.v1-0-0'
 import { Route as ReleasesV030RouteImport } from './routes/releases.v0-3-0'
 import { Route as ExamplesSlugRouteImport } from './routes/examples.$slug'
 import { Route as DocsReportsRouteImport } from './routes/docs.reports'
@@ -81,6 +82,11 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DocsRoute,
+} as any)
+const ReleasesV100Route = ReleasesV100RouteImport.update({
+  id: '/releases/v1-0-0',
+  path: '/releases/v1-0-0',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ReleasesV030Route = ReleasesV030RouteImport.update({
   id: '/releases/v0-3-0',
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/docs/reports': typeof DocsReportsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/releases/v0-3-0': typeof ReleasesV030Route
+  '/releases/v1-0-0': typeof ReleasesV100Route
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
   '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/docs/reports': typeof DocsReportsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/releases/v0-3-0': typeof ReleasesV030Route
+  '/releases/v1-0-0': typeof ReleasesV100Route
   '/docs': typeof DocsIndexRoute
   '/examples': typeof ExamplesIndexRoute
   '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/docs/reports': typeof DocsReportsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/releases/v0-3-0': typeof ReleasesV030Route
+  '/releases/v1-0-0': typeof ReleasesV100Route
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
   '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/docs/reports'
     | '/examples/$slug'
     | '/releases/v0-3-0'
+    | '/releases/v1-0-0'
     | '/docs/'
     | '/examples/'
     | '/api/public/refresh-package-analytics'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/docs/reports'
     | '/examples/$slug'
     | '/releases/v0-3-0'
+    | '/releases/v1-0-0'
     | '/docs'
     | '/examples'
     | '/api/public/refresh-package-analytics'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/docs/reports'
     | '/examples/$slug'
     | '/releases/v0-3-0'
+    | '/releases/v1-0-0'
     | '/docs/'
     | '/examples/'
     | '/api/public/refresh-package-analytics'
@@ -301,6 +313,7 @@ export interface RootRouteChildren {
   RoadmapRoute: typeof RoadmapRoute
   ExamplesSlugRoute: typeof ExamplesSlugRoute
   ReleasesV030Route: typeof ReleasesV030Route
+  ReleasesV100Route: typeof ReleasesV100Route
   ExamplesIndexRoute: typeof ExamplesIndexRoute
   ApiPublicRefreshPackageAnalyticsRoute: typeof ApiPublicRefreshPackageAnalyticsRoute
 }
@@ -376,6 +389,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/docs/'
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof DocsRoute
+    }
+    '/releases/v1-0-0': {
+      id: '/releases/v1-0-0'
+      path: '/releases/v1-0-0'
+      fullPath: '/releases/v1-0-0'
+      preLoaderRoute: typeof ReleasesV100RouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/releases/v0-3-0': {
       id: '/releases/v0-3-0'
@@ -503,9 +523,20 @@ const rootRouteChildren: RootRouteChildren = {
   RoadmapRoute: RoadmapRoute,
   ExamplesSlugRoute: ExamplesSlugRoute,
   ReleasesV030Route: ReleasesV030Route,
+  ReleasesV100Route: ReleasesV100Route,
   ExamplesIndexRoute: ExamplesIndexRoute,
   ApiPublicRefreshPackageAnalyticsRoute: ApiPublicRefreshPackageAnalyticsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

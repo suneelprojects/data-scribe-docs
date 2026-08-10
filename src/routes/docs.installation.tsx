@@ -7,9 +7,16 @@ export const Route = createFileRoute("/docs/installation")({
   head: () => ({
     meta: [
       { title: "Installation — EazyDataFix" },
-      { name: "description", content: "Install EazyDataFix with pip. Requires Python 3.10 or later; tested with Python 3.10–3.13." },
+      {
+        name: "description",
+        content:
+          "Install EazyDataFix with pip. Requires Python 3.10 or later; tested with Python 3.10–3.13.",
+      },
       { property: "og:title", content: "Installation — EazyDataFix" },
-      { property: "og:description", content: "Install EazyDataFix with pip. Requires Python 3.10 or later." },
+      {
+        property: "og:description",
+        content: "Install EazyDataFix with pip. Requires Python 3.10 or later.",
+      },
     ],
   }),
   component: Installation,
@@ -33,22 +40,37 @@ function Installation() {
         </ul>
 
         <h2 id="install">Install with pip</h2>
-        <CodeBlock code="pip install eazydatafix" language="bash" filename="terminal" showActions={false} />
+        <CodeBlock
+          code="pip install eazydatafix"
+          language="bash"
+          filename="terminal"
+          showActions={false}
+        />
 
         <h3 id="install-parquet">With Parquet support</h3>
-        <CodeBlock code={`pip install "eazydatafix[parquet]"`} language="bash" filename="terminal" showActions={false} />
+        <CodeBlock
+          code={`pip install "eazydatafix[parquet]"`}
+          language="bash"
+          filename="terminal"
+          showActions={false}
+        />
 
         <h2 id="verify">Verify the installation</h2>
         <ReplBlock
           lines={[
             { kind: "in", text: "import eazydatafix as edf" },
             { kind: "in", text: "edf.__version__" },
-            { kind: "out", text: "'0.3.0'" },
+            { kind: "out", text: "'1.0.0'" },
           ]}
         />
 
         <h2 id="upgrade">Upgrade</h2>
-        <CodeBlock code="pip install --upgrade eazydatafix" language="bash" filename="terminal" showActions={false} />
+        <CodeBlock
+          code="pip install --upgrade eazydatafix"
+          language="bash"
+          filename="terminal"
+          showActions={false}
+        />
 
         <h2 id="troubleshooting">Troubleshooting</h2>
         <p>

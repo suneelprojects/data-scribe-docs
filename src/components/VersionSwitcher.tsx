@@ -31,7 +31,7 @@ export function VersionSwitcher() {
         {versions.map((v) => (
           <DropdownMenuItem
             key={v.value}
-            disabled={v.status === "planned"}
+            disabled={v.status !== "latest"}
             onSelect={() => setCurrent(v.value)}
             className="flex items-center justify-between font-mono text-xs"
           >
@@ -44,11 +44,10 @@ export function VersionSwitcher() {
               {v.label}
             </span>
             <span className="text-[10px] font-sans text-muted-foreground">
-              {v.status === "latest" ? "Latest Stable" : "Planned"}
+              {v.status === "latest" ? "Latest Stable" : "Previous"}
             </span>
           </DropdownMenuItem>
         ))}
-
       </DropdownMenuContent>
     </DropdownMenu>
   );

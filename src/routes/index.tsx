@@ -5,48 +5,48 @@ import {
   BadgeCheck,
   Check,
   CheckCircle2,
-  ChevronRight,
+  ClipboardCheck,
+  Code2,
   Copy,
-  Cpu,
   ExternalLink,
+  FileCheck2,
   FileText,
   Github,
-  Layers,
-  ListChecks,
+  Layers3,
   Package,
   ScanSearch,
   ShieldCheck,
   Sparkles,
-  Timer,
+  TerminalSquare,
   Wand2,
   Workflow,
 } from "lucide-react";
 import { CodeBlock } from "@/components/CodeBlock";
-import { ReplBlock } from "@/components/ReplBlock";
 import { InstallChip } from "@/components/InstallChip";
 import { CommunityWidget } from "@/components/CommunityWidget";
-import { allDocs } from "@/content/reference";
-import poster from "@/assets/release-v0-3-0.jpg.asset.json";
 
-const INSTALL_CMD_V030 = "pip install eazydatafix==0.3.0";
-const PYPI_URL = "https://pypi.org/project/eazydatafix/0.3.0/";
-const GH_RELEASE_URL = "https://github.com/suneelprojects/eazydatafix/releases/tag/v0.3.0";
+const INSTALL_CMD = "pip install eazydatafix==1.0.0";
+const PYPI_URL = "https://pypi.org/project/eazydatafix/1.0.0/";
+const GH_RELEASE_URL = "https://github.com/suneelprojects/eazydatafix/releases/tag/v1.0.0";
 const GH_REPO_URL = "https://github.com/suneelprojects/eazydatafix";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EazyDataFix | Deterministic Agentic EDA for Python" },
+      { title: "EazyDataFix 1.0 | Auditable Data Cleaning, EDA and Validation" },
       {
         name: "description",
         content:
-          "EazyDataFix is a deterministic-first Python framework for data quality, exploratory data analysis, traceable execution, automated reporting, validation, and safe data preparation.",
+          "EazyDataFix 1.0 is a deterministic-first Python framework for auditable cleaning, data preparation, validation contracts, Agentic EDA, reporting and production CLI workflows.",
       },
-      { property: "og:title", content: "EazyDataFix | Deterministic Agentic EDA for Python" },
+      {
+        property: "og:title",
+        content: "EazyDataFix 1.0 | From raw data to validated, analysis-ready datasets",
+      },
       {
         property: "og:description",
         content:
-          "Agentic EDA you can inspect, reproduce, and trust. Understand your dataset, plan the right analyses, execute them deterministically, and generate traceable reports — without requiring an LLM.",
+          "Profile, assess, clean, prepare, validate and explore datasets through reproducible Python APIs and a production CLI.",
       },
     ],
   }),
@@ -56,89 +56,106 @@ export const Route = createFileRoute("/")({
 const supported = ["CSV", "Excel", "JSON", "Parquet", "pandas.DataFrame"];
 const comingSoon = ["SQL", "Spark", "Polars"];
 
-const workflow = [
+const v1Features = [
   {
-    step: "Understand",
-    icon: ScanSearch,
-    desc: "Run deterministic exploratory data analysis with semantic role detection.",
+    title: "Unified workflow",
+    body: "edf.run() composes profiling, assessment, controlled cleaning and deterministic EDA.",
+    icon: Workflow,
+    anchor: "unified-workflow",
   },
   {
-    step: "Plan",
-    icon: ListChecks,
-    desc: "Select or skip relevant EDA steps with priorities, dependencies, and clear reasons.",
+    title: "Auditable cleaning",
+    body: "Use dry runs, per-column rules and structured before/after change records.",
+    icon: ClipboardCheck,
+    anchor: "controlled-cleaning",
   },
   {
-    step: "Execute",
-    icon: Cpu,
-    desc: "Run modular deterministic analyses for missing values, duplicates, distributions, outliers, skewness, imbalance, correlations, and datetime trends.",
+    title: "Preparation reports",
+    body: "Apply threshold-gated conversions and inspect every preparation change and warning.",
+    icon: FileCheck2,
+    anchor: "preparation-reports",
   },
   {
-    step: "Decide",
-    icon: Wand2,
-    desc: "Generate traceable priority findings, follow-up actions, visualisation recommendations, and unresolved domain questions.",
+    title: "Data contracts",
+    body: "Infer schemas and enforce reusable not-null, unique, minimum and maximum rules.",
+    icon: ShieldCheck,
+    anchor: "data-contracts",
   },
   {
-    step: "Report",
-    icon: FileText,
-    desc: "Export standalone HTML, stable JSON, optional Markdown, and deterministic PNG visualisations.",
+    title: "Production CLI",
+    body: "Process one or many files with JSON/YAML config, JSONL logs and stable exit codes.",
+    icon: TerminalSquare,
+    anchor: "production-cli",
+  },
+  {
+    title: "Stable public API",
+    body: "Existing v0.5 workflows remain compatible, backed by formal result objects and errors.",
+    icon: BadgeCheck,
+    anchor: "compatibility",
   },
 ];
 
-const v030Features = [
-  { title: "Deterministic EDA", body: "Structured analysis without hidden model behaviour.", icon: BadgeCheck },
-  { title: "Semantic Role Detection", body: "Classifies numeric measures, categorical fields, identifiers, datetimes, and booleans.", icon: Layers },
-  { title: "Deterministic Planner", body: "Explains which analyses should run and why.", icon: ListChecks },
-  { title: "Modular Executor", body: "Runs selected analysis steps with isolated failure handling.", icon: Cpu },
-  { title: "Agentic Orchestrator", body: "Coordinates understanding, planning, execution, and follow-up decisions.", icon: Workflow },
-  { title: "Traceable Recommendations", body: "Every finding includes its source step, priority, target columns, reason, and prerequisites.", icon: CheckCircle2 },
-  { title: "Professional Reports", body: "Exports HTML, JSON, Markdown, and PNG visualisations.", icon: FileText },
-  { title: "No LLM Required", body: "The complete workflow remains reproducible and deterministic.", icon: ShieldCheck },
-  { title: "Non-Mutation Guarantee", body: "Caller-owned pandas DataFrames are copied and preserved.", icon: ShieldCheck },
-  { title: "Python 3.10–3.13", body: "Fully validated across supported Python versions.", icon: Timer },
+const lifecycle = [
+  { step: "Profile", desc: "Understand columns, types, shape and memory use.", icon: ScanSearch },
+  { step: "Assess", desc: "Measure quality and identify actionable issues.", icon: ClipboardCheck },
+  { step: "Fix", desc: "Preview or apply controlled cleaning rules.", icon: Wand2 },
+  { step: "Validate", desc: "Enforce schema and quality contracts.", icon: ShieldCheck },
+  { step: "Explore", desc: "Run deterministic and Agentic EDA.", icon: Layers3 },
 ];
 
-const AGENTIC_CODE = `import eazydatafix as edf
+const UNIFIED_CODE = `import eazydatafix as edf
 
-workflow = edf.run_agentic_eda("employees.csv")
+config = edf.FixConfig(dry_run=True)
+result = edf.run("employees.csv", config=config)
 
-report = edf.export_agentic_eda_report(
-    workflow,
-    dataset="employees.csv",
-    output_dir="eda-report",
+print(result.assessment.quality.score)
+print(result.fix_result.change_log)
+print(result.eda_result.observations)`;
+
+const CONTRACT_CODE = `import eazydatafix as edf
+
+contract = edf.infer_schema("employees.csv")
+rules = (
+    edf.QualityRule("email_required", "email", "not_null"),
+    edf.QualityRule("employee_id_unique", "employee_id", "unique"),
+    edf.QualityRule("salary_floor", "salary", "min", 0),
 )
 
-print(workflow.deterministic_final_summary)
-print(report.generated_files)`;
+validation = edf.validate_contract(
+    "employees.csv", contract, rules
+)
+if not validation.passed:
+    raise SystemExit(1)`;
 
-const OUTPUT_TREE = `eda-report/
-├── agentic-eda-report.html
-├── agentic-eda-report.json
-├── agentic-eda-report.md
-└── visualisations/
-    ├── 01-missing-value-chart-phone-salary.png
-    ├── 02-bar-chart-department.png
-    └── 03-time-series-line-chart-joining-date.png`;
+const CLI_CODE = `# Run the complete v1 workflow
+edf employees.csv
 
-function InstallV030Button() {
+# Batch processing from a JSON or YAML config
+edf --config workflow.yaml \\
+  --output results.json \\
+  --log-file events.jsonl`;
+
+function InstallV1Button() {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(INSTALL_CMD_V030);
+      await navigator.clipboard.writeText(INSTALL_CMD);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      /* ignore */
+      /* Clipboard access may be unavailable in some browsers. */
     }
   };
+
   return (
     <button
       type="button"
       onClick={copy}
       className="inline-flex items-center gap-1.5 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
-      title={INSTALL_CMD_V030}
+      title={INSTALL_CMD}
     >
       {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-      {copied ? "Copied" : "Install v0.3.0"}
+      {copied ? "Copied" : "Install v1.0.0"}
     </button>
   );
 }
@@ -146,47 +163,41 @@ function InstallV030Button() {
 function Home() {
   return (
     <div>
-      {/* Hero */}
-      <section className="border-b border-border">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:py-20">
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,color-mix(in_oklab,var(--color-accent)_12%,transparent),transparent_34%)]" />
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:py-24">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-2.5 py-1 text-[11px] font-mono text-muted-foreground">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-accent/35 bg-accent/10 px-3 py-1 text-[11px] font-mono text-accent">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
-              v0.3.0
-              <span className="rounded bg-accent/15 px-1.5 py-0.5 text-[10px] font-sans font-medium text-accent">
-                latest
-              </span>
-              <span className="font-sans">· Latest Stable Release</span>
+              v1.0.0
+              <span className="font-sans text-muted-foreground">· Stable production release</span>
             </div>
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-              Agentic EDA you can inspect, reproduce, and trust.
+            <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
+              From raw data to validated, analysis-ready datasets.
             </h1>
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Understand your dataset, plan the right analyses, execute them deterministically,
-              and generate traceable reports — without requiring an LLM.
-            </p>
-            <p className="mt-3 max-w-xl text-xs text-muted-foreground/80">
-              EazyDataFix v0.3.0 is released. Supports Console, HTML, PDF, Excel, CSV, JSON and Markdown reports.
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Profile, assess, clean, prepare, validate and explore data through deterministic,
+              traceable Python workflows—without requiring an LLM.
             </p>
 
-            <div className="mt-6">
+            <div className="mt-7">
               <InstallChip />
             </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <Link
-                to="/docs"
+                to="/docs/quickstart"
                 className="inline-flex items-center gap-1.5 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
               >
                 Get Started
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
               <Link
-                to="/releases/v0-3-0"
+                to="/releases/v1-0-0"
                 className="inline-flex items-center gap-1.5 rounded-md border border-accent/50 bg-accent/10 px-4 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent/15"
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                What's new in 0.3.0
+                What&apos;s new in 1.0
               </Link>
               <a
                 href={GH_REPO_URL}
@@ -208,48 +219,41 @@ function Home() {
               </a>
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
-              {["MIT License", "Python 3.10–3.13", "Zero configuration", "Pandas-based"].map((t) => (
-                <span key={t} className="inline-flex items-center gap-1.5">
+            <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+              {["MIT License", "Python 3.10–3.13", "LLM optional", "DataFrame-safe"].map((item) => (
+                <span key={item} className="inline-flex items-center gap-1.5">
                   <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
-                  {t}
+                  {item}
                 </span>
               ))}
             </div>
           </div>
 
-          <CodeBlock
-            code={`import eazydatafix as edf\n\n# NEW in 0.3.0 — deterministic Agentic EDA\nworkflow = edf.run_agentic_eda("employees.csv")\n\nreport = edf.export_agentic_eda_report(\n    workflow,\n    dataset="employees.csv",\n    output_dir="eda-report",\n)`}
-            filename="main.py"
-            showLineNumbers
-          />
+          <CodeBlock code={UNIFIED_CODE} filename="production_workflow.py" showLineNumbers />
         </div>
       </section>
 
-      {/* Release announcement */}
       <section className="border-b border-border bg-muted/20">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-          <div className="grid gap-8 rounded-xl border border-border bg-card p-5 sm:p-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+          <div className="grid gap-8 rounded-xl border border-border bg-card p-5 shadow-sm sm:p-8 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:items-center">
             <div>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-[11px] font-medium text-accent">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
-                Now Live
+                Released 8 August 2026
               </span>
               <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                EazyDataFix 0.3.0
+                EazyDataFix 1.0.0
               </h2>
               <p className="mt-1 text-sm font-medium text-accent">
-                Deterministic Agentic EDA for Python
+                Stable workflows for real data pipelines
               </p>
               <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                Analyse datasets, create deterministic execution plans, run reproducible EDA
-                workflows, generate traceable follow-up recommendations, and export HTML, JSON,
-                Markdown, and PNG reports. EazyDataFix v0.3.0 does not require an LLM — optional
-                grounded AI explanations are planned for a future release.
+                Version 1.0 keeps every v0.5 workflow and adds controlled cleaning, deterministic
+                preparation reports, reusable data contracts, a unified Python workflow and a
+                pipeline-safe command-line interface.
               </p>
-
               <div className="mt-5 flex flex-wrap items-center gap-2">
-                <InstallV030Button />
+                <InstallV1Button />
                 <a
                   href={GH_RELEASE_URL}
                   target="_blank"
@@ -257,89 +261,66 @@ function Home() {
                   className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
                   <Github className="h-3.5 w-3.5" />
-                  View Release
+                  View GitHub release
                   <ExternalLink className="h-3 w-3 opacity-60" />
                 </a>
-                <a
-                  href={PYPI_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline"
-                >
-                  View on PyPI
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
-
-              <div className="mt-4 font-mono text-[11px] text-muted-foreground">
-                {INSTALL_CMD_V030}
               </div>
             </div>
 
-            <Link
-              to="/releases/v0-3-0"
-              className="group relative block overflow-hidden rounded-lg border border-border bg-background"
-            >
-              <img
-                src={poster.url}
-                alt="EazyDataFix 0.3.0 deterministic Agentic EDA release poster"
-                width={1536}
-                height={1024}
-                loading="lazy"
-                className="w-full transition-transform duration-300 group-hover:scale-[1.01]"
-              />
-              <div className="flex items-center justify-between border-t border-border px-3 py-2 text-xs text-muted-foreground">
-                <span>Release poster · v0.3.0</span>
-                <span className="inline-flex items-center gap-1 text-accent">
-                  Read notes <ChevronRight className="h-3 w-3" />
-                </span>
-              </div>
-            </Link>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {v1Features.slice(0, 4).map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <Link
+                    key={feature.title}
+                    to="/releases/v1-0-0"
+                    hash={feature.anchor}
+                    className="rounded-lg border border-border bg-background p-4 transition-colors hover:border-accent"
+                  >
+                    <Icon className="h-4 w-4 text-accent" />
+                    <div className="mt-2 text-sm font-medium text-foreground">{feature.title}</div>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {feature.body}
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* What's new in v0.3.0 — pipeline */}
       <section className="border-b border-border">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                What's new in v0.3.0
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                A deterministic five-stage workflow — no LLM required.
-              </p>
-            </div>
-            <Link
-              to="/releases/v0-3-0"
-              className="hidden text-sm font-medium text-accent hover:underline sm:inline"
-            >
-              Read the release notes →
-            </Link>
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+          <div className="max-w-2xl">
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+              One library across the data lifecycle
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Start with a single API, then use the individual stages when your pipeline needs more
+              control.
+            </p>
           </div>
-
-          <div className="mt-8 grid gap-4 lg:grid-cols-5">
-            {workflow.map((w, i) => {
-              const Icon = w.icon;
+          <div className="mt-8 grid gap-4 md:grid-cols-5">
+            {lifecycle.map((item, index) => {
+              const Icon = item.icon;
               return (
                 <div
-                  key={w.step}
-                  className="relative rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent"
+                  key={item.step}
+                  className="relative rounded-lg border border-border bg-card p-5"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="grid h-7 w-7 place-items-center rounded-md bg-accent/15 text-accent">
+                  <div className="flex items-center justify-between">
+                    <span className="grid h-8 w-8 place-items-center rounded-md bg-accent/12 text-accent">
                       <Icon className="h-4 w-4" />
                     </span>
-                    <span className="font-mono text-[11px] text-muted-foreground">
-                      Step {i + 1}
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      0{index + 1}
                     </span>
                   </div>
-                  <div className="mt-3 text-base font-semibold text-foreground">{w.step}</div>
-                  <p className="mt-1.5 text-sm text-muted-foreground">{w.desc}</p>
-                  {i < workflow.length - 1 && (
-                    <ChevronRight className="absolute -right-3 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-muted-foreground/40 lg:block" />
-                  )}
+                  <div className="mt-4 text-sm font-semibold text-foreground">{item.step}</div>
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                    {item.desc}
+                  </p>
                 </div>
               );
             })}
@@ -347,259 +328,211 @@ function Home() {
         </div>
       </section>
 
-      {/* Agentic EDA code example */}
       <section className="border-b border-border bg-muted/20">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-            Run the full workflow
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            One call runs understanding, planning, execution and decision-making. Another exports
-            a complete report.
-          </p>
-          <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            <CodeBlock code={AGENTIC_CODE} filename="agentic_eda.py" showLineNumbers />
-            <CodeBlock
-              code={OUTPUT_TREE}
-              language="text"
-              filename="eda-report/"
-              showActions={false}
-            />
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-2xl">
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                Built for inspection, not black boxes
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Every v1 workflow produces explicit results your notebook, application or CI job can
+                inspect and act on.
+              </p>
+            </div>
+            <Link to="/releases/v1-0-0" className="text-sm font-medium text-accent hover:underline">
+              Read the complete release notes →
+            </Link>
           </div>
-        </div>
-      </section>
-
-      {/* v0.3.0 feature highlights */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-            v0.3.0 highlights
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Everything shipped in the Deterministic Agentic EDA release.
-          </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {v030Features.map((f) => {
-              const Icon = f.icon;
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {v1Features.map((feature) => {
+              const Icon = feature.icon;
               return (
-                <div
-                  key={f.title}
-                  className="rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent"
+                <Link
+                  key={feature.title}
+                  to="/releases/v1-0-0"
+                  hash={feature.anchor}
+                  className="group rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent"
                 >
                   <Icon className="h-4 w-4 text-accent" />
-                  <div className="mt-3 text-sm font-medium text-foreground">{f.title}</div>
-                  <p className="mt-1.5 text-sm text-muted-foreground">{f.body}</p>
-                </div>
+                  <div className="mt-3 text-sm font-medium text-foreground">{feature.title}</div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {feature.body}
+                  </p>
+                  <div className="mt-4 inline-flex items-center gap-1 text-xs text-muted-foreground group-hover:text-accent">
+                    Learn more <ArrowRight className="h-3 w-3" />
+                  </div>
+                </Link>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Core APIs (highlight) */}
       <section className="border-b border-border">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">Core APIs</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            The functions that cover the full profile → assess → fix → EDA → ship workflow.
-          </p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
+            <div>
+              <div className="inline-flex items-center gap-2 font-mono text-xs text-accent">
+                <ShieldCheck className="h-4 w-4" />
+                Pipeline contracts
+              </div>
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
+                Turn data expectations into pass/fail checks
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Infer a contract from known-good data, add reusable quality rules, and fail your
+                pipeline deterministically when incoming data breaks the agreement.
+              </p>
+              <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+                {[
+                  "Expected columns and data types",
+                  "Extra-column policy",
+                  "Not-null and uniqueness rules",
+                  "Numeric minimum and maximum rules",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <CodeBlock code={CONTRACT_CODE} filename="validate_pipeline.py" showLineNumbers />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-border bg-muted/20">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] lg:items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 font-mono text-xs text-accent">
+              <TerminalSquare className="h-4 w-4" />
+              Production CLI
+            </div>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
+              The same deterministic workflows from your terminal
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Run profile, assess, fix, prepare, EDA, Agentic EDA or the complete workflow across
+              one or many files. Exit codes distinguish success, processing failures and invalid
+              configuration.
+            </p>
+          </div>
+          <CodeBlock code={CLI_CODE} language="bash" filename="terminal" showLineNumbers />
+        </div>
+      </section>
+
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+          <div className="max-w-2xl">
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground">Core APIs</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Use the complete workflow or compose only the stages your project needs.
+            </p>
+          </div>
+          <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: "📊", name: "profile()", desc: "Understand your dataset structure.", href: "/docs/reference/profile" },
-              { icon: "✅", name: "assess()", desc: "Measure data quality.", href: "/docs/reference/assess" },
-              { icon: "🧹", name: "fix()", desc: "Automatically clean datasets.", href: "/docs/reference/fix" },
-              { icon: "🧭", name: "run_agentic_eda()", desc: "End-to-end deterministic EDA.", href: "/releases/v0-3-0#orchestrator", badge: "0.3" },
-              { icon: "📤", name: "export_agentic_eda_report()", desc: "HTML, JSON, Markdown, PNG.", href: "/releases/v0-3-0#report-export", badge: "0.3" },
-            ].map((c) => (
+              {
+                name: "run",
+                desc: "Profile, assess, clean and explore in one call.",
+                href: "/releases/v1-0-0#unified-workflow",
+                badge: "1.0",
+              },
+              {
+                name: "fix",
+                desc: "Controlled cleaning with dry-run previews.",
+                href: "/docs/reference/fix",
+                badge: "Auditable",
+              },
+              {
+                name: "prepare_with_report",
+                desc: "Prepare data with changes and warnings.",
+                href: "/releases/v1-0-0#preparation-reports",
+                badge: "1.0",
+              },
+              {
+                name: "validate_contract",
+                desc: "Enforce schema and quality rules.",
+                href: "/releases/v1-0-0#data-contracts",
+                badge: "1.0",
+              },
+              {
+                name: "profile",
+                desc: "Describe dataset shape, types and structure.",
+                href: "/docs/reference/profile",
+              },
+              {
+                name: "assess",
+                desc: "Measure quality and surface recommendations.",
+                href: "/docs/reference/assess",
+              },
+              {
+                name: "run_agentic_eda",
+                desc: "Plan and execute deterministic EDA.",
+                href: "/releases/v0-3-0#orchestrator",
+              },
+              {
+                name: "generate_agentic_eda_narrative",
+                desc: "Add optional evidence-cited AI narrative.",
+                href: "/changelog#v0-5-0",
+              },
+            ].map((api) => (
               <a
-                key={c.name}
-                href={c.href}
-                className="rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent"
+                key={api.name}
+                href={api.href}
+                className="group rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent"
               >
-                <div className="flex items-center justify-between">
-                  <div className="text-lg leading-none">{c.icon}</div>
-                  {c.badge && (
+                <div className="flex items-center justify-between gap-3">
+                  <Code2 className="h-4 w-4 text-accent" />
+                  {api.badge && (
                     <span className="rounded bg-accent/15 px-1.5 py-0.5 text-[10px] font-medium text-accent">
-                      {c.badge}
+                      {api.badge}
                     </span>
                   )}
                 </div>
-                <div className="mt-3 font-mono text-sm">
+                <div className="mt-3 break-words font-mono text-sm text-foreground">
                   <span className="text-muted-foreground">edf.</span>
-                  <span className="text-accent">{c.name.replace("()", "")}</span>
-                  <span className="text-muted-foreground">()</span>
+                  {api.name}()
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{c.desc}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{api.desc}</p>
               </a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Why */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-            Why EazyDataFix?
-          </h2>
-          <div className="mt-4 space-y-4 text-base leading-relaxed text-muted-foreground">
-            <p>
-              Data scientists spend a significant share of every project cleaning and exploring
-              data before any analysis can begin. The work is repetitive — check for nulls, drop
-              duplicates, coerce dtypes, plot a distribution — but different enough on every
-              dataset that ad-hoc scripts pile up.
-            </p>
-            <p>
-              EazyDataFix collapses this loop into explicit calls:{" "}
-              <code className="font-mono text-foreground">edf.profile()</code>,{" "}
-              <code className="font-mono text-foreground">edf.assess()</code>,{" "}
-              <code className="font-mono text-foreground">edf.fix()</code> and, new in 0.3.0,{" "}
-              <code className="font-mono text-foreground">edf.run_agentic_eda()</code>. Each
-              returns a structured, serialisable object so the entire pipeline stays auditable —
-              even in notebooks.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Installation */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">Installation</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Requires Python 3.10+. Available on PyPI.
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <CodeBlock
-              code="pip install eazydatafix"
-              language="bash"
-              filename="latest"
-              showActions={false}
-            />
-            <CodeBlock
-              code={INSTALL_CMD_V030}
-              language="bash"
-              filename="pinned"
-              showActions={false}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Start */}
-      <section className="border-b border-border bg-muted/20">
-        <div className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">Quick Start</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Assess a dataset, run the automatic fixer, and export the cleaned copy.
-          </p>
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <CodeBlock
-              code={`import pandas as pd\nimport eazydatafix as edf\n\ndf = pd.read_csv("employees.csv")\n\nreport = edf.assess(df)\nreport.summary()\n\nresult = edf.fix(df)\ncleaned_df = result.dataframe\nresult.to_csv("clean.csv")`}
-              filename="quickstart.py"
-            />
-            <ReplBlock
-              lines={[
-                { kind: "in", text: "report = edf.assess(df)" },
-                { kind: "in", text: "report.summary()" },
-                { kind: "out", text: "QualityReport(<DataFrame>)" },
-                { kind: "out", text: "  rows              1,204" },
-                { kind: "out", text: "  columns              12" },
-                { kind: "out", text: "  quality_score     94.0" },
-                { kind: "out", text: "  missing_values      38  (0.3%)" },
-                { kind: "out", text: "  duplicates           6  (0.5%)" },
-                { kind: "blank" },
-                { kind: "in", text: "result = edf.fix(df)" },
-                { kind: "in", text: 'result.to_csv("clean.csv")' },
-                { kind: "out", text: "wrote clean.csv (1,198 rows × 12 cols)" },
-              ]}
-              title="Expected output"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Core APIs — full reference cards */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                Function reference
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Every function ships with a NumPy/Pydantic-style contract.
-              </p>
-            </div>
-            <Link
-              to="/docs/reference"
-              className="text-sm font-medium text-accent hover:underline"
-            >
-              Full reference →
-            </Link>
-          </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {allDocs.map((d) => (
-              <Link
-                key={d.slug}
-                to={"/docs/reference/$fn" as const}
-                params={{ fn: d.slug }}
-                className="group rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent"
-              >
-                <div className="font-mono text-sm">
-                  <span className="text-muted-foreground">edf.</span>
-                  <span className="text-accent">{d.name}</span>
-                  <span className="text-muted-foreground">()</span>
-                </div>
-                <p className="mt-2 text-sm text-muted-foreground">{d.oneLiner}</p>
-                <div className="mt-4 rounded border border-border bg-muted/40 px-2 py-1 font-mono text-[11px] text-muted-foreground">
-                  <span className="text-foreground">returns</span>{" "}
-                  <span className="text-accent">{d.returns.type}</span>
-                </div>
-                <div className="mt-4 flex items-center gap-1 text-xs text-muted-foreground group-hover:text-accent">
-                  Read reference <ArrowRight className="h-3 w-3" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Supported sources */}
       <section className="border-b border-border bg-muted/20">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-            Supported data sources
-          </h2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <div className="grid gap-8 md:grid-cols-2">
             <div>
-              <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Supported
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {supported.map((s) => (
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                Supported inputs
+              </h2>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {supported.map((source) => (
                   <span
-                    key={s}
+                    key={source}
                     className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 font-mono text-xs"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                    {s}
+                    {source}
                   </span>
                 ))}
               </div>
             </div>
             <div>
-              <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Coming soon
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {comingSoon.map((s) => (
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                On the horizon
+              </h2>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {comingSoon.map((source) => (
                   <span
-                    key={s}
+                    key={source}
                     className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/40 px-2.5 py-1 font-mono text-xs text-muted-foreground"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
-                    {s}
+                    {source}
                   </span>
                 ))}
               </div>
@@ -608,39 +541,43 @@ function Home() {
         </div>
       </section>
 
-      {/* Roadmap teaser */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
-          <div className="flex items-end justify-between">
-            <h2 className="text-2xl font-semibold tracking-tight text-foreground">Roadmap</h2>
-            <Link to="/roadmap" className="text-sm font-medium text-accent hover:underline">
-              Full roadmap →
-            </Link>
-          </div>
-          <ul className="mt-6 space-y-3 text-sm">
-            {[
-              { v: "v0.3", desc: "Deterministic Agentic EDA · shipped" },
-              { v: "v0.4", desc: "JSON · Parquet · SQLite readers" },
-              { v: "v1.0", desc: "Enterprise connectors · Spark · REST API" },
-            ].map((r) => (
-              <li key={r.v} className="flex items-center gap-4">
-                <span className="w-16 font-mono text-muted-foreground">{r.v}</span>
-                <span className="text-foreground">{r.desc}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* Community */}
       <section>
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground">Community</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            All values are placeholders and will update once metrics are wired up.
-          </p>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                Project snapshot
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Verified facts from the v1.0.0 release—no placeholder counters.
+              </p>
+            </div>
+            <Link to="/analytics" className="text-sm font-medium text-accent hover:underline">
+              View package analytics →
+            </Link>
+          </div>
           <div className="mt-6">
             <CommunityWidget />
+          </div>
+          <div className="mt-8 rounded-lg border border-border bg-card p-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
+            <div>
+              <div className="inline-flex items-center gap-2 text-sm font-medium text-foreground">
+                <FileText className="h-4 w-4 text-accent" />
+                Ready to use EazyDataFix 1.0?
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Install from PyPI, follow the quick start, or review the source on GitHub.
+              </p>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2 sm:mt-0">
+              <InstallV1Button />
+              <Link
+                to="/docs"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
+              >
+                Read the docs <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>

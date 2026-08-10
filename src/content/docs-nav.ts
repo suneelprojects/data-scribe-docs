@@ -21,13 +21,23 @@ export const docsNav: NavGroup[] = [
     ],
   },
   {
+    label: "Production v1",
+    items: [
+      { title: "Unified run() Workflow", url: "/releases/v1-0-0#unified-workflow", badge: "1.0" },
+      { title: "Controlled Cleaning", url: "/releases/v1-0-0#controlled-cleaning", badge: "1.0" },
+      { title: "Preparation Reports", url: "/releases/v1-0-0#preparation-reports", badge: "1.0" },
+      { title: "Data Contracts", url: "/releases/v1-0-0#data-contracts", badge: "1.0" },
+      { title: "Production CLI", url: "/releases/v1-0-0#production-cli", badge: "1.0" },
+    ],
+  },
+  {
     label: "Agentic EDA",
     items: [
-      { title: "Deterministic EDA", url: "/releases/v0-3-0#deterministic-eda", badge: "0.3" },
-      { title: "EDA Planner", url: "/releases/v0-3-0#planner", badge: "0.3" },
-      { title: "EDA Executor", url: "/releases/v0-3-0#executor", badge: "0.3" },
-      { title: "Agentic Orchestrator", url: "/releases/v0-3-0#orchestrator", badge: "0.3" },
-      { title: "Report Export", url: "/releases/v0-3-0#report-export", badge: "0.3" },
+      { title: "Deterministic EDA", url: "/releases/v0-3-0#deterministic-eda" },
+      { title: "EDA Planner", url: "/releases/v0-3-0#planner" },
+      { title: "EDA Executor", url: "/releases/v0-3-0#executor" },
+      { title: "Agentic Orchestrator", url: "/releases/v0-3-0#orchestrator" },
+      { title: "Report Export", url: "/releases/v0-3-0#report-export" },
     ],
   },
   {
@@ -42,7 +52,7 @@ export const docsNav: NavGroup[] = [
   {
     label: "Meta",
     items: [
-      { title: "v0.3.0 Release Notes", url: "/releases/v0-3-0", badge: "New" },
+      { title: "v1.0.0 Release Notes", url: "/releases/v1-0-0", badge: "Latest" },
       { title: "Roadmap", url: "/roadmap" },
       { title: "Changelog", url: "/changelog" },
       { title: "Benchmarks", url: "/benchmarks", badge: "Preview" },
@@ -53,7 +63,8 @@ export const docsNav: NavGroup[] = [
 ];
 
 export const versions = [
-  { label: "v0.3.0", value: "0.3.0", status: "latest" as const },
-  { label: "v0.4.0", value: "0.4.0", status: "planned" as const },
-  { label: "v0.5.0", value: "0.5.0", status: "planned" as const },
+  { label: "v1.0.0", value: "1.0.0", status: "latest" as const },
+  { label: "v0.5.0", value: "0.5.0", status: "previous" as const },
+  { label: "v0.4.0", value: "0.4.0", status: "previous" as const },
+  { label: "v0.3.0", value: "0.3.0", status: "previous" as const },
 ];

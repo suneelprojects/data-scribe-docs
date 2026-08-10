@@ -33,7 +33,7 @@ function Page() {
 
         <h2 id="dev-setup">Development setup</h2>
         <CodeBlock
-          code={`git clone https://github.com/eazydatafix/eazydatafix.git\ncd eazydatafix\npython -m venv .venv\nsource .venv/bin/activate\npip install -e ".[dev]"`}
+          code={`git clone https://github.com/suneelprojects/eazydatafix.git\ncd eazydatafix\npython -m venv .venv\nsource .venv/bin/activate\npip install -e ".[dev]"`}
           language="bash"
           filename="terminal"
           showActions={false}
@@ -56,8 +56,8 @@ function Page() {
 
         <h2 id="code-of-conduct">Code of conduct</h2>
         <p>
-          Be kind, assume good intent, and remember the person on the other side of the pull
-          request is a volunteer. See <code>CODE_OF_CONDUCT.md</code> for the full text.
+          Be kind, assume good intent, and remember the person on the other side of the pull request
+          is a volunteer. See <code>CODE_OF_CONDUCT.md</code> for the full text.
         </p>
       </div>
     </div>
