@@ -28,16 +28,15 @@ export const Route = createFileRoute("/examples/$slug")({
 });
 
 function ExamplePage() {
-  const { ex } = Route.useLoaderData();
+  const { slug } = Route.useParams();
+  const ex = findExample(slug);
+  if (!ex) return null;
   const related = examples.filter((e) => e.slug !== ex.slug).slice(0, 3);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <DocPageHeader
-        breadcrumbs={[
-          { label: "Examples", to: "/examples" },
-          { label: ex.title },
-        ]}
+        breadcrumbs={[{ label: "Examples", to: "/examples" }, { label: ex.title }]}
         title={ex.title}
         description={ex.summary}
       />

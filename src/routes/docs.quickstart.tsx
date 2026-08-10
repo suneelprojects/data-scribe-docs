@@ -1,15 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { DocPageHeader } from "@/components/DocPageHeader";
 import { CodeBlock } from "@/components/CodeBlock";
-import { ReplBlock } from "@/components/ReplBlock";
+import { DocPageHeader } from "@/components/DocPageHeader";
 
 export const Route = createFileRoute("/docs/quickstart")({
   head: () => ({
     meta: [
-      { title: "Quick Start — EazyDataFix" },
-      { name: "description", content: "Assess and fix your first dataset in five lines of Python." },
-      { property: "og:title", content: "Quick Start — EazyDataFix" },
-      { property: "og:description", content: "Assess and fix your first dataset with EazyDataFix." },
+      { title: "EazyDataFix 1.0 Quick Start" },
+      {
+        name: "description",
+        content: "Profile, assess, clean and explore your first dataset with EazyDataFix 1.0.",
+      },
+      { property: "og:title", content: "EazyDataFix 1.0 Quick Start" },
+      {
+        property: "og:description",
+        content: "Run a complete, auditable data workflow in a few lines of Python.",
+      },
     ],
   }),
   component: QuickStart,
@@ -21,44 +26,97 @@ function QuickStart() {
       <DocPageHeader
         breadcrumbs={[{ label: "Docs", to: "/docs" }, { label: "Quick Start" }]}
         title="Quick Start"
-        description="Load a dataset, run an assessment, apply the automatic fixer and export the result."
+        description="Run the complete v1 workflow, inspect each result, then choose whether to save the cleaned dataset."
       />
       <div id="doc-content" className="prose-doc">
-        <h2 id="a-first-dataset">A first dataset</h2>
-        <p>
-          The example below uses a small employees CSV. Any pandas DataFrame or Excel file will
-          work too — see <Link to="/docs/reference/$fn" params={{ fn: "assess" }}>the reference</Link>.
-        </p>
-
+        <h2 id="install">1. Install</h2>
         <CodeBlock
-          code={`import pandas as pd\nimport eazydatafix as edf\n\ndf = pd.read_csv("employees.csv")\n\nreport = edf.assess(df)\nreport.summary()\n\nresult = edf.fix(df)\ncleaned_df = result.dataframe\nresult.to_csv("clean.csv")`}
-          filename="quickstart.py"
+          code="pip install eazydatafix==1.0.0"
+          language="bash"
+          filename="terminal"
+          showActions={false}
         />
 
-        <h2 id="expected-output">Expected output</h2>
-        <ReplBlock
-          lines={[
-            { kind: "in", text: "report = edf.assess(df)" },
-            { kind: "in", text: "report.summary()" },
-            { kind: "out", text: "QualityReport(<DataFrame>)" },
-            { kind: "out", text: "  rows              1,204" },
-            { kind: "out", text: "  columns              12" },
-            { kind: "out", text: "  quality_score     94.0" },
-            { kind: "out", text: "  missing_values      38  (0.3%)" },
-            { kind: "out", text: "  duplicates           6  (0.5%)" },
-            { kind: "blank" },
-            { kind: "in", text: "result = edf.fix(df)" },
-            { kind: "in", text: "result.applied_fixes" },
-            { kind: "out", text: "['strip_whitespace', 'coerce_numeric', 'drop_duplicates(6)', 'impute_missing(38, median)']" },
-          ]}
+        <h2 id="run">2. Run the complete workflow</h2>
+        <p>
+          <code>edf.run()</code> profiles the source, measures its quality, applies controlled
+          cleaning and runs deterministic EDA. The result keeps every stage available separately.
+        </p>
+        <CodeBlock
+          code={`import eazydatafix as edf
+
+result = edf.run("employees.csv")
+
+print(result.profile.rows)
+print(result.assessment.quality.score)
+print(result.fix_result.applied_fixes)
+print(result.eda_result.observations)
+
+result.fix_result.save("employees-clean.csv")`}
+          filename="quickstart.py"
+          showLineNumbers
+        />
+
+        <h2 id="preview">3. Preview cleaning before applying it</h2>
+        <p>
+          Use a dry run when you want to inspect every proposed change first. The source dataset
+          remains in <code>preview.dataset</code>; the cleaned proposal is available separately.
+        </p>
+        <CodeBlock
+          code={`import eazydatafix as edf
+
+preview = edf.fix(
+    "employees.csv",
+    edf.FixConfig(dry_run=True),
+)
+
+print(preview.change_log)
+print(preview.proposed_dataset.head())`}
+          filename="preview_cleaning.py"
+          showLineNumbers
+        />
+
+        <h2 id="validate">4. Add a data contract</h2>
+        <p>
+          Infer an expected schema from trusted data and validate new inputs before your analysis or
+          model pipeline continues.
+        </p>
+        <CodeBlock
+          code={`contract = edf.infer_schema("employees.csv")
+
+rules = (
+    edf.QualityRule("employee_id_unique", "employee_id", "unique"),
+    edf.QualityRule("salary_non_negative", "salary", "min", 0),
+)
+
+validation = edf.validate_contract(
+    "employees-next.csv",
+    contract,
+    rules,
+)
+
+assert validation.passed, validation.to_dict()`}
+          filename="validate_input.py"
+          showLineNumbers
         />
 
         <h2 id="next-steps">Next steps</h2>
         <ul>
-          <li><Link to="/docs/assessment">Understand the assessment report</Link></li>
-          <li><Link to="/docs/fixing">Configure the cleaning pipeline</Link></li>
-          <li><Link to="/docs/profiling">Deep-dive with edf.profile()</Link></li>
-          <li><Link to="/examples">Browse worked examples</Link></li>
+          <li>
+            <Link to="/releases/v1-0-0">Explore every capability added in v1.0.0</Link>
+          </li>
+          <li>
+            <Link to="/docs/assessment">Understand the assessment report</Link>
+          </li>
+          <li>
+            <Link to="/docs/fixing">Configure the cleaning pipeline</Link>
+          </li>
+          <li>
+            <Link to="/docs/profiling">Deep-dive with edf.profile()</Link>
+          </li>
+          <li>
+            <Link to="/examples">Browse worked examples</Link>
+          </li>
         </ul>
       </div>
     </div>

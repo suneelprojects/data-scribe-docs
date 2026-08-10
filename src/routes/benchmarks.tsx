@@ -1,113 +1,98 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CheckCircle2, Clock3, Database, Scale } from "lucide-react";
 import { DocPageHeader } from "@/components/DocPageHeader";
 
 export const Route = createFileRoute("/benchmarks")({
   head: () => ({
     meta: [
       { title: "Benchmarks — EazyDataFix" },
-      { name: "description", content: "Performance benchmarks (placeholder). Numbers ship with v1.0." },
+      {
+        name: "description",
+        content: "The reproducible benchmark methodology being prepared for EazyDataFix.",
+      },
       { property: "og:title", content: "Benchmarks — EazyDataFix" },
-      { property: "og:description", content: "Placeholder benchmarks for EazyDataFix." },
+      {
+        property: "og:description",
+        content:
+          "Transparent performance measurements will be published with datasets, code and environment details.",
+      },
     ],
   }),
   component: Page,
 });
 
-type Bench = { label: string; ours: number; other?: number; otherLabel?: string; unit: string };
-
-const cards: { title: string; note: string; benches: Bench[] }[] = [
+const methodology = [
   {
-    title: "Execution time",
-    note: "assess() on 1M rows × 20 cols",
-    benches: [
-      { label: "EazyDataFix", ours: 62, unit: "ms", other: 100 },
-      { label: "pandas (manual)", ours: 100, unit: "ms", other: 100 },
-    ],
+    title: "Representative datasets",
+    description:
+      "Small, medium and large tabular inputs with mixed numeric, categorical, text and datetime columns.",
+    icon: Database,
   },
   {
-    title: "Memory usage",
-    note: "Peak RSS during fix()",
-    benches: [
-      { label: "EazyDataFix", ours: 78, unit: "MB", other: 100 },
-      { label: "pandas (manual)", ours: 100, unit: "MB", other: 100 },
-    ],
+    title: "Workflow-level timing",
+    description:
+      "Profile, assess, fix, prepare, validate and EDA measured independently and end to end.",
+    icon: Clock3,
   },
   {
-    title: "Dataset size",
-    note: "Time scaling across 100k → 10M rows",
-    benches: [
-      { label: "100k rows", ours: 15, unit: "%", other: 100 },
-      { label: "1M rows", ours: 42, unit: "%", other: 100 },
-      { label: "10M rows", ours: 90, unit: "%", other: 100 },
-    ],
+    title: "Memory and scaling",
+    description:
+      "Peak memory, row-count scaling and the effect of optional input formats recorded separately.",
+    icon: Scale,
   },
   {
-    title: "vs Pandas",
-    note: "Wall-clock speedup on the standard suite",
-    benches: [
-      { label: "assess()", ours: 60, unit: "%", other: 100 },
-      { label: "fix()", ours: 55, unit: "%", other: 100 },
-      { label: "profile()", ours: 70, unit: "%", other: 100 },
-    ],
-  },
-  {
-    title: "vs Polars",
-    note: "Same suite, Polars backend",
-    benches: [
-      { label: "assess()", ours: 95, unit: "%", other: 100 },
-      { label: "fix()", ours: 100, unit: "%", other: 100 },
-      { label: "profile()", ours: 90, unit: "%", other: 100 },
-    ],
+    title: "Reproducible evidence",
+    description:
+      "Every published number will include code, dataset description, hardware and dependency versions.",
+    icon: CheckCircle2,
   },
 ];
 
 function Page() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <DocPageHeader
         breadcrumbs={[{ label: "Benchmarks" }]}
         title="Benchmarks"
-        description="Placeholder numbers to illustrate the reporting format. Real measurements will land with v1.0."
+        description="No unverified performance claims. Reproducible measurements will be published only with the evidence needed to repeat them."
       />
 
-      <div className="mb-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-        <span className="mr-2 rounded bg-accent/15 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent">
-          placeholder
-        </span>
-        All values below are illustrative. Do not use for comparison.
+      <div className="rounded-lg border border-accent/30 bg-accent/5 p-5">
+        <div className="font-mono text-xs font-medium uppercase tracking-wider text-accent">
+          Methodology in preparation
+        </div>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          The previous illustrative counters have been removed. Until the benchmark suite and raw
+          results are public, this page intentionally shows no speed, memory or competitor figures.
+        </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {cards.map((c) => (
-          <div key={c.title} className="rounded-lg border border-border bg-card p-5">
-            <div className="flex items-baseline justify-between gap-3">
-              <h3 className="text-base font-semibold text-foreground">{c.title}</h3>
-              <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
-                placeholder
-              </span>
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        {methodology.map((item) => {
+          const Icon = item.icon;
+          return (
+            <div key={item.title} className="rounded-lg border border-border bg-card p-5">
+              <Icon className="h-4 w-4 text-accent" />
+              <h2 className="mt-3 text-sm font-semibold text-foreground">{item.title}</h2>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                {item.description}
+              </p>
             </div>
-            <div className="mt-1 text-xs text-muted-foreground">{c.note}</div>
-            <div className="mt-4 space-y-3">
-              {c.benches.map((b) => (
-                <div key={b.label}>
-                  <div className="flex items-baseline justify-between text-xs">
-                    <span className="text-muted-foreground">{b.label}</span>
-                    <span className="font-mono text-foreground">
-                      --{" "}
-                      <span className="text-muted-foreground">{b.unit}</span>
-                    </span>
-                  </div>
-                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-accent/70"
-                      style={{ width: `${Math.min(100, b.ours)}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+          );
+        })}
+      </div>
+
+      <div className="mt-8 rounded-lg border border-border bg-muted/20 p-5 text-sm text-muted-foreground">
+        Want to contribute a reproducible benchmark? Open a focused proposal in{" "}
+        <a
+          href="https://github.com/suneelprojects/eazydatafix/issues"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-accent hover:underline"
+        >
+          GitHub Issues
+        </a>
+        .
       </div>
     </div>
   );

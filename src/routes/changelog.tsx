@@ -26,7 +26,11 @@ function Page() {
       <div className="relative pl-6">
         <div className="absolute left-2 top-2 bottom-2 w-px bg-border" />
         {changelog.map((entry) => (
-          <div key={entry.version} className="relative mb-12">
+          <div
+            key={entry.version}
+            id={entry.version.toLowerCase().replaceAll(".", "-")}
+            className="relative mb-12 scroll-mt-24"
+          >
             <span
               className={cn(
                 "absolute -left-[22px] top-2 h-3 w-3 rounded-full border-2 border-background",
@@ -52,9 +56,7 @@ function Page() {
             </div>
 
             <div className="mt-4 space-y-4 text-sm">
-              {entry.added && (
-                <Group label="Added" items={entry.added} tone="text-accent" />
-              )}
+              {entry.added && <Group label="Added" items={entry.added} tone="text-accent" />}
               {entry.changed && (
                 <Group label="Changed" items={entry.changed} tone="text-foreground" />
               )}

@@ -80,26 +80,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EazyDataFix 0.3.0 — Deterministic Agentic EDA for Python" },
+      { title: "EazyDataFix 1.0 — Auditable Data Cleaning, EDA and Validation" },
       {
         name: "description",
         content:
-          "EazyDataFix 0.3.0 provides deterministic EDA, semantic role detection, planning, execution, traceable recommendations, and HTML, JSON, Markdown and PNG report exports for Python.",
+          "EazyDataFix 1.0 provides auditable cleaning, preparation reports, data contracts, deterministic Agentic EDA, reporting and production CLI workflows for Python.",
       },
       { name: "author", content: "Suneel Kumar Kola" },
-      { property: "og:title", content: "EazyDataFix 0.3.0 — Deterministic Agentic EDA for Python" },
+      {
+        property: "og:title",
+        content: "EazyDataFix 1.0 — From raw data to validated, analysis-ready datasets",
+      },
       {
         property: "og:description",
         content:
-          "EazyDataFix 0.3.0 provides deterministic EDA, semantic role detection, planning, execution, traceable recommendations, and HTML, JSON, Markdown and PNG report exports for Python.",
+          "Profile, assess, clean, prepare, validate and explore datasets through reproducible Python APIs and a production CLI.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "EazyDataFix 0.3.0 — Deterministic Agentic EDA for Python" },
-      { name: "twitter:description", content: "EazyDataFix 0.3.0 provides deterministic EDA, semantic role detection, planning, execution, traceable recommendations, and HTML, JSON, Markdown and PNG report exports for Python." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fb069550-00d5-4477-b3c3-44ccba187177/id-preview-fcd7c222--a1c93004-6948-443f-8cff-90bad9ac84ed.lovable.app-1784389587623.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fb069550-00d5-4477-b3c3-44ccba187177/id-preview-fcd7c222--a1c93004-6948-443f-8cff-90bad9ac84ed.lovable.app-1784389587623.png" },
-
+      {
+        name: "twitter:title",
+        content: "EazyDataFix 1.0 — Auditable Data Cleaning, EDA and Validation",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Stable Python workflows for controlled cleaning, preparation reports, data contracts, deterministic Agentic EDA and batch CLI processing.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

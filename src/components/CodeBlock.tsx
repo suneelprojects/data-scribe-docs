@@ -26,7 +26,7 @@ export function CodeBlock({
   showLineNumbers = false,
   className,
   colabUrl = "https://colab.research.google.com/#create=true",
-  githubUrl = "https://github.com/eazydatafix/eazydatafix",
+  githubUrl = "https://github.com/suneelprojects/eazydatafix",
   downloadName,
   header,
 }: CodeBlockProps) {
@@ -37,10 +37,7 @@ export function CodeBlock({
       ? highlightPython(code)
       : language === "bash"
         ? highlightBash(code)
-        : code
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
+        : code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   const handleCopy = async () => {
     try {
@@ -100,7 +97,11 @@ export function CodeBlock({
 
       {showActions && (
         <div className="flex items-center gap-1 border-b border-white/5 bg-black/10 px-2 py-1 text-xs">
-          <ActionBtn onClick={handleCopy} label={copied ? "Copied" : "Copy"} icon={copied ? Check : Copy} />
+          <ActionBtn
+            onClick={handleCopy}
+            label={copied ? "Copied" : "Copy"}
+            icon={copied ? Check : Copy}
+          />
           <ActionBtn onClick={handleDownload} label="Download" icon={Download} />
           <ActionLink href={colabUrl} label="Colab" icon={ExternalLink} />
           <ActionLink href={githubUrl} label="GitHub" icon={ExternalLink} />
