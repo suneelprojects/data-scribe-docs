@@ -40,11 +40,11 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <div className="hidden lg:block">
+        <div className="hidden xl:block">
           <VersionSwitcher />
         </div>
 
-        <nav className="ml-2 hidden items-center gap-1 lg:flex">
+        <nav className="ml-2 hidden items-center gap-1 xl:flex">
           {navLinks.map((l) => (
             <Link
               key={l.to}
@@ -62,11 +62,8 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <div className="hidden xl:block">
-            <InstallChip />
-          </div>
           <div className="hidden md:block">
-            <DocSearch />
+            <DocSearch compact />
           </div>
 
           <a
@@ -93,7 +90,7 @@ export function SiteHeader() {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted lg:hidden"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted xl:hidden"
                 aria-label="Menu"
               >
                 <Menu className="h-4 w-4" />
