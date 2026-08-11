@@ -24,6 +24,7 @@ import {
 import { CodeBlock } from "@/components/CodeBlock";
 import { InstallChip } from "@/components/InstallChip";
 import { CommunityWidget } from "@/components/CommunityWidget";
+import { SpeedLab } from "@/components/SpeedLab";
 
 const INSTALL_CMD = "pip install eazydatafix==1.0.0";
 const PYPI_URL = "https://pypi.org/project/eazydatafix/1.0.0/";
@@ -232,6 +233,8 @@ function Home() {
           <CodeBlock code={UNIFIED_CODE} filename="production_workflow.py" showLineNumbers />
         </div>
       </section>
+
+      <SpeedLab />
 
       <section className="border-b border-border bg-muted/20">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">

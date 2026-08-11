@@ -1,13 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, FileText, Book, Package, Compass } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { searchDocs, type SearchEntry } from "@/content/search-index";
+import { cn } from "@/lib/utils";
 
 const sectionIcons: Record<SearchEntry["section"], typeof FileText> = {
   "Getting Started": Compass,
@@ -16,7 +12,7 @@ const sectionIcons: Record<SearchEntry["section"], typeof FileText> = {
   Meta: FileText,
 };
 
-export function DocSearch() {
+export function DocSearch({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [active, setActive] = useState(0);
@@ -65,11 +61,22 @@ export function DocSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex w-full items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted md:w-64"
+        className={cn(
+          "inline-flex items-center gap-2 rounded-md border border-border bg-muted/40 text-sm text-muted-foreground transition-colors hover:bg-muted",
+          compact ? "h-8 w-8 justify-center p-0" : "w-full px-3 py-1.5 md:w-64",
+        )}
+        aria-label={compact ? "Search documentation" : undefined}
       >
         <Search className="h-3.5 w-3.5" />
-        <span className="flex-1 text-left">Search documentation...</span>
-        <kbd className="hidden shrink-0 rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] md:inline">
+        <span className={cn("flex-1 text-left", compact && "sr-only")}>
+          Search documentation...
+        </span>
+        <kbd
+          className={cn(
+            "hidden shrink-0 rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] md:inline",
+            compact && "md:hidden",
+          )}
+        >
           ⌘K
         </kbd>
       </button>
@@ -149,8 +156,14 @@ export function DocSearch() {
           </div>
           <div className="flex items-center justify-between border-t border-border bg-muted/30 px-4 py-2 text-[11px] text-muted-foreground">
             <div className="flex items-center gap-3">
-              <span><kbd className="rounded border border-border bg-background px-1 font-mono">↑↓</kbd> navigate</span>
-              <span><kbd className="rounded border border-border bg-background px-1 font-mono">↵</kbd> open</span>
+              <span>
+                <kbd className="rounded border border-border bg-background px-1 font-mono">↑↓</kbd>{" "}
+                navigate
+              </span>
+              <span>
+                <kbd className="rounded border border-border bg-background px-1 font-mono">↵</kbd>{" "}
+                open
+              </span>
             </div>
             <Link to="/docs" onClick={() => setOpen(false)} className="hover:text-foreground">
               Browse all docs →
