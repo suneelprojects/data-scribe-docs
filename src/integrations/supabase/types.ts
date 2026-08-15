@@ -14,6 +14,230 @@ export type Database = {
   }
   public: {
     Tables: {
+      content_articles: {
+        Row: {
+          canonical_url: string | null
+          content_markdown: string
+          content_type: string
+          created_at: string
+          created_by_email: string
+          cta_text: string
+          cta_url: string
+          excerpt: string
+          faq: Json
+          id: string
+          image_alt: string
+          image_prompt: string
+          internal_links: string[]
+          meta_description: string
+          meta_title: string
+          model: string | null
+          og_description: string
+          og_title: string
+          pillar: string
+          primary_keyword: string
+          prompt_version: string | null
+          published_at: string | null
+          quality_checks: Json
+          quality_score: number
+          scheduled_at: string | null
+          search_intent: string
+          secondary_keywords: string[]
+          seo_score: number
+          slug: string
+          source_items: Json
+          status: string
+          title: string
+          updated_at: string
+          updated_by_email: string
+        }
+        Insert: {
+          canonical_url?: string | null
+          content_markdown: string
+          content_type?: string
+          created_at?: string
+          created_by_email: string
+          cta_text?: string
+          cta_url?: string
+          excerpt: string
+          faq?: Json
+          id?: string
+          image_alt?: string
+          image_prompt?: string
+          internal_links?: string[]
+          meta_description: string
+          meta_title: string
+          model?: string | null
+          og_description: string
+          og_title: string
+          pillar: string
+          primary_keyword: string
+          prompt_version?: string | null
+          published_at?: string | null
+          quality_checks?: Json
+          quality_score?: number
+          scheduled_at?: string | null
+          search_intent?: string
+          secondary_keywords?: string[]
+          seo_score?: number
+          slug: string
+          source_items?: Json
+          status?: string
+          title: string
+          updated_at?: string
+          updated_by_email: string
+        }
+        Update: {
+          canonical_url?: string | null
+          content_markdown?: string
+          content_type?: string
+          created_at?: string
+          created_by_email?: string
+          cta_text?: string
+          cta_url?: string
+          excerpt?: string
+          faq?: Json
+          id?: string
+          image_alt?: string
+          image_prompt?: string
+          internal_links?: string[]
+          meta_description?: string
+          meta_title?: string
+          model?: string | null
+          og_description?: string
+          og_title?: string
+          pillar?: string
+          primary_keyword?: string
+          prompt_version?: string | null
+          published_at?: string | null
+          quality_checks?: Json
+          quality_score?: number
+          scheduled_at?: string | null
+          search_intent?: string
+          secondary_keywords?: string[]
+          seo_score?: number
+          slug?: string
+          source_items?: Json
+          status?: string
+          title?: string
+          updated_at?: string
+          updated_by_email?: string
+        }
+        Relationships: []
+      }
+      content_audit_log: {
+        Row: {
+          action: string
+          actor_email: string
+          article_id: string | null
+          created_at: string
+          details: Json
+          id: number
+        }
+        Insert: {
+          action: string
+          actor_email: string
+          article_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: number
+        }
+        Update: {
+          action?: string
+          actor_email?: string
+          article_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_audit_log_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "content_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_generation_runs: {
+        Row: {
+          article_count: number
+          article_ids: string[]
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          input_tokens: number | null
+          model: string
+          output_tokens: number | null
+          prompt_version: string
+          requested_by_email: string
+          run_date: string | null
+          run_type: string
+          status: string
+        }
+        Insert: {
+          article_count?: number
+          article_ids?: string[]
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          input_tokens?: number | null
+          model: string
+          output_tokens?: number | null
+          prompt_version: string
+          requested_by_email: string
+          run_date?: string | null
+          run_type: string
+          status?: string
+        }
+        Update: {
+          article_count?: number
+          article_ids?: string[]
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          input_tokens?: number | null
+          model?: string
+          output_tokens?: number | null
+          prompt_version?: string
+          requested_by_email?: string
+          run_date?: string | null
+          run_type?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      content_studio_settings: {
+        Row: {
+          daily_draft_count: number
+          default_author: string
+          id: number
+          prompt_version: string
+          updated_at: string
+          updated_by_email: string
+        }
+        Insert: {
+          daily_draft_count?: number
+          default_author?: string
+          id?: number
+          prompt_version?: string
+          updated_at?: string
+          updated_by_email?: string
+        }
+        Update: {
+          daily_draft_count?: number
+          default_author?: string
+          id?: number
+          prompt_version?: string
+          updated_at?: string
+          updated_by_email?: string
+        }
+        Relationships: []
+      }
       package_analytics_cache: {
         Row: {
           created_at: string
