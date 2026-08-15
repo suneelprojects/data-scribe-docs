@@ -13,6 +13,7 @@ const navLinks = [
   { to: "/docs", label: "Documentation" },
   { to: "/docs/reference", label: "API Reference" },
   { to: "/examples", label: "Examples" },
+  { to: "/blog", label: "Blog" },
   { to: "/roadmap", label: "Roadmap" },
   { to: "/analytics", label: "Analytics" },
   { to: "/ecosystem", label: "Ecosystem" },

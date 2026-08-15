@@ -15,6 +15,7 @@ const cols: { title: string; links: { label: string; to?: string; href?: string 
   {
     title: "Project",
     links: [
+      { label: "Blog", to: "/blog" },
       { label: "Analytics", to: "/analytics" },
       { label: "Roadmap", to: "/roadmap" },
       { label: "Changelog", to: "/changelog" },
@@ -29,6 +30,7 @@ const cols: { title: string; links: { label: string; to?: string; href?: string 
       { label: "PyPI", href: "https://pypi.org/project/eazydatafix/" },
       { label: "License", href: "https://opensource.org/licenses/MIT" },
       { label: "Contributing", to: "/contributing" },
+      { label: "RSS feed", href: "/rss.xml" },
     ],
   },
 ];
