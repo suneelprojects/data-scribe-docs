@@ -9,6 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as EcosystemRouteImport } from './routes/ecosystem'
 import { Route as DocsRouteImport } from './routes/docs'
@@ -19,6 +22,7 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as ReleasesV100RouteImport } from './routes/releases.v1-0-0'
 import { Route as ReleasesV030RouteImport } from './routes/releases.v0-3-0'
 import { Route as ExamplesSlugRouteImport } from './routes/examples.$slug'
@@ -29,10 +33,28 @@ import { Route as DocsInstallationRouteImport } from './routes/docs.installation
 import { Route as DocsFixingRouteImport } from './routes/docs.fixing'
 import { Route as DocsExamplesRouteImport } from './routes/docs.examples'
 import { Route as DocsAssessmentRouteImport } from './routes/docs.assessment'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AdminContentStudioRouteImport } from './routes/admin.content-studio'
 import { Route as DocsReferenceIndexRouteImport } from './routes/docs.reference.index'
 import { Route as DocsReferenceFnRouteImport } from './routes/docs.reference.$fn'
 import { Route as ApiPublicRefreshPackageAnalyticsRouteImport } from './routes/api/public/refresh-package-analytics'
+import { Route as ApiCronGenerateBlogDraftsRouteImport } from './routes/api/cron/generate-blog-drafts'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RssDotxmlRoute = RssDotxmlRouteImport.update({
+  id: '/rss.xml',
+  path: '/rss.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
   path: '/roadmap',
@@ -82,6 +104,11 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DocsRoute,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ReleasesV100Route = ReleasesV100RouteImport.update({
   id: '/releases/v1-0-0',
@@ -133,6 +160,16 @@ const DocsAssessmentRoute = DocsAssessmentRouteImport.update({
   path: '/assessment',
   getParentRoute: () => DocsRoute,
 } as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminContentStudioRoute = AdminContentStudioRouteImport.update({
+  id: '/admin/content-studio',
+  path: '/admin/content-studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsReferenceIndexRoute = DocsReferenceIndexRouteImport.update({
   id: '/reference/',
   path: '/reference/',
@@ -149,6 +186,12 @@ const ApiPublicRefreshPackageAnalyticsRoute =
     path: '/api/public/refresh-package-analytics',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiCronGenerateBlogDraftsRoute =
+  ApiCronGenerateBlogDraftsRouteImport.update({
+    id: '/api/cron/generate-blog-drafts',
+    path: '/api/cron/generate-blog-drafts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -159,6 +202,11 @@ export interface FileRoutesByFullPath {
   '/docs': typeof DocsRouteWithChildren
   '/ecosystem': typeof EcosystemRoute
   '/roadmap': typeof RoadmapRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/rss.xml': typeof RssDotxmlRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/content-studio': typeof AdminContentStudioRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/docs/assessment': typeof DocsAssessmentRoute
   '/docs/examples': typeof DocsExamplesRoute
   '/docs/fixing': typeof DocsFixingRoute
@@ -169,8 +217,10 @@ export interface FileRoutesByFullPath {
   '/examples/$slug': typeof ExamplesSlugRoute
   '/releases/v0-3-0': typeof ReleasesV030Route
   '/releases/v1-0-0': typeof ReleasesV100Route
+  '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
+  '/api/cron/generate-blog-drafts': typeof ApiCronGenerateBlogDraftsRoute
   '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference/': typeof DocsReferenceIndexRoute
@@ -183,6 +233,11 @@ export interface FileRoutesByTo {
   '/contributing': typeof ContributingRoute
   '/ecosystem': typeof EcosystemRoute
   '/roadmap': typeof RoadmapRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/rss.xml': typeof RssDotxmlRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/content-studio': typeof AdminContentStudioRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/docs/assessment': typeof DocsAssessmentRoute
   '/docs/examples': typeof DocsExamplesRoute
   '/docs/fixing': typeof DocsFixingRoute
@@ -193,8 +248,10 @@ export interface FileRoutesByTo {
   '/examples/$slug': typeof ExamplesSlugRoute
   '/releases/v0-3-0': typeof ReleasesV030Route
   '/releases/v1-0-0': typeof ReleasesV100Route
+  '/blog': typeof BlogIndexRoute
   '/docs': typeof DocsIndexRoute
   '/examples': typeof ExamplesIndexRoute
+  '/api/cron/generate-blog-drafts': typeof ApiCronGenerateBlogDraftsRoute
   '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference': typeof DocsReferenceIndexRoute
@@ -209,6 +266,11 @@ export interface FileRoutesById {
   '/docs': typeof DocsRouteWithChildren
   '/ecosystem': typeof EcosystemRoute
   '/roadmap': typeof RoadmapRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/rss.xml': typeof RssDotxmlRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/content-studio': typeof AdminContentStudioRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/docs/assessment': typeof DocsAssessmentRoute
   '/docs/examples': typeof DocsExamplesRoute
   '/docs/fixing': typeof DocsFixingRoute
@@ -219,8 +281,10 @@ export interface FileRoutesById {
   '/examples/$slug': typeof ExamplesSlugRoute
   '/releases/v0-3-0': typeof ReleasesV030Route
   '/releases/v1-0-0': typeof ReleasesV100Route
+  '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
+  '/api/cron/generate-blog-drafts': typeof ApiCronGenerateBlogDraftsRoute
   '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference/': typeof DocsReferenceIndexRoute
@@ -236,6 +300,11 @@ export interface FileRouteTypes {
     | '/docs'
     | '/ecosystem'
     | '/roadmap'
+    | '/robots.txt'
+    | '/rss.xml'
+    | '/sitemap.xml'
+    | '/admin/content-studio'
+    | '/blog/$slug'
     | '/docs/assessment'
     | '/docs/examples'
     | '/docs/fixing'
@@ -246,8 +315,10 @@ export interface FileRouteTypes {
     | '/examples/$slug'
     | '/releases/v0-3-0'
     | '/releases/v1-0-0'
+    | '/blog/'
     | '/docs/'
     | '/examples/'
+    | '/api/cron/generate-blog-drafts'
     | '/api/public/refresh-package-analytics'
     | '/docs/reference/$fn'
     | '/docs/reference/'
@@ -260,6 +331,11 @@ export interface FileRouteTypes {
     | '/contributing'
     | '/ecosystem'
     | '/roadmap'
+    | '/robots.txt'
+    | '/rss.xml'
+    | '/sitemap.xml'
+    | '/admin/content-studio'
+    | '/blog/$slug'
     | '/docs/assessment'
     | '/docs/examples'
     | '/docs/fixing'
@@ -270,8 +346,10 @@ export interface FileRouteTypes {
     | '/examples/$slug'
     | '/releases/v0-3-0'
     | '/releases/v1-0-0'
+    | '/blog'
     | '/docs'
     | '/examples'
+    | '/api/cron/generate-blog-drafts'
     | '/api/public/refresh-package-analytics'
     | '/docs/reference/$fn'
     | '/docs/reference'
@@ -285,6 +363,11 @@ export interface FileRouteTypes {
     | '/docs'
     | '/ecosystem'
     | '/roadmap'
+    | '/robots.txt'
+    | '/rss.xml'
+    | '/sitemap.xml'
+    | '/admin/content-studio'
+    | '/blog/$slug'
     | '/docs/assessment'
     | '/docs/examples'
     | '/docs/fixing'
@@ -295,8 +378,10 @@ export interface FileRouteTypes {
     | '/examples/$slug'
     | '/releases/v0-3-0'
     | '/releases/v1-0-0'
+    | '/blog/'
     | '/docs/'
     | '/examples/'
+    | '/api/cron/generate-blog-drafts'
     | '/api/public/refresh-package-analytics'
     | '/docs/reference/$fn'
     | '/docs/reference/'
@@ -311,15 +396,43 @@ export interface RootRouteChildren {
   DocsRoute: typeof DocsRouteWithChildren
   EcosystemRoute: typeof EcosystemRoute
   RoadmapRoute: typeof RoadmapRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  RssDotxmlRoute: typeof RssDotxmlRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminContentStudioRoute: typeof AdminContentStudioRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   ExamplesSlugRoute: typeof ExamplesSlugRoute
   ReleasesV030Route: typeof ReleasesV030Route
   ReleasesV100Route: typeof ReleasesV100Route
+  BlogIndexRoute: typeof BlogIndexRoute
   ExamplesIndexRoute: typeof ExamplesIndexRoute
+  ApiCronGenerateBlogDraftsRoute: typeof ApiCronGenerateBlogDraftsRoute
   ApiPublicRefreshPackageAnalyticsRoute: typeof ApiPublicRefreshPackageAnalyticsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rss.xml': {
+      id: '/rss.xml'
+      path: '/rss.xml'
+      fullPath: '/rss.xml'
+      preLoaderRoute: typeof RssDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/roadmap': {
       id: '/roadmap'
       path: '/roadmap'
@@ -389,6 +502,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/docs/'
       preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof DocsRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/releases/v1-0-0': {
       id: '/releases/v1-0-0'
@@ -460,6 +580,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsAssessmentRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/content-studio': {
+      id: '/admin/content-studio'
+      path: '/admin/content-studio'
+      fullPath: '/admin/content-studio'
+      preLoaderRoute: typeof AdminContentStudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs/reference/': {
       id: '/docs/reference/'
       path: '/reference'
@@ -479,6 +613,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/refresh-package-analytics'
       fullPath: '/api/public/refresh-package-analytics'
       preLoaderRoute: typeof ApiPublicRefreshPackageAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/generate-blog-drafts': {
+      id: '/api/cron/generate-blog-drafts'
+      path: '/api/cron/generate-blog-drafts'
+      fullPath: '/api/cron/generate-blog-drafts'
+      preLoaderRoute: typeof ApiCronGenerateBlogDraftsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -521,10 +662,17 @@ const rootRouteChildren: RootRouteChildren = {
   DocsRoute: DocsRouteWithChildren,
   EcosystemRoute: EcosystemRoute,
   RoadmapRoute: RoadmapRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  RssDotxmlRoute: RssDotxmlRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminContentStudioRoute: AdminContentStudioRoute,
+  BlogSlugRoute: BlogSlugRoute,
   ExamplesSlugRoute: ExamplesSlugRoute,
   ReleasesV030Route: ReleasesV030Route,
   ReleasesV100Route: ReleasesV100Route,
+  BlogIndexRoute: BlogIndexRoute,
   ExamplesIndexRoute: ExamplesIndexRoute,
+  ApiCronGenerateBlogDraftsRoute: ApiCronGenerateBlogDraftsRoute,
   ApiPublicRefreshPackageAnalyticsRoute: ApiPublicRefreshPackageAnalyticsRoute,
 }
 export const routeTree = rootRouteImport
