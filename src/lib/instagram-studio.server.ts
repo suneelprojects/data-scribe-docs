@@ -20,6 +20,8 @@ const CONTENT_MODEL = process.env["OPENAI_CONTENT_MODEL"]?.trim() || "gpt-5.6";
 const IMAGE_MODEL = process.env["OPENAI_IMAGE_MODEL"]?.trim() || "gpt-image-2";
 const PROMPT_VERSION = "instagram-v1";
 const STORAGE_BUCKET = "instagram-media";
+const PREVIEW_URL_TTL_SECONDS = 60 * 60;
+const META_FETCH_URL_TTL_SECONDS = 60 * 60;
 const SITE_URL = "https://eazydatafix.com";
 
 const EAZYDATAFIX_FACTS = `
@@ -82,9 +84,10 @@ const instagramPostSchema = {
   },
 } as const;
 
-function normalizePost(row: PostRow): InstagramPost {
+function normalizePost(row: PostRow, imageUrl: string | null = row.image_url): InstagramPost {
   return {
     ...row,
+    image_url: imageUrl,
     status: row.status as InstagramPostStatus,
     hashtags: row.hashtags ?? [],
     quality_checks: asInstagramQualityChecks(row.quality_checks),
@@ -323,8 +326,39 @@ async function uploadPostImage(postId: string, imageBytes: Uint8Array) {
     upsert: true,
   });
   if (error) throw new Error(`Unable to store the Instagram image: ${error.message}`);
-  const { data } = supabaseAdmin.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-  return { path, url: `${data.publicUrl}?v=${Date.now()}` };
+  return { path };
+}
+
+async function createSignedImageUrl(path: string, expiresIn = PREVIEW_URL_TTL_SECONDS) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin.storage
+    .from(STORAGE_BUCKET)
+    .createSignedUrl(path, expiresIn);
+  if (error || !data?.signedUrl) {
+    throw new Error(error?.message || "Unable to create a temporary Instagram image URL.");
+  }
+  return data.signedUrl;
+}
+
+async function normalizePostsWithSignedImages(rows: PostRow[]) {
+  const paths = [...new Set(rows.flatMap((row) => (row.image_path ? [row.image_path] : [])))];
+  if (paths.length === 0) return rows.map((row) => normalizePost(row));
+
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin.storage
+    .from(STORAGE_BUCKET)
+    .createSignedUrls(paths, PREVIEW_URL_TTL_SECONDS);
+  if (error || !data) {
+    throw new Error(error?.message || "Unable to create temporary Instagram preview URLs.");
+  }
+  const signedUrls = new Map(
+    data.flatMap((item) =>
+      item.path && item.signedUrl ? [[item.path, item.signedUrl] as const] : [],
+    ),
+  );
+  return rows.map((row) =>
+    normalizePost(row, row.image_path ? (signedUrls.get(row.image_path) ?? null) : row.image_url),
+  );
 }
 
 async function metaRequest<T>(url: string, init?: RequestInit): Promise<T> {
@@ -571,7 +605,7 @@ export async function generateInstagramDraft(options: {
     const image = await uploadPostImage(postId, imageBytes);
     const { data: completedPost, error: updateError } = await supabaseAdmin
       .from("instagram_posts")
-      .update({ image_path: image.path, image_url: image.url, last_error: null })
+      .update({ image_path: image.path, image_url: null, last_error: null })
       .eq("id", postId)
       .select("*")
       .single();
@@ -590,7 +624,13 @@ export async function generateInstagramDraft(options: {
       })
       .eq("id", run.id);
     await instagramAudit(postId, "generated", options.actorEmail, { run_id: run.id });
-    return { skipped: false, created: 1, postIds: [postId], post: normalizePost(completedPost) };
+    const previewUrl = await createSignedImageUrl(image.path);
+    return {
+      skipped: false,
+      created: 1,
+      postIds: [postId],
+      post: normalizePost(completedPost, previewUrl),
+    };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown Instagram generation error";
     await supabaseAdmin
@@ -651,7 +691,7 @@ export async function getInstagramDashboard(claims: unknown): Promise<InstagramD
   if (runsResult.error) throw new Error(runsResult.error.message);
   if (settingsResult.error) throw new Error(settingsResult.error.message);
   if (credentialResult.error) throw new Error(credentialResult.error.message);
-  const posts = (postsResult.data ?? []).map(normalizePost);
+  const posts = await normalizePostsWithSignedImages(postsResult.data ?? []);
   return {
     posts,
     recentRuns: runsResult.data ?? [],
@@ -754,7 +794,7 @@ export async function regenerateInstagramImage(postId: string, claims: unknown) 
     .from("instagram_posts")
     .update({
       image_path: image.path,
-      image_url: image.url,
+      image_url: null,
       status: "draft",
       last_error: null,
       updated_by_email: actorEmail,
@@ -765,7 +805,8 @@ export async function regenerateInstagramImage(postId: string, claims: unknown) 
   if (updateError || !data)
     throw new Error(updateError?.message || "The new image could not be saved.");
   await instagramAudit(postId, "image_regenerated", actorEmail);
-  return normalizePost(data);
+  const previewUrl = await createSignedImageUrl(image.path);
+  return normalizePost(data, previewUrl);
 }
 
 export async function setInstagramPostStatus(
@@ -786,7 +827,11 @@ export async function setInstagramPostStatus(
   if ((input.status === "review" || input.status === "scheduled") && current.quality_score < 80) {
     throw new Error("Quality score must be at least 80 before approval.");
   }
-  if ((input.status === "review" || input.status === "scheduled") && !current.image_url) {
+  if (
+    (input.status === "review" || input.status === "scheduled") &&
+    !current.image_path &&
+    !current.image_url
+  ) {
     throw new Error("Generate an image before approving this post.");
   }
   let scheduledAt: string | null = null;
@@ -858,7 +903,9 @@ export async function publishInstagramPostById(postId: string, actorEmail: strin
   }
   if (current.quality_score < 80)
     throw new Error("Quality score must be at least 80 before publishing.");
-  if (!current.image_url) throw new Error("The Instagram post has no public image URL.");
+  if (!current.image_path && !current.image_url) {
+    throw new Error("The Instagram post has no stored image.");
+  }
 
   await supabaseAdmin
     .from("instagram_posts")
@@ -870,8 +917,12 @@ export async function publishInstagramPostById(postId: string, actorEmail: strin
     if (!credential.instagram_user_id) throw new Error("Instagram account ID is unavailable.");
     let creationId = current.meta_creation_id;
     if (!creationId) {
+      const imageUrl = current.image_path
+        ? await createSignedImageUrl(current.image_path, META_FETCH_URL_TTL_SECONDS)
+        : current.image_url;
+      if (!imageUrl) throw new Error("The Instagram image URL could not be prepared.");
       const body = new URLSearchParams({
-        image_url: current.image_url,
+        image_url: imageUrl,
         caption: publishCaption(current),
         access_token: credential.access_token,
       });

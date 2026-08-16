@@ -20,7 +20,9 @@ For Instagram Studio, also apply:
 supabase/migrations/20260816190000_instagram_studio.sql
 ```
 
-This adds the Instagram draft queue, generation and audit history, service-role-only token storage, settings, and the public `instagram-media` bucket that Meta uses to fetch approved images. Browser users cannot query the Instagram tables or credentials directly.
+This adds the Instagram draft queue, generation and audit history, service-role-only token storage and settings. Keep the `instagram-media` bucket private. The server creates one-hour signed URLs for admin previews and creates a fresh signed URL immediately before Meta fetches an approved image. Signed URLs are not persisted in the database. Browser users cannot query the Instagram tables or credentials directly.
+
+If the managed migration runner rejects the `storage.buckets` statement, create a private bucket named `instagram-media` through the storage dashboard. The application uploads only server-generated JPEG files to that bucket.
 
 ## 2. Configure Lovable Cloud secrets
 
@@ -93,4 +95,4 @@ Publication requires an SEO score of at least 70 and a quality score of at least
 6. Publish the first post manually and confirm the returned Instagram permalink opens.
 7. Schedule a later approved post and confirm the 30-minute workflow publishes it.
 
-Editing approved or scheduled copy returns the post to Draft so it must pass human approval again. Tokens and app secrets are never returned to the browser or written to logs.
+Editing approved or scheduled copy returns the post to Draft so it must pass human approval again. Tokens and app secrets are never returned to the browser or written to logs. Private media is exposed only through short-lived signed URLs created by the server.
