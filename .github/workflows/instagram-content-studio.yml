@@ -1,0 +1,31 @@
+name: EazyDataFix Instagram Content Studio
+
+on:
+  schedule:
+    # Every 30 minutes. The server creates at most one daily draft after 08:00 IST
+    # and publishes only approved posts whose scheduled time has arrived.
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eazydatafix-instagram-content-studio
+  cancel-in-progress: false
+
+jobs:
+  instagram-tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Generate daily draft and publish due approved posts
+        env:
+          CONTENT_STUDIO_CRON_SECRET: ${{ secrets.CONTENT_STUDIO_CRON_SECRET }}
+        run: |
+          test -n "$CONTENT_STUDIO_CRON_SECRET"
+          curl --fail-with-body --silent --show-error \
+            --max-time 540 \
+            --request POST \
+            --header "Authorization: Bearer $CONTENT_STUDIO_CRON_SECRET" \
+            https://eazydatafix.com/api/cron/instagram-studio-tick
