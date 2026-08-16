@@ -1,6 +1,6 @@
 # EazyDataFix Content Studio setup
 
-The Content Studio is available at `/admin/content-studio`. It uses Supabase for authentication and durable content storage, the OpenAI Responses API for structured article generation, and a GitHub Actions schedule for two daily drafts.
+The Content Studio is available at `/admin/content-studio`. It uses Supabase for authentication and durable content storage, OpenAI for structured copy and image generation, Meta's Instagram API for approved publishing, and GitHub Actions for scheduled automation.
 
 ## 1. Apply the database migration
 
@@ -14,6 +14,14 @@ Apply `supabase/migrations/20260815184500_content_studio.sql` to the Supabase pr
 
 Draft, review and archived content is never included in the public read policy.
 
+For Instagram Studio, also apply:
+
+```text
+supabase/migrations/20260816190000_instagram_studio.sql
+```
+
+This adds the Instagram draft queue, generation and audit history, service-role-only token storage, settings, and the public `instagram-media` bucket that Meta uses to fetch approved images. Browser users cannot query the Instagram tables or credentials directly.
+
 ## 2. Configure Lovable Cloud secrets
 
 Add these server-only values in Lovable Cloud. Never prefix them with `VITE_`.
@@ -21,9 +29,13 @@ Add these server-only values in Lovable Cloud. Never prefix them with `VITE_`.
 ```text
 OPENAI_API_KEY
 OPENAI_CONTENT_MODEL=gpt-5.6
+OPENAI_IMAGE_MODEL=gpt-image-2
 CONTENT_ADMIN_EMAILS=approved-admin@example.com
 CONTENT_CRON_SECRET=<a-long-random-value>
 SUPABASE_SERVICE_ROLE_KEY=<existing-project-secret>
+INSTAGRAM_ACCESS_TOKEN=<generated-long-lived-token>
+INSTAGRAM_APP_ID=<instagram-app-id>
+INSTAGRAM_APP_SECRET=<instagram-app-secret>
 ```
 
 `CONTENT_ADMIN_EMAILS` accepts a comma-separated list. The server denies access when this value is empty and never sends the allow-list to the browser.
@@ -47,11 +59,18 @@ https://eazydatafix.com/admin/content-studio
 
 Authentication identifies the user. Server-side `CONTENT_ADMIN_EMAILS` authorization decides who can access the studio.
 
-## 4. Enable the daily schedule
+## 4. Enable the schedules
 
 Create a GitHub Actions repository secret named `CONTENT_STUDIO_CRON_SECRET` with the exact same value used in Lovable Cloud. The workflow runs every day at 08:00 Asia/Kolkata and creates two drafts. It does not publish them.
 
 The endpoint is idempotent by India calendar date, so retries do not create a second daily batch.
+
+The Instagram workflow uses the same GitHub `CONTENT_STUDIO_CRON_SECRET`. It runs every 30 minutes and calls `/api/cron/instagram-studio-tick`. The server:
+
+- Creates at most one Instagram draft per India calendar date after 08:00 IST
+- Leaves every generated post in Draft until an admin approves it
+- Publishes only approved Scheduled posts whose time has arrived
+- Verifies and refreshes the long-lived Instagram token server-side
 
 ## 5. First production check
 
@@ -63,3 +82,15 @@ The endpoint is idempotent by India calendar date, so retries do not create a se
 6. Confirm the article appears under `/blog`, `/sitemap.xml` and `/rss.xml`.
 
 Publication requires an SEO score of at least 70 and a quality score of at least 80.
+
+## 6. First Instagram production check
+
+1. Open the Instagram tab inside `/admin/content-studio`.
+2. Click **Verify connection** and confirm the connected account is `@eazydatafix`.
+3. Generate one draft and wait for its 4:5 image.
+4. Edit the hook, caption, hashtags, image prompt and alt text as needed, then save.
+5. Approve a post only after it reaches a quality score of at least 80.
+6. Publish the first post manually and confirm the returned Instagram permalink opens.
+7. Schedule a later approved post and confirm the 30-minute workflow publishes it.
+
+Editing approved or scheduled copy returns the post to Draft so it must pass human approval again. Tokens and app secrets are never returned to the browser or written to logs.

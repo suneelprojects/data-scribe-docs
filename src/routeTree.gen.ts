@@ -38,6 +38,7 @@ import { Route as AdminContentStudioRouteImport } from './routes/admin.content-s
 import { Route as DocsReferenceIndexRouteImport } from './routes/docs.reference.index'
 import { Route as DocsReferenceFnRouteImport } from './routes/docs.reference.$fn'
 import { Route as ApiPublicRefreshPackageAnalyticsRouteImport } from './routes/api/public/refresh-package-analytics'
+import { Route as ApiCronInstagramStudioTickRouteImport } from './routes/api/cron/instagram-studio-tick'
 import { Route as ApiCronGenerateBlogDraftsRouteImport } from './routes/api/cron/generate-blog-drafts'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -186,6 +187,12 @@ const ApiPublicRefreshPackageAnalyticsRoute =
     path: '/api/public/refresh-package-analytics',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiCronInstagramStudioTickRoute =
+  ApiCronInstagramStudioTickRouteImport.update({
+    id: '/api/cron/instagram-studio-tick',
+    path: '/api/cron/instagram-studio-tick',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiCronGenerateBlogDraftsRoute =
   ApiCronGenerateBlogDraftsRouteImport.update({
     id: '/api/cron/generate-blog-drafts',
@@ -221,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
   '/api/cron/generate-blog-drafts': typeof ApiCronGenerateBlogDraftsRoute
+  '/api/cron/instagram-studio-tick': typeof ApiCronInstagramStudioTickRoute
   '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference/': typeof DocsReferenceIndexRoute
@@ -252,6 +260,7 @@ export interface FileRoutesByTo {
   '/docs': typeof DocsIndexRoute
   '/examples': typeof ExamplesIndexRoute
   '/api/cron/generate-blog-drafts': typeof ApiCronGenerateBlogDraftsRoute
+  '/api/cron/instagram-studio-tick': typeof ApiCronInstagramStudioTickRoute
   '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference': typeof DocsReferenceIndexRoute
@@ -285,6 +294,7 @@ export interface FileRoutesById {
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
   '/api/cron/generate-blog-drafts': typeof ApiCronGenerateBlogDraftsRoute
+  '/api/cron/instagram-studio-tick': typeof ApiCronInstagramStudioTickRoute
   '/api/public/refresh-package-analytics': typeof ApiPublicRefreshPackageAnalyticsRoute
   '/docs/reference/$fn': typeof DocsReferenceFnRoute
   '/docs/reference/': typeof DocsReferenceIndexRoute
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/docs/'
     | '/examples/'
     | '/api/cron/generate-blog-drafts'
+    | '/api/cron/instagram-studio-tick'
     | '/api/public/refresh-package-analytics'
     | '/docs/reference/$fn'
     | '/docs/reference/'
@@ -350,6 +361,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/examples'
     | '/api/cron/generate-blog-drafts'
+    | '/api/cron/instagram-studio-tick'
     | '/api/public/refresh-package-analytics'
     | '/docs/reference/$fn'
     | '/docs/reference'
@@ -382,6 +394,7 @@ export interface FileRouteTypes {
     | '/docs/'
     | '/examples/'
     | '/api/cron/generate-blog-drafts'
+    | '/api/cron/instagram-studio-tick'
     | '/api/public/refresh-package-analytics'
     | '/docs/reference/$fn'
     | '/docs/reference/'
@@ -407,6 +420,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   ExamplesIndexRoute: typeof ExamplesIndexRoute
   ApiCronGenerateBlogDraftsRoute: typeof ApiCronGenerateBlogDraftsRoute
+  ApiCronInstagramStudioTickRoute: typeof ApiCronInstagramStudioTickRoute
   ApiPublicRefreshPackageAnalyticsRoute: typeof ApiPublicRefreshPackageAnalyticsRoute
 }
 
@@ -615,6 +629,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRefreshPackageAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cron/instagram-studio-tick': {
+      id: '/api/cron/instagram-studio-tick'
+      path: '/api/cron/instagram-studio-tick'
+      fullPath: '/api/cron/instagram-studio-tick'
+      preLoaderRoute: typeof ApiCronInstagramStudioTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/cron/generate-blog-drafts': {
       id: '/api/cron/generate-blog-drafts'
       path: '/api/cron/generate-blog-drafts'
@@ -673,6 +694,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   ExamplesIndexRoute: ExamplesIndexRoute,
   ApiCronGenerateBlogDraftsRoute: ApiCronGenerateBlogDraftsRoute,
+  ApiCronInstagramStudioTickRoute: ApiCronInstagramStudioTickRoute,
   ApiPublicRefreshPackageAnalyticsRoute: ApiPublicRefreshPackageAnalyticsRoute,
 }
 export const routeTree = rootRouteImport

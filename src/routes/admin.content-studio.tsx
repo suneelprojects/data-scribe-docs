@@ -15,6 +15,7 @@ import {
   FileCheck2,
   FileText,
   Gauge,
+  Instagram,
   Loader2,
   LogOut,
   Mail,
@@ -31,6 +32,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ArticleMarkdown } from "@/components/ArticleMarkdown";
+import { InstagramStudio } from "@/components/InstagramStudio";
 import { supabase } from "@/integrations/supabase/client";
 import {
   changeContentArticleStatus,
@@ -210,6 +212,7 @@ function ContentStudioApp({ userEmail }: { userEmail: string }) {
   const [scheduling, setScheduling] = useState<ContentArticle | null>(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"all" | ArticleStatus>("all");
+  const [workspace, setWorkspace] = useState<"blog" | "instagram">("blog");
 
   const dashboard = useQuery({
     queryKey: ["content-studio-dashboard"],
@@ -270,25 +273,31 @@ function ContentStudioApp({ userEmail }: { userEmail: string }) {
             </div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Content Studio</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Generate two drafts, improve them with evidence, then approve publication.
+              {workspace === "blog"
+                ? "Generate two drafts, improve them with evidence, then approve publication."
+                : "Create, review, schedule and publish single-image Instagram posts."}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Link
-              to="/blog"
-              target="_blank"
-              className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-background px-3 text-sm font-medium hover:bg-muted"
-            >
-              View blog <ArrowUpRight className="h-4 w-4" />
-            </Link>
-            <button
-              type="button"
-              onClick={() => refresh()}
-              className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-background px-3 text-sm hover:bg-muted"
-            >
-              <RefreshCw className={cn("h-4 w-4", dashboard.isFetching && "animate-spin")} />{" "}
-              Refresh
-            </button>
+            {workspace === "blog" && (
+              <>
+                <Link
+                  to="/blog"
+                  target="_blank"
+                  className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-background px-3 text-sm font-medium hover:bg-muted"
+                >
+                  View blog <ArrowUpRight className="h-4 w-4" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => refresh()}
+                  className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-background px-3 text-sm hover:bg-muted"
+                >
+                  <RefreshCw className={cn("h-4 w-4", dashboard.isFetching && "animate-spin")} />{" "}
+                  Refresh
+                </button>
+              </>
+            )}
             <button
               type="button"
               onClick={() => supabase.auth.signOut()}
@@ -298,144 +307,180 @@ function ContentStudioApp({ userEmail }: { userEmail: string }) {
             </button>
           </div>
         </div>
+        <div className="mx-auto flex max-w-7xl gap-1 px-4 pb-4 sm:px-6">
+          <button
+            type="button"
+            onClick={() => setWorkspace("blog")}
+            className={cn(
+              "inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium",
+              workspace === "blog"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            <FileText className="h-4 w-4" /> Blog articles
+          </button>
+          <button
+            type="button"
+            onClick={() => setWorkspace("instagram")}
+            className={cn(
+              "inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium",
+              workspace === "instagram"
+                ? "bg-gradient-to-r from-fuchsia-600 to-pink-500 text-white"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            <Instagram className="h-4 w-4" /> Instagram
+          </button>
+        </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
-        <Stats dashboard={data} />
+        {workspace === "instagram" ? (
+          <InstagramStudio />
+        ) : (
+          <>
+            <Stats dashboard={data} />
 
-        <section className="mt-6 grid gap-5 xl:grid-cols-[1fr_330px]">
-          <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
+            <section className="mt-6 grid gap-5 xl:grid-cols-[1fr_330px]">
+              <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-semibold">
+                      <Sparkles className="h-4 w-4 text-accent" /> Generate today’s drafts
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      One educational article and one product-led tutorial. Both remain drafts until
+                      you approve them.
+                    </p>
+                  </div>
+                  <div
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-[11px] font-medium",
+                      data.settings.automationReady
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+                    )}
+                  >
+                    {data.settings.automationReady ? "Automation ready" : "Secrets required"}
+                  </div>
+                </div>
+                <textarea
+                  value={topic}
+                  onChange={(event) => setTopic(event.target.value)}
+                  placeholder="Optional editorial direction, for example: mixed date formats in sales data…"
+                  className="mt-5 min-h-24 w-full resize-y rounded-xl border border-input bg-background p-3 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15"
+                />
+                <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    Model: <span className="font-mono text-foreground">{data.settings.model}</span>{" "}
+                    · Prompt: {data.settings.promptVersion}
+                  </p>
+                  <button
+                    type="button"
+                    disabled={generationMutation.isPending}
+                    onClick={() => generationMutation.mutate()}
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-foreground px-4 text-sm font-medium text-background disabled:opacity-60"
+                  >
+                    {generationMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-4 w-4" />
+                    )}
+                    {generationMutation.isPending ? "Writing two drafts…" : "Generate two drafts"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card p-5">
                 <div className="flex items-center gap-2 text-sm font-semibold">
-                  <Sparkles className="h-4 w-4 text-accent" /> Generate today’s drafts
+                  <Settings2 className="h-4 w-4 text-accent" /> Editorial guardrails
                 </div>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  One educational article and one product-led tutorial. Both remain drafts until you
-                  approve them.
-                </p>
-              </div>
-              <div
-                className={cn(
-                  "rounded-full px-2.5 py-1 text-[11px] font-medium",
-                  data.settings.automationReady
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    : "bg-amber-500/10 text-amber-700 dark:text-amber-400",
-                )}
-              >
-                {data.settings.automationReady ? "Automation ready" : "Secrets required"}
-              </div>
-            </div>
-            <textarea
-              value={topic}
-              onChange={(event) => setTopic(event.target.value)}
-              placeholder="Optional editorial direction, for example: mixed date formats in sales data…"
-              className="mt-5 min-h-24 w-full resize-y rounded-xl border border-input bg-background p-3 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/15"
-            />
-            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-muted-foreground">
-                Model: <span className="font-mono text-foreground">{data.settings.model}</span> ·
-                Prompt: {data.settings.promptVersion}
-              </p>
-              <button
-                type="button"
-                disabled={generationMutation.isPending}
-                onClick={() => generationMutation.mutate()}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-foreground px-4 text-sm font-medium text-background disabled:opacity-60"
-              >
-                {generationMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Sparkles className="h-4 w-4" />
-                )}
-                {generationMutation.isPending ? "Writing two drafts…" : "Generate two drafts"}
-              </button>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <Settings2 className="h-4 w-4 text-accent" /> Editorial guardrails
-            </div>
-            <div className="mt-4 space-y-3 text-xs">
-              {[
-                "No unsupported speed or time claims",
-                "Only verified EazyDataFix API names",
-                "SEO score ≥70 before publication",
-                "Quality score ≥80 before publication",
-                "Human review remains mandatory",
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-2 text-muted-foreground">
-                  <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
-                  <span>{item}</span>
+                <div className="mt-4 space-y-3 text-xs">
+                  {[
+                    "No unsupported speed or time claims",
+                    "Only verified EazyDataFix API names",
+                    "SEO score ≥70 before publication",
+                    "Quality score ≥80 before publication",
+                    "Human review remains mandatory",
+                  ].map((item) => (
+                    <div key={item} className="flex items-start gap-2 text-muted-foreground">
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+              </div>
+            </section>
 
-        <section className="mt-6 rounded-2xl border border-border bg-card">
-          <div className="flex flex-col gap-4 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Editorial queue</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Edit, review, schedule and publish from a single queue.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <label className="relative">
-                <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search articles"
-                  className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm outline-none focus:border-accent sm:w-56"
-                />
-              </label>
-              <select
-                value={status}
-                onChange={(event) => setStatus(event.target.value as "all" | ArticleStatus)}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus:border-accent"
-              >
-                <option value="all">All statuses</option>
-                <option value="draft">Draft</option>
-                <option value="review">Review</option>
-                <option value="scheduled">Scheduled</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-          </div>
-          {articles.length > 0 ? (
-            <div className="divide-y divide-border">
-              {articles.map((article) => (
-                <ArticleRow
-                  key={article.id}
-                  article={article}
-                  busy={statusMutation.isPending}
-                  onEdit={() => setEditing(article)}
-                  onReview={() => statusMutation.mutate({ id: article.id, status: "review" })}
-                  onPublish={() => statusMutation.mutate({ id: article.id, status: "published" })}
-                  onSchedule={() => setScheduling(article)}
-                  onArchive={() => statusMutation.mutate({ id: article.id, status: "archived" })}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="px-5 py-16 text-center">
-              <FileText className="mx-auto h-7 w-7 text-muted-foreground" />
-              <div className="mt-3 text-sm font-medium">No articles match this view</div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Generate today’s drafts or clear the current filters.
-              </p>
-            </div>
-          )}
-        </section>
+            <section className="mt-6 rounded-2xl border border-border bg-card">
+              <div className="flex flex-col gap-4 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold">Editorial queue</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Edit, review, schedule and publish from a single queue.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <label className="relative">
+                    <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <input
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                      placeholder="Search articles"
+                      className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm outline-none focus:border-accent sm:w-56"
+                    />
+                  </label>
+                  <select
+                    value={status}
+                    onChange={(event) => setStatus(event.target.value as "all" | ArticleStatus)}
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus:border-accent"
+                  >
+                    <option value="all">All statuses</option>
+                    <option value="draft">Draft</option>
+                    <option value="review">Review</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="published">Published</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </div>
+              </div>
+              {articles.length > 0 ? (
+                <div className="divide-y divide-border">
+                  {articles.map((article) => (
+                    <ArticleRow
+                      key={article.id}
+                      article={article}
+                      busy={statusMutation.isPending}
+                      onEdit={() => setEditing(article)}
+                      onReview={() => statusMutation.mutate({ id: article.id, status: "review" })}
+                      onPublish={() =>
+                        statusMutation.mutate({ id: article.id, status: "published" })
+                      }
+                      onSchedule={() => setScheduling(article)}
+                      onArchive={() =>
+                        statusMutation.mutate({ id: article.id, status: "archived" })
+                      }
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="px-5 py-16 text-center">
+                  <FileText className="mx-auto h-7 w-7 text-muted-foreground" />
+                  <div className="mt-3 text-sm font-medium">No articles match this view</div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Generate today’s drafts or clear the current filters.
+                  </p>
+                </div>
+              )}
+            </section>
 
-        <RecentRuns runs={data.recentRuns} />
+            <RecentRuns runs={data.recentRuns} />
+          </>
+        )}
       </div>
 
-      {editing && (
+      {workspace === "blog" && editing && (
         <ArticleEditor
           article={editing}
           onClose={() => setEditing(null)}
@@ -445,7 +490,7 @@ function ContentStudioApp({ userEmail }: { userEmail: string }) {
           }}
         />
       )}
-      {scheduling && (
+      {workspace === "blog" && scheduling && (
         <ScheduleDialog
           article={scheduling}
           busy={statusMutation.isPending}
