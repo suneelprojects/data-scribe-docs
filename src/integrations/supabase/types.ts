@@ -238,6 +238,256 @@ export type Database = {
         }
         Relationships: []
       }
+      instagram_audit_log: {
+        Row: {
+          action: string
+          actor_email: string
+          created_at: string
+          details: Json
+          id: number
+          post_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_email: string
+          created_at?: string
+          details?: Json
+          id?: number
+          post_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string
+          created_at?: string
+          details?: Json
+          id?: number
+          post_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instagram_audit_log_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "instagram_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instagram_credentials: {
+        Row: {
+          access_token: string
+          created_at: string
+          id: number
+          instagram_user_id: string | null
+          instagram_username: string | null
+          last_refreshed_at: string | null
+          last_verified_at: string | null
+          token_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          id?: number
+          instagram_user_id?: string | null
+          instagram_username?: string | null
+          last_refreshed_at?: string | null
+          last_verified_at?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          id?: number
+          instagram_user_id?: string | null
+          instagram_username?: string | null
+          last_refreshed_at?: string | null
+          last_verified_at?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      instagram_generation_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          image_model: string
+          input_tokens: number | null
+          model: string
+          output_tokens: number | null
+          post_count: number
+          post_ids: string[]
+          prompt_version: string
+          requested_by_email: string
+          run_date: string | null
+          run_type: string
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          image_model: string
+          input_tokens?: number | null
+          model: string
+          output_tokens?: number | null
+          post_count?: number
+          post_ids?: string[]
+          prompt_version: string
+          requested_by_email: string
+          run_date?: string | null
+          run_type: string
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          image_model?: string
+          input_tokens?: number | null
+          model?: string
+          output_tokens?: number | null
+          post_count?: number
+          post_ids?: string[]
+          prompt_version?: string
+          requested_by_email?: string
+          run_date?: string | null
+          run_type?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      instagram_posts: {
+        Row: {
+          caption: string
+          created_at: string
+          created_by_email: string
+          hashtags: string[]
+          hook: string
+          id: string
+          image_alt: string
+          image_model: string | null
+          image_path: string | null
+          image_prompt: string
+          image_url: string | null
+          instagram_media_id: string | null
+          instagram_permalink: string | null
+          last_error: string | null
+          meta_creation_id: string | null
+          model: string | null
+          pillar: string
+          prompt_version: string | null
+          published_at: string | null
+          quality_checks: Json
+          quality_score: number
+          scheduled_at: string | null
+          source_article_id: string | null
+          status: string
+          updated_at: string
+          updated_by_email: string
+        }
+        Insert: {
+          caption: string
+          created_at?: string
+          created_by_email: string
+          hashtags?: string[]
+          hook: string
+          id?: string
+          image_alt: string
+          image_model?: string | null
+          image_path?: string | null
+          image_prompt: string
+          image_url?: string | null
+          instagram_media_id?: string | null
+          instagram_permalink?: string | null
+          last_error?: string | null
+          meta_creation_id?: string | null
+          model?: string | null
+          pillar: string
+          prompt_version?: string | null
+          published_at?: string | null
+          quality_checks?: Json
+          quality_score?: number
+          scheduled_at?: string | null
+          source_article_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by_email: string
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          created_by_email?: string
+          hashtags?: string[]
+          hook?: string
+          id?: string
+          image_alt?: string
+          image_model?: string | null
+          image_path?: string | null
+          image_prompt?: string
+          image_url?: string | null
+          instagram_media_id?: string | null
+          instagram_permalink?: string | null
+          last_error?: string | null
+          meta_creation_id?: string | null
+          model?: string | null
+          pillar?: string
+          prompt_version?: string | null
+          published_at?: string | null
+          quality_checks?: Json
+          quality_score?: number
+          scheduled_at?: string | null
+          source_article_id?: string | null
+          status?: string
+          updated_at?: string
+          updated_by_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instagram_posts_source_article_id_fkey"
+            columns: ["source_article_id"]
+            isOneToOne: false
+            referencedRelation: "content_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instagram_studio_settings: {
+        Row: {
+          daily_draft_count: number
+          default_publish_time: string
+          id: number
+          prompt_version: string
+          timezone: string
+          updated_at: string
+          updated_by_email: string
+        }
+        Insert: {
+          daily_draft_count?: number
+          default_publish_time?: string
+          id?: number
+          prompt_version?: string
+          timezone?: string
+          updated_at?: string
+          updated_by_email?: string
+        }
+        Update: {
+          daily_draft_count?: number
+          default_publish_time?: string
+          id?: number
+          prompt_version?: string
+          timezone?: string
+          updated_at?: string
+          updated_by_email?: string
+        }
+        Relationships: []
+      }
       package_analytics_cache: {
         Row: {
           created_at: string
