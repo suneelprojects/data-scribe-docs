@@ -70,6 +70,8 @@ The endpoint is idempotent by India calendar date, so retries do not create a se
 The Instagram workflow uses the same GitHub `CONTENT_STUDIO_CRON_SECRET`. It runs every 30 minutes and calls `/api/cron/instagram-studio-tick`. The server:
 
 - Creates at most one Instagram draft per India calendar date after 08:00 IST
+- Rotates a balanced weekly feed: education, meme, quick tip, original quote, problem story, community prompt and one soft product post
+- Generates every image as a consistent 4:5 EazyDataFix poster with a brand area, category, headline and website footer
 - Leaves every generated post in Draft until an admin approves it
 - Publishes only approved Scheduled posts whose time has arrived
 - Verifies and refreshes the long-lived Instagram token server-side

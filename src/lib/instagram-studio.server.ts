@@ -18,7 +18,7 @@ const GRAPH_URL = `https://graph.instagram.com/${GRAPH_VERSION}`;
 const FACEBOOK_GRAPH_URL = `https://graph.facebook.com/${GRAPH_VERSION}`;
 const CONTENT_MODEL = process.env["OPENAI_CONTENT_MODEL"]?.trim() || "gpt-5.6";
 const IMAGE_MODEL = process.env["OPENAI_IMAGE_MODEL"]?.trim() || "gpt-image-2";
-const PROMPT_VERSION = "instagram-v1";
+const PROMPT_VERSION = "instagram-v2-branded-mix";
 const STORAGE_BUCKET = "instagram-media";
 const PREVIEW_URL_TTL_SECONDS = 60 * 60;
 const META_FETCH_URL_TTL_SECONDS = 60 * 60;
@@ -43,6 +43,96 @@ type GeneratedInstagramPost = {
   hashtags: string[];
   image_prompt: string;
   image_alt: string;
+};
+
+type InstagramContentFormat =
+  | "education"
+  | "quick-tip"
+  | "meme"
+  | "quote"
+  | "problem-story"
+  | "community"
+  | "product";
+
+type InstagramContentPlan = {
+  format: InstagramContentFormat;
+  pillar: string;
+  direction: string;
+  captionGuide: string;
+  usePublishedArticle: boolean;
+  requireCta: boolean;
+};
+
+const CONTENT_ROTATION: Record<number, InstagramContentPlan> = {
+  0: {
+    format: "product",
+    pillar: "EazyDataFix in practice",
+    direction:
+      "Show one practical EazyDataFix capability through a real data-workflow problem. Keep the promotion useful and restrained.",
+    captionGuide: "Write 250-1,000 characters and finish with a soft CTA to eazydatafix.com.",
+    usePublishedArticle: true,
+    requireCta: true,
+  },
+  1: {
+    format: "education",
+    pillar: "Data clarity",
+    direction:
+      "Teach one accurate, broadly useful data-analysis or data-quality concept without turning the post into a product advertisement.",
+    captionGuide:
+      "Write 220-900 characters with one concrete example and one practical takeaway. Do not force a CTA or product mention.",
+    usePublishedArticle: false,
+    requireCta: false,
+  },
+  2: {
+    format: "meme",
+    pillar: "Analyst life meme",
+    direction:
+      "Create an original, good-natured and highly relatable data-analyst meme about messy data, spreadsheets, debugging or stakeholder requests. Never mock a protected group or a real person.",
+    captionGuide:
+      "Write 80-450 characters. Let the joke breathe, add one relatable observation and do not include a sales CTA.",
+    usePublishedArticle: false,
+    requireCta: false,
+  },
+  3: {
+    format: "quick-tip",
+    pillar: "Data quick tip",
+    direction:
+      "Give one immediately useful data-analysis, Python, pandas or data-quality tip that a learner can apply today.",
+    captionGuide:
+      "Write 160-700 characters with a clear action or mini checklist. Do not force a product mention or CTA.",
+    usePublishedArticle: false,
+    requireCta: false,
+  },
+  4: {
+    format: "quote",
+    pillar: "Data mindset",
+    direction:
+      "Write one original, memorable quote about data thinking, evidence, curiosity or clean analysis. Do not attribute it to another person.",
+    captionGuide:
+      "Write 80-500 characters with the original quote first and a brief reflection. No sales CTA.",
+    usePublishedArticle: false,
+    requireCta: false,
+  },
+  5: {
+    format: "problem-story",
+    pillar: "Data problem of the week",
+    direction:
+      "Tell a short, realistic data-work problem and reveal the lesson. Focus on the analyst's experience, not on selling software.",
+    captionGuide:
+      "Write 220-900 characters with a setup, consequence and practical lesson. Do not force a product CTA.",
+    usePublishedArticle: false,
+    requireCta: false,
+  },
+  6: {
+    format: "community",
+    pillar: "Data community",
+    direction:
+      "Start a thoughtful conversation or small data challenge for analysts and learners. Ask one genuine question without engagement bait.",
+    captionGuide:
+      "Write 100-550 characters and end with one specific discussion question. No sales CTA.",
+    usePublishedArticle: false,
+    requireCta: false,
+  },
 };
 
 type OpenAITextPayload = {
@@ -106,9 +196,15 @@ function normalizeHashtags(values: string[]) {
 }
 
 function evaluatePost(
-  post: Pick<InstagramPost, "hook" | "caption" | "hashtags" | "image_prompt" | "image_alt">,
+  post: Pick<
+    InstagramPost,
+    "pillar" | "hook" | "caption" | "hashtags" | "image_prompt" | "image_alt"
+  >,
 ) {
   const fullText = `${post.hook} ${post.caption}`;
+  const plan = contentPlanForPillar(post.pillar);
+  const shortForm = plan?.format === "meme" || plan?.format === "quote";
+  const minimumCaptionLength = shortForm ? 80 : plan?.format === "community" ? 100 : 160;
   const unsupportedClaim =
     /\b(?:\d+(?:\.\d+)?\s*(?:x|times)\s+faster|saves?\s+\d+\s*(?:hours?|minutes?)|\d+%\s+(?:faster|better|less|more))\b/i.test(
       fullText,
@@ -127,11 +223,11 @@ function evaluatePost(
       "Keep the hook between 15 and 140 characters",
     ],
     [
-      post.caption.trim().length >= 250 && post.caption.trim().length <= 1800,
+      post.caption.trim().length >= minimumCaptionLength && post.caption.trim().length <= 1800,
       20,
       "caption-length",
-      "Caption has useful depth",
-      "Keep the caption between 250 and 1,800 characters",
+      "Caption length fits the content format",
+      `Keep this ${plan?.format ?? "post"} caption between ${minimumCaptionLength} and 1,800 characters`,
     ],
     [
       hashtags.length >= 4 && hashtags.length <= 8,
@@ -148,11 +244,11 @@ function evaluatePost(
       "Remove numerical performance or time-saving claims without evidence",
     ],
     [
-      /eazydatafix\.com|link in (?:the )?bio/i.test(post.caption),
+      !plan?.requireCta || /eazydatafix\.com|link in (?:the )?bio/i.test(post.caption),
       10,
       "cta",
-      "Caption includes a clear destination",
-      "Add eazydatafix.com or a link-in-bio call to action",
+      plan?.requireCta ? "Product post includes a clear destination" : "No forced sales CTA",
+      "Add eazydatafix.com or a link-in-bio CTA to this product-focused post",
     ],
     [
       post.image_alt.trim().length >= 20 && post.image_alt.trim().length <= 220,
@@ -206,6 +302,45 @@ function istHour() {
   );
 }
 
+function istWeekdayIndex() {
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    weekday: "short",
+  }).format(new Date());
+  return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(weekday);
+}
+
+function contentPlanForPillar(pillar: string) {
+  const normalized = pillar.trim().toLowerCase();
+  return Object.values(CONTENT_ROTATION).find((plan) => plan.pillar.toLowerCase() === normalized);
+}
+
+function selectContentPlan(topic?: string): InstagramContentPlan {
+  const direction = topic?.trim();
+  if (!direction) return CONTENT_ROTATION[istWeekdayIndex()] ?? CONTENT_ROTATION[1];
+
+  const lower = direction.toLowerCase();
+  const day = /\bmeme\b/.test(lower)
+    ? 2
+    : /\bquote\b|mindset/.test(lower)
+      ? 4
+      : /\btip\b|checklist|how[- ]to/.test(lower)
+        ? 3
+        : /\bquestion\b|challenge|community/.test(lower)
+          ? 6
+          : /eazydatafix|product|feature|tutorial/.test(lower)
+            ? 0
+            : /story|mistake|problem/.test(lower)
+              ? 5
+              : 1;
+  const base = CONTENT_ROTATION[day];
+  return {
+    ...base,
+    direction: `Follow this admin direction: ${direction}\n\n${base.direction}`,
+    usePublishedArticle: false,
+  };
+}
+
 async function instagramAudit(
   postId: string | null,
   action: string,
@@ -224,6 +359,7 @@ async function instagramAudit(
 
 async function callOpenAIForPost(options: {
   topic?: string;
+  contentPlan: InstagramContentPlan;
   sourceArticle?: {
     title: string;
     excerpt: string;
@@ -237,7 +373,7 @@ async function callOpenAIForPost(options: {
   const recent = options.recentPosts.map((post) => `- ${post.hook} | ${post.pillar}`).join("\n");
   const source = options.sourceArticle
     ? `Use this verified EazyDataFix article as the primary source:\nTitle: ${options.sourceArticle.title}\nKeyword: ${options.sourceArticle.primary_keyword}\nExcerpt: ${options.sourceArticle.excerpt}\nArticle body:\n${options.sourceArticle.content_markdown.slice(0, 7000)}`
-    : "Create a practical post from the verified EazyDataFix product facts.";
+    : "No product article is required for this post. Use accurate, broadly accepted data-analysis knowledge and avoid unsupported claims.";
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
@@ -248,16 +384,24 @@ async function callOpenAIForPost(options: {
       model: CONTENT_MODEL,
       store: false,
       max_output_tokens: 2500,
-      instructions: `You are the social content editor for EazyDataFix. Create accurate, useful Instagram content for data analysts and Python learners. Return only the requested structured output. ${EAZYDATAFIX_FACTS}`,
+      instructions: `You are the social content editor for EazyDataFix. Build a trustworthy, useful and human Instagram presence for data analysts and Python learners. The feed must not feel like a continuous advertisement. Return only the requested structured output. ${EAZYDATAFIX_FACTS}`,
       input: `${options.topic?.trim() ? `Admin direction: ${options.topic.trim()}\n` : ""}${source}
 
 Create one single-image Instagram post.
-- Write a scroll-stopping but honest hook.
-- Write a 250-1,200 character educational caption with short paragraphs, one practical takeaway and a natural CTA to eazydatafix.com or the link in bio.
+- Assigned format: ${options.contentPlan.format}
+- Required content pillar (return this exact value): ${options.contentPlan.pillar}
+- Editorial direction: ${options.contentPlan.direction}
+- Caption guidance: ${options.contentPlan.captionGuide}
+- Write a scroll-stopping but honest hook between 35 and 90 characters so it also works as the poster headline.
+- Keep the caption natural, useful and easy to scan with short paragraphs.
 - Use four to eight focused hashtags. Return them without the # character.
 - Do not use fabricated numbers, testimonials, performance claims or engagement bait.
+- Mention EazyDataFix only when the assigned format is product or when it is genuinely necessary to answer the admin direction.
+- ${options.contentPlan.requireCta ? "Include one soft CTA to eazydatafix.com or the link in bio." : "Do not add eazydatafix.com, link-in-bio language or a sales CTA."}
 - Do not repeat the same idea as these recent posts:\n${recent || "- No previous Instagram posts."}
-- The image prompt must describe a premium 4:5 editorial illustration about data quality or analysis, using midnight navy, cyan, cobalt and restrained green accents. No readable words, logos, watermarks, UI screenshots or code text.
+- The image prompt must describe the visual concept and artwork for a branded 4:5 EazyDataFix poster. Use deep navy, cyan, cobalt, white and restrained green accents. Match the assigned format: educational diagram for education/tips, witty conceptual scene for a meme, calm symbolic visual for a quote, narrative visual for a problem story, or a polished product concept for product content.
+- Keep the lower section visually calm and low-detail for the headline. The image-generation step supplies the exact visible brand, category, headline and footer separately.
+- Do not request any additional readable words, logos, watermarks, UI screenshots or code text inside the artwork.
 - Image alt text must objectively describe the intended visual.
 `,
       text: {
@@ -285,7 +429,10 @@ Create one single-image Instagram post.
   };
 }
 
-async function generateImage(prompt: string) {
+async function generateImage(
+  prompt: string,
+  poster: { hook: string; pillar: string; format: InstagramContentFormat },
+) {
   const apiKey = process.env["OPENAI_API_KEY"];
   if (!apiKey) throw new Error("OPENAI_API_KEY is not configured in Lovable Cloud.");
   const response = await fetch("https://api.openai.com/v1/images/generations", {
@@ -296,7 +443,25 @@ async function generateImage(prompt: string) {
     },
     body: JSON.stringify({
       model: IMAGE_MODEL,
-      prompt: `${prompt}\nPortrait 4:5 composition. Professional editorial illustration. No readable text, no letters, no numbers, no logo, no watermark, no interface screenshot.`,
+      prompt: `${prompt}
+
+Create a complete premium vertical 4:5 EazyDataFix social poster for the ${poster.format.replace(/-/g, " ")} format.
+
+CONSISTENT BRAND SYSTEM:
+- Deep midnight navy background with cyan, cobalt, white and restrained green accents.
+- Small clean EazyDataFix brand area at the top-left.
+- Visual storytelling occupies the upper and middle area.
+- Dark low-detail gradient panel in the lower section for the headline.
+- Modern editorial typography, strong hierarchy, generous spacing and safe margins.
+- Premium educational design, not a generic corporate advertisement.
+
+USE ONLY THESE EXACT VISIBLE TEXT STRINGS:
+- Brand: "EazyDataFix"
+- Category: "${poster.pillar}"
+- Main headline: "${poster.hook}"
+- Footer: "eazydatafix.com"
+
+Spell every visible word exactly. Keep the headline large and readable. Do not invent or add any other words, numbers, logos, watermarks, UI screenshots or code text.`,
       n: 1,
       size: IMAGE_MODEL === "gpt-image-2" ? "1024x1280" : "1024x1536",
       quality: "medium",
@@ -540,6 +705,7 @@ export async function generateInstagramDraft(options: {
 
   let postId: string | null = null;
   try {
+    const contentPlan = selectContentPlan(options.topic);
     const [recentResult, usedSourcesResult] = await Promise.all([
       supabaseAdmin
         .from("instagram_posts")
@@ -558,7 +724,7 @@ export async function generateInstagramDraft(options: {
       .map((row) => row.source_article_id)
       .filter((id): id is string => Boolean(id));
     let sourceArticle = null;
-    if (!options.topic?.trim()) {
+    if (contentPlan.usePublishedArticle) {
       let query = supabaseAdmin
         .from("content_articles")
         .select("id, title, excerpt, content_markdown, primary_keyword")
@@ -572,21 +738,23 @@ export async function generateInstagramDraft(options: {
     }
     const generated = await callOpenAIForPost({
       topic: options.topic,
+      contentPlan,
       sourceArticle,
       recentPosts: recentResult.data ?? [],
     });
-    const evaluated = evaluatePost(generated.post as InstagramPost);
+    const generatedPost = { ...generated.post, pillar: contentPlan.pillar };
+    const evaluated = evaluatePost(generatedPost as InstagramPost);
     const { data: inserted, error: insertError } = await supabaseAdmin
       .from("instagram_posts")
       .insert({
         source_article_id: sourceArticle?.id ?? null,
         status: "draft",
-        pillar: generated.post.pillar.trim(),
-        hook: generated.post.hook.trim(),
-        caption: generated.post.caption.trim(),
+        pillar: contentPlan.pillar,
+        hook: generatedPost.hook.trim(),
+        caption: generatedPost.caption.trim(),
         hashtags: evaluated.hashtags,
-        image_prompt: generated.post.image_prompt.trim(),
-        image_alt: generated.post.image_alt.trim(),
+        image_prompt: generatedPost.image_prompt.trim(),
+        image_alt: generatedPost.image_alt.trim(),
         quality_score: evaluated.qualityScore,
         quality_checks: evaluated.qualityChecks as unknown as Json,
         model: CONTENT_MODEL,
@@ -601,7 +769,11 @@ export async function generateInstagramDraft(options: {
       throw new Error(insertError?.message || "Instagram draft could not be saved.");
     postId = inserted.id;
 
-    const imageBytes = await generateImage(generated.post.image_prompt);
+    const imageBytes = await generateImage(generatedPost.image_prompt, {
+      hook: generatedPost.hook,
+      pillar: contentPlan.pillar,
+      format: contentPlan.format,
+    });
     const image = await uploadPostImage(postId, imageBytes);
     const { data: completedPost, error: updateError } = await supabaseAdmin
       .from("instagram_posts")
@@ -788,7 +960,11 @@ export async function regenerateInstagramImage(postId: string, claims: unknown) 
   if (["publishing", "published", "archived"].includes(post.status)) {
     throw new Error("This post cannot receive a new image in its current status.");
   }
-  const imageBytes = await generateImage(post.image_prompt);
+  const imageBytes = await generateImage(post.image_prompt, {
+    hook: post.hook,
+    pillar: post.pillar,
+    format: contentPlanForPillar(post.pillar)?.format ?? "education",
+  });
   const image = await uploadPostImage(postId, imageBytes);
   const { data, error: updateError } = await supabaseAdmin
     .from("instagram_posts")
