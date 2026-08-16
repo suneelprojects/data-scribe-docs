@@ -165,8 +165,8 @@ export function InstagramStudio() {
                 <Sparkles className="h-4 w-4 text-pink-500" /> Generate one Instagram draft
               </div>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                AI creates the caption, focused hashtags and a 4:5 image. Nothing publishes without
-                your approval.
+                AI rotates education, tips, memes, quotes, community and occasional product content,
+                then creates a branded 4:5 poster. Nothing publishes without your approval.
               </p>
             </div>
             <span
