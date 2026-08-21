@@ -1,15 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { DocPageHeader } from "@/components/DocPageHeader";
 import { CodeBlock } from "@/components/CodeBlock";
+import { DocPageHeader } from "@/components/DocPageHeader";
 import { ReplBlock } from "@/components/ReplBlock";
 
 export const Route = createFileRoute("/docs/profiling")({
   head: () => ({
     meta: [
       { title: "Profiling — EazyDataFix" },
-      { name: "description", content: "Deep column-level profiling with edf.profile()." },
+      { name: "description", content: "Structural dataset profiling with edf.profile()." },
       { property: "og:title", content: "Profiling — EazyDataFix" },
-      { property: "og:description", content: "Column-level profiling for pandas DataFrames." },
+      { property: "og:description", content: "Structural profiles for supported datasets." },
     ],
   }),
   component: Page,
@@ -21,55 +21,61 @@ function Page() {
       <DocPageHeader
         breadcrumbs={[{ label: "Docs", to: "/docs" }, { label: "Profiling" }]}
         title="Profiling"
-        description="edf.profile() computes rich per-column statistics — dtype, cardinality, nulls, distribution summary and pairwise correlations."
+        description="edf.profile() gives you a fast structural inventory: shape, columns, data types and memory use."
       />
       <div id="doc-content" className="prose-doc">
         <h2 id="basic-usage">Basic usage</h2>
         <CodeBlock
-          code={`import pandas as pd\nimport eazydatafix as edf\n\ndf = pd.read_csv("hospital.csv")\nprof = edf.profile(df, sample=10_000)\nprof.columns["age"]`}
+          code={`import eazydatafix as edf
+
+profile = edf.profile("hospital.csv")
+
+print(profile.rows, profile.columns)
+print(profile.column_names)
+print(profile.data_types)
+print(profile.memory_usage_bytes)`}
           filename="profile.py"
         />
 
         <ReplBlock
           lines={[
-            { kind: "in", text: 'prof = edf.profile(df, sample=10_000)' },
-            { kind: "in", text: 'prof.columns["age"]' },
-            { kind: "out", text: "ColumnProfile(age)" },
-            { kind: "out", text: "  dtype       int64" },
-            { kind: "out", text: "  missing     0" },
-            { kind: "out", text: "  unique      87" },
-            { kind: "out", text: "  min         0" },
-            { kind: "out", text: "  max         104" },
-            { kind: "out", text: "  mean        42.3" },
-            { kind: "out", text: "  median      41" },
+            { kind: "in", text: "profile.rows, profile.columns" },
+            { kind: "out", text: "(15, 8)" },
+            { kind: "in", text: "profile.column_names[:3]" },
+            { kind: "out", text: "['patient_id', 'age', 'gender']" },
           ]}
         />
 
-        <h2 id="correlations">Correlations</h2>
-        <p>
-          By default, <code>profile()</code> computes Pearson correlations for numeric columns.
-          Disable with <code>correlations=False</code> on very wide datasets.
-        </p>
+        <h2 id="fields">Available fields</h2>
+        <ul>
+          <li>
+            <code>file_name</code> and <code>file_type</code>
+          </li>
+          <li>
+            <code>rows</code> and <code>columns</code>
+          </li>
+          <li>
+            <code>column_names</code> and <code>data_types</code>
+          </li>
+          <li>
+            <code>memory_usage_bytes</code>
+          </li>
+        </ul>
 
-        <h2 id="sampling">Sampling</h2>
+        <h2 id="scope">Profile versus assess</h2>
         <p>
-          For datasets larger than ~5M rows, pass <code>sample=</code> to keep profiling under a
-          second while retaining a representative distribution.
-        </p>
-
-        <h2 id="exporting">Exporting</h2>
-        <p>
-          <code>prof.to_html("out.html")</code> writes a shareable HTML profile.{" "}
-          <code>prof.to_dict()</code> returns a JSON-friendly dict.
+          A profile describes the dataset structure only. Use <code>edf.assess()</code> when you
+          need missing-value counts, duplicates, quality dimensions, recommendations or an
+          exportable report.
         </p>
 
         <h2 id="see-also">See also</h2>
         <p>
-          Full options at{" "}
+          Full details at{" "}
           <Link to="/docs/reference/$fn" params={{ fn: "profile" }}>
             <code>edf.profile()</code>
           </Link>
-          .
+          , or continue to <Link to="/docs/assessment">assessment</Link>.
         </p>
       </div>
     </div>

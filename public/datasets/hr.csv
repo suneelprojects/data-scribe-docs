@@ -1,0 +1,13 @@
+employee_id,name,department,role,start_date,employment_type,location
+SYN-HR001,Synthetic Employee 001,Engineering,Data Engineer,2022-03-14,Full-time,Sample Office A
+SYN-HR002," Synthetic Employee 002 ",Sales,Account Manager,2021-08-02,Full-time,Sample Office B
+SYN-HR003,Synthetic Employee 003," Engineering ",Software Engineer,2023-01-09,Full-time,Sample Office C
+SYN-HR004,Synthetic Employee 004,Operations,Operations Analyst,2020-11-16,Full-time,Sample Office D
+SYN-HR005,Synthetic Employee 005,Marketing,Content Strategist,2024-02-12,Contract,Sample Office E
+SYN-HR006,Synthetic Employee 006,Finance,Financial Analyst,2022-06-20,Full-time,Sample Office F
+SYN-HR007,Synthetic Employee 007,Engineering,ML Engineer,2023-07-03,Full-time,Sample Office G
+SYN-HR008,Synthetic Employee 008,Sales,Sales Associate,2024-04-15,Intern,Sample Office H
+SYN-HR009,Synthetic Employee 009,Operations,Process Lead,2019-09-23,Full-time,Sample Office I
+SYN-HR010,Synthetic Employee 010,Marketing,Designer,2021-12-06,Full-time,Sample Office J
+SYN-HR011,Synthetic Employee 011,Finance,Accountant,2020-05-18,Full-time,Sample Office K
+SYN-HR011,Synthetic Employee 011,Finance,Accountant,2020-05-18,Full-time,Sample Office K

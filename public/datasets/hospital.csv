@@ -1,0 +1,16 @@
+patient_id,age,gender,admission_date,diagnosis,length_of_stay,insurance,readmitted
+SYN-P001,45,F,2026-01-04,Hypertension,3,Private,false
+SYN-P002,67,M,2026-01-06,Diabetes,5,Government,true
+SYN-P003,29,F,2026-01-08,Asthma,2,Private,false
+SYN-P004,81,M,2026-01-11,Pneumonia,8,Government,true
+SYN-P005,54,F,2026-01-13,Arthritis,4,Private,false
+SYN-P006,,M,2026-01-16,Migraine,1,Self-pay,false
+SYN-P007,38,F,2026-01-18,Fracture,6,Private,false
+SYN-P008,72,M,2026-01-22,Cardiac observation,4,Government,true
+SYN-P009,19,F,2026-01-24,Dehydration,2,Self-pay,false
+SYN-P010,63,M,2026-01-27,Diabetes,3,Private,true
+SYN-P011,50,F,2026-02-01,Hypertension,2,Government,false
+SYN-P012,34,M,2026-02-03,Asthma,,Private,false
+SYN-P013,76,F,2026-02-06,Pneumonia,9,Government,true
+SYN-P014,42,M,2026-02-09,Fracture,5,Private,false
+SYN-P015,58,F,,Arthritis,3,Private,false

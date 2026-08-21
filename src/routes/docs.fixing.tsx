@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { DocPageHeader } from "@/components/DocPageHeader";
 import { CodeBlock } from "@/components/CodeBlock";
+import { DocPageHeader } from "@/components/DocPageHeader";
 import { ReplBlock } from "@/components/ReplBlock";
 
 export const Route = createFileRoute("/docs/fixing")({
@@ -21,56 +21,83 @@ function Page() {
       <DocPageHeader
         breadcrumbs={[{ label: "Docs", to: "/docs" }, { label: "Fixing" }]}
         title="Fixing"
-        description="edf.fix() runs an opinionated, deterministic cleaning pipeline and returns a FixResult that includes the cleaned DataFrame plus an audit trail."
+        description="edf.fix() runs a deterministic, configurable cleaning pipeline and returns the cleaned data with an audit trail."
       />
       <div id="doc-content" className="prose-doc">
         <h2 id="pipeline">The default pipeline</h2>
         <ol>
-          <li>Normalise whitespace and Unicode</li>
-          <li>Coerce obvious dtypes (dates, numbers, booleans)</li>
-          <li>Drop exact duplicate rows</li>
-          <li>Impute missing values per column</li>
-          <li>Emit an <code>applied_fixes</code> log</li>
+          <li>Normalise column names</li>
+          <li>Trim leading and trailing whitespace</li>
+          <li>Recognise configured missing-value markers</li>
+          <li>Remove exact duplicate rows</li>
+          <li>Remove empty rows and columns</li>
+          <li>Fill missing values with the configured strategy</li>
         </ol>
 
-        <h2 id="strategies">Strategies</h2>
+        <h2 id="configuration">Configuration</h2>
         <p>
-          Pass <code>strategy="safe" | "auto" | "aggressive"</code> to trade caution for coverage:
+          Pass a <code>FixConfig</code> to control every cleaning stage. Use a
+          <code> ColumnCleaningRule</code> when one column needs a different strategy.
         </p>
-        <ul>
-          <li><code>safe</code> — only non-destructive fixes.</li>
-          <li><code>auto</code> — the balanced default.</li>
-          <li><code>aggressive</code> — drops columns with &gt;90% missing values.</li>
-        </ul>
-
         <CodeBlock
-          code={`import eazydatafix as edf\n\nresult = edf.fix("employees.csv", strategy="safe")\nresult.applied_fixes\nresult.to_csv("clean.csv")`}
+          code={`import eazydatafix as edf
+
+config = edf.FixConfig(
+    missing_value_strategy="median",
+    missing_markers=("", "NA", "N/A", "unknown"),
+    column_rules={
+        "department": edf.ColumnCleaningRule(
+            missing_value_strategy="mode",
+        ),
+    },
+)
+
+result = edf.fix("employees.csv", config)
+print(result.applied_fixes)
+result.save("employees-clean.csv")`}
           filename="fixing.py"
         />
 
         <h2 id="dry-run">Dry run</h2>
-        <p>Preview what would change without materialising a new DataFrame:</p>
+        <p>
+          Set <code>dry_run=True</code> to preserve the source in <code>result.dataset</code> and
+          inspect the cleaned proposal separately in <code>result.proposed_dataset</code>.
+        </p>
         <CodeBlock
-          code={`result = edf.fix("employees.csv", dry_run=True)\nresult.diff()`}
+          code={`config = edf.FixConfig(dry_run=True)
+preview = edf.fix("employees.csv", config)
+
+print(preview.dry_run)
+print(preview.change_log)
+print(preview.proposed_dataset.head())`}
           filename="dry_run.py"
         />
 
         <ReplBlock
           lines={[
-            { kind: "in", text: 'result = edf.fix("employees.csv", dry_run=True)' },
-            { kind: "in", text: "result.diff()" },
-            { kind: "out", text: "  strip_whitespace: 42 cells" },
-            { kind: "out", text: "  drop_duplicates: 6 rows" },
-            { kind: "out", text: "  impute_missing: 38 cells (median)" },
+            { kind: "in", text: "preview.dry_run" },
+            { kind: "out", text: "True" },
+            { kind: "in", text: "preview.dataset.shape, preview.proposed_dataset.shape" },
+            { kind: "out", text: "((12, 8), (11, 8))" },
           ]}
         />
 
         <h2 id="exporting">Exporting</h2>
         <p>
-          <code>result.to_csv()</code> and <code>result.to_excel()</code> write the cleaned
-          dataset. See{" "}
-          <Link to="/docs/reference/$fn" params={{ fn: "fix" }}>the reference</Link> for every
-          option.
+          <code>result.save()</code> and the backwards-compatible <code>result.to_csv()</code>
+          write CSV files. For Excel, export the cleaned DataFrame directly.
+        </p>
+        <CodeBlock
+          code={`result.save("employees-clean.csv")
+result.dataset.to_excel("employees-clean.xlsx", index=False)`}
+          filename="export_cleaned.py"
+        />
+        <p>
+          See{" "}
+          <Link to="/docs/reference/$fn" params={{ fn: "fix" }}>
+            the reference
+          </Link>{" "}
+          for the complete return value and usage notes.
         </p>
       </div>
     </div>

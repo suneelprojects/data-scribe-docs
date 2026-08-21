@@ -1,0 +1,13 @@
+employee_id,name,email,department,salary,hire_date,active,city
+SYN-E001,Synthetic Employee 001,employee001@example.test,Engineering,72000,2023-02-14,true,Sample City A
+SYN-E002," Synthetic Employee 002 ",employee002@example.test,Sales,61000,2022-11-01,true,Sample City B
+SYN-E003,Synthetic Employee 003,employee003@example.test,Engineering,N/A,2024-01-08,true,Sample City C
+SYN-E004,Synthetic Employee 004,employee004@example.test,Operations,58000,2021-06-21,false,Sample City D
+SYN-E005,Synthetic Employee 005,,Marketing,54000,2023-09-12,true,Sample City E
+SYN-E006,Synthetic Employee 006,employee006@example.test,Finance,68000,2020-03-17,true,Sample City F
+SYN-E007,Synthetic Employee 007,employee007@example.test," Engineering ",75000,2022-07-25,true,Sample City G
+SYN-E008,Synthetic Employee 008,employee008@example.test,Sales,null,2024-04-02,true,Sample City H
+SYN-E009,Synthetic Employee 009,employee009@example.test,Operations,63000,2021-12-10,false,Sample City I
+SYN-E010,Synthetic Employee 010,employee010@example.test,Finance,70000,2023-05-19,true,Sample City J
+SYN-E011,Synthetic Employee 011,employee011@example.test,Marketing,57000,,true,Sample City K
+SYN-E011,Synthetic Employee 011,employee011@example.test,Marketing,57000,,true,Sample City K
