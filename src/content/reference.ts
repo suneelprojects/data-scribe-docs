@@ -25,145 +25,167 @@ export type FunctionDoc = {
 export const assessDoc: FunctionDoc = {
   name: "assess",
   slug: "assess",
-  signature: "edf.assess(data, *, columns=None, thresholds=None, verbose=False) -> QualityReport",
-  oneLiner: "Compute a full data-quality assessment for a dataset.",
+  signature: "edf.assess(dataset) -> AssessmentReport",
+  oneLiner: "Compute a structured data-quality assessment for a dataset.",
   description:
-    "Computes missing values, duplicates, dtype consistency, cardinality, outliers and a composite quality score for the supplied dataset. Accepts CSV paths, Excel workbooks and pandas DataFrames. The returned QualityReport is a serialisable object with .summary(), .to_dict() and .to_html() methods.",
+    "Measures completeness, uniqueness and the package's quality dimensions for a supported file or pandas DataFrame. The returned AssessmentReport includes dataset information, recommendations, validations and export helpers for HTML, JSON, Markdown, CSV, Excel and PDF.",
   parameters: [
-    { name: "data", type: "str | pathlib.Path | pandas.DataFrame", description: "Source dataset. Strings ending in .csv, .xlsx or .xls are loaded automatically." },
-    { name: "columns", type: "list[str] | None", default: "None", description: "Restrict the assessment to a subset of columns. When None, every column is scanned." },
-    { name: "thresholds", type: "dict | None", default: "None", description: "Override default warning thresholds, e.g. {'missing': 0.2, 'duplicates': 0.05}." },
-    { name: "verbose", type: "bool", default: "False", description: "Print a per-column log while assessing." },
+    {
+      name: "dataset",
+      type: "str | pathlib.Path | pandas.DataFrame",
+      description: "A pandas DataFrame or path to a supported CSV or Excel dataset.",
+    },
   ],
-  returns: { type: "QualityReport", description: "Structured report with summary metrics and per-column diagnostics." },
+  returns: {
+    type: "AssessmentReport",
+    description:
+      "Structured dataset information, completeness and uniqueness metrics, quality scores, recommendations and validations.",
+  },
   raises: [
     { name: "FileNotFoundError", when: "the supplied path does not exist." },
-    { name: "ValueError", when: "the file extension is not supported or the DataFrame is empty." },
+    { name: "ValueError", when: "the supplied file type is not supported." },
   ],
   examples: [
     {
       title: "Assess a CSV file",
-      code: `import eazydatafix as edf\n\nreport = edf.assess("employees.csv")\nreport.summary()`,
+      code: `import eazydatafix as edf\n\nreport = edf.assess("employees.csv")\n\nprint(report.dataset_info.rows, report.dataset_info.columns)\nprint(report.completeness.total_missing_values)\nprint(report.uniqueness.duplicate_rows)\nprint(report.quality.score, report.quality.grade)`,
       repl: [
-        { kind: "in", text: 'import eazydatafix as edf' },
         { kind: "in", text: 'report = edf.assess("employees.csv")' },
-        { kind: "in", text: 'report.summary()' },
-        { kind: "out", text: "QualityReport(employees.csv)" },
-        { kind: "out", text: "  rows           1,204" },
-        { kind: "out", text: "  columns           12" },
-        { kind: "out", text: "  missing_values    38  (0.3%)" },
-        { kind: "out", text: "  duplicates         6  (0.5%)" },
-        { kind: "out", text: "  quality_score   94.0" },
+        { kind: "in", text: "report.dataset_info.rows, report.dataset_info.columns" },
+        { kind: "out", text: "(12, 8)" },
+        { kind: "in", text: "report.completeness.total_missing_values" },
+        { kind: "out", text: "5" },
+        { kind: "in", text: "report.quality.score" },
+        { kind: "out", text: "82.76" },
       ],
     },
     {
-      title: "Custom thresholds",
-      code: `report = edf.assess(\n    "sales.xlsx",\n    thresholds={"missing": 0.05, "duplicates": 0.01},\n    verbose=True,\n)`,
+      title: "Export the report",
+      code: `report = edf.assess("employees.csv")\nreport.to_html("quality.html")\nreport.to_json("quality.json")`,
     },
   ],
   notes: [
     "assess() never mutates its input; call fix() to obtain a cleaned copy.",
-    "For DataFrames larger than one million rows, use edf.profile() first to plan the assessment.",
+    "The quality score is available at report.quality.score, not report.quality_score.",
   ],
   bestPractices: [
-    "Run assess() before fix() so you can review issues and decide which fixes to allow.",
-    "Persist the returned report with report.to_dict() for reproducible pipelines.",
+    "Run assess() before and after controlled cleaning to measure the effect.",
+    "Use a report export method when you need a durable CI or audit artefact.",
   ],
   seeAlso: [
-    { name: "fix()", slug: "fix", description: "Apply automatic cleaning based on an assessment." },
-    { name: "profile()", slug: "profile", description: "Deep column-level statistics and distributions." },
+    { name: "fix()", slug: "fix", description: "Apply configurable, deterministic cleaning." },
+    { name: "profile()", slug: "profile", description: "Inspect the dataset's structure." },
   ],
 };
 
 export const fixDoc: FunctionDoc = {
   name: "fix",
   slug: "fix",
-  signature: "edf.fix(data, *, strategy='auto', drop_duplicates=True, fill_missing='median', dry_run=False) -> FixResult",
-  oneLiner: "Apply automated cleaning fixes to a dataset.",
+  signature: "edf.fix(dataset, config=None) -> FixResult",
+  oneLiner: "Apply configurable, deterministic cleaning to a dataset.",
   description:
-    "Executes an opinionated cleaning pipeline: normalises whitespace, coerces obvious dtypes, drops exact duplicates, imputes missing values with a per-column strategy, and flags rows that could not be repaired. Returns a FixResult that exposes the cleaned DataFrame, the list of applied fixes and helpers for export.",
+    "Runs the v1 cleaning pipeline with an optional FixConfig. Configure missing-value handling, custom missing markers, per-column overrides, duplicate and empty-row removal, whitespace trimming and column-name normalisation. Dry runs preserve the source dataset and expose a separate proposed dataset.",
   parameters: [
-    { name: "data", type: "str | pathlib.Path | pandas.DataFrame", description: "Source dataset. Same input types as assess()." },
-    { name: "strategy", type: "Literal['auto', 'safe', 'aggressive']", default: "'auto'", description: "'safe' only applies non-destructive fixes; 'aggressive' will drop columns with >90% missing values." },
-    { name: "drop_duplicates", type: "bool", default: "True", description: "Remove exact duplicate rows before imputation." },
-    { name: "fill_missing", type: "Literal['mean', 'median', 'mode', 'ffill', 'drop']", default: "'median'", description: "Per-column imputation strategy for numeric fields." },
-    { name: "dry_run", type: "bool", default: "False", description: "When True, computes the diff without materialising the cleaned DataFrame." },
+    {
+      name: "dataset",
+      type: "str | pathlib.Path | pandas.DataFrame",
+      description: "A pandas DataFrame or path to a supported CSV or Excel dataset.",
+    },
+    {
+      name: "config",
+      type: "FixConfig | None",
+      default: "None",
+      description: "Optional deterministic cleaning configuration. None uses FixConfig defaults.",
+    },
   ],
-  returns: { type: "FixResult", description: "Wraps .dataframe, .applied_fixes, .to_csv(), .to_excel() and .diff()." },
+  returns: {
+    type: "FixResult",
+    description:
+      "The resulting dataset, before/after assessments, applied fixes, structured change log and optional dry-run proposal.",
+  },
   raises: [
-    { name: "ValueError", when: "an unknown strategy or fill_missing option is passed." },
+    { name: "FileNotFoundError", when: "the supplied path does not exist." },
+    { name: "ValueError", when: "a cleaning strategy or input file type is unsupported." },
   ],
   examples: [
     {
       title: "Clean and export",
-      code: `import eazydatafix as edf\n\nresult = edf.fix("employees.csv")\nresult.applied_fixes\nresult.to_csv("clean.csv")`,
+      code: `import eazydatafix as edf\n\nconfig = edf.FixConfig(\n    missing_value_strategy="median",\n    missing_markers=("", "NA", "N/A", "unknown"),\n)\nresult = edf.fix("employees.csv", config)\nprint(result.applied_fixes)\nresult.save("employees-clean.csv")`,
       repl: [
-        { kind: "in", text: 'result = edf.fix("employees.csv")' },
-        { kind: "in", text: 'result.applied_fixes' },
-        { kind: "out", text: "['strip_whitespace', 'coerce_numeric', 'drop_duplicates(6)', 'impute_missing(38, median)']" },
-        { kind: "in", text: 'result.to_csv("clean.csv")' },
-        { kind: "out", text: "wrote clean.csv (1,198 rows × 12 cols)" },
+        { kind: "in", text: 'result = edf.fix("employees.csv", config)' },
+        { kind: "in", text: "result.applied_fixes" },
+        { kind: "out", text: "['Trimmed leading/trailing whitespaces.'," },
+        { kind: "out", text: " 'Removed 1 duplicate row(s).'," },
+        { kind: "out", text: " \"Filled numeric column 'salary' using median.\"]" },
+        { kind: "in", text: 'result.save("employees-clean.csv")' },
       ],
+    },
+    {
+      title: "Preview with a dry run",
+      code: `config = edf.FixConfig(dry_run=True)\npreview = edf.fix("employees.csv", config)\n\nprint(preview.dry_run)\nprint(preview.change_log)\nprint(preview.proposed_dataset.head())`,
     },
   ],
   notes: [
-    "fix() is deterministic — the same input plus the same options produces the same output.",
-    "Pass dry_run=True to preview which fixes would apply without touching the data.",
+    "fix() does not mutate a caller-supplied DataFrame.",
+    "In a dry run, result.dataset remains unchanged and result.proposed_dataset contains the cleaned preview.",
   ],
   bestPractices: [
-    "Store result.applied_fixes alongside the cleaned file so pipelines stay auditable.",
-    "Prefer strategy='safe' for regulated workloads; keep 'aggressive' for exploratory work.",
+    "Keep result.applied_fixes and result.change_log with the cleaned output for auditability.",
+    "Use ColumnCleaningRule entries when one column needs different missing markers or imputation.",
   ],
   seeAlso: [
-    { name: "assess()", slug: "assess", description: "Understand issues before fixing." },
-    { name: "profile()", slug: "profile", description: "Inspect column distributions and dtypes." },
+    { name: "assess()", slug: "assess", description: "Measure quality before and after cleaning." },
+    { name: "profile()", slug: "profile", description: "Inspect rows, columns and data types." },
   ],
 };
 
 export const profileDoc: FunctionDoc = {
   name: "profile",
   slug: "profile",
-  signature: "edf.profile(data, *, sample=None, correlations=True) -> Profile",
-  oneLiner: "Compute a rich column-level profile of a dataset.",
+  signature: "edf.profile(dataset) -> DatasetProfile",
+  oneLiner: "Inspect the structural metadata of a dataset.",
   description:
-    "Generates per-column dtype, cardinality, null-rate, distribution summary and pairwise correlations. Designed to be readable in the REPL and exportable to HTML for review.",
+    "Returns a lightweight structural profile: file name and type, row and column counts, column names, pandas data types and memory use. It intentionally does not perform quality assessment or calculate distributions and correlations.",
   parameters: [
-    { name: "data", type: "str | pathlib.Path | pandas.DataFrame", description: "Source dataset." },
-    { name: "sample", type: "int | None", default: "None", description: "Randomly sample N rows before profiling for very large datasets." },
-    { name: "correlations", type: "bool", default: "True", description: "Compute pairwise Pearson correlations for numeric columns." },
+    {
+      name: "dataset",
+      type: "str | pathlib.Path | pandas.DataFrame",
+      description: "A pandas DataFrame or path to a supported CSV or Excel dataset.",
+    },
   ],
-  returns: { type: "Profile", description: "Object with .columns, .correlations, .to_html() and .to_dict()." },
+  returns: {
+    type: "DatasetProfile",
+    description:
+      "Structural metadata in file_name, file_type, rows, columns, column_names, data_types and memory_usage_bytes.",
+  },
   raises: [
-    { name: "ValueError", when: "sample is larger than the dataset." },
+    { name: "FileNotFoundError", when: "the supplied path does not exist." },
+    { name: "ValueError", when: "the supplied file type is not supported." },
   ],
   examples: [
     {
-      title: "Profile a DataFrame",
-      code: `import pandas as pd\nimport eazydatafix as edf\n\ndf = pd.read_csv("hospital.csv")\nprof = edf.profile(df, sample=10_000)\nprof.columns["age"]`,
+      title: "Profile a dataset",
+      code: `import eazydatafix as edf\n\nprofile = edf.profile("hospital.csv")\nprint(profile.rows, profile.columns)\nprint(profile.column_names)\nprint(profile.data_types)`,
       repl: [
-        { kind: "in", text: 'prof = edf.profile(df)' },
-        { kind: "in", text: 'prof.columns["age"]' },
-        { kind: "out", text: "ColumnProfile(age)" },
-        { kind: "out", text: "  dtype       int64" },
-        { kind: "out", text: "  missing     0" },
-        { kind: "out", text: "  unique      87" },
-        { kind: "out", text: "  min         0" },
-        { kind: "out", text: "  max         104" },
-        { kind: "out", text: "  mean        42.3" },
+        { kind: "in", text: 'profile = edf.profile("hospital.csv")' },
+        { kind: "in", text: "profile.rows, profile.columns" },
+        { kind: "out", text: "(15, 8)" },
+        { kind: "in", text: "profile.column_names[:3]" },
+        { kind: "out", text: "['patient_id', 'age', 'gender']" },
       ],
     },
   ],
   notes: [
-    "Profiles are lightweight and cheap to serialise — safe to store per-run.",
-    "Correlations only include columns with dtype numeric or bool.",
+    "profile() is a structural inventory, not a data-quality report.",
+    "Use assess() for missing values, duplicates, quality dimensions and report exports.",
   ],
   bestPractices: [
-    "Use sample= for datasets over ~5M rows to keep profiling under a second.",
-    "Export prof.to_html() into your CI artefacts for quick data reviews.",
+    "Run profile() first when you need a quick shape and schema check.",
+    "Pair profile() with assess() when you also need quality metrics.",
   ],
   seeAlso: [
-    { name: "assess()", slug: "assess", description: "Composite quality report." },
-    { name: "fix()", slug: "fix", description: "Apply automated fixes." },
+    { name: "assess()", slug: "assess", description: "Generate quality metrics and exports." },
+    { name: "fix()", slug: "fix", description: "Apply configurable cleaning." },
   ],
 };
 

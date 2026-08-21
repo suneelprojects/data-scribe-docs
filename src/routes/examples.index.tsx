@@ -6,7 +6,10 @@ export const Route = createFileRoute("/examples/")({
   head: () => ({
     meta: [
       { title: "Examples Gallery — EazyDataFix" },
-      { name: "description", content: "Seven worked examples across CSV, Excel, healthcare, HR and more." },
+      {
+        name: "description",
+        content: "Seven worked examples across CSV, Excel, healthcare, HR and more.",
+      },
       { property: "og:title", content: "Examples Gallery — EazyDataFix" },
       { property: "og:description", content: "Worked examples for EazyDataFix." },
     ],
@@ -20,7 +23,7 @@ function Gallery() {
       <DocPageHeader
         breadcrumbs={[{ label: "Examples" }]}
         title="Examples Gallery"
-        description="Every example ships with the Python source, expected REPL output, and a placeholder download for the dataset."
+        description="Every example ships with runnable v1.0.0 Python, verified output, and a real downloadable dataset."
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {examples.map((e) => (

@@ -1,15 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { DocPageHeader } from "@/components/DocPageHeader";
 import { CodeBlock } from "@/components/CodeBlock";
+import { DocPageHeader } from "@/components/DocPageHeader";
 import { ReplBlock } from "@/components/ReplBlock";
 
 export const Route = createFileRoute("/docs/assessment")({
   head: () => ({
     meta: [
       { title: "Assessment — EazyDataFix" },
-      { name: "description", content: "Understand what edf.assess() computes and how to read the QualityReport." },
+      {
+        name: "description",
+        content: "Understand what edf.assess() computes and how to read an AssessmentReport.",
+      },
       { property: "og:title", content: "Assessment — EazyDataFix" },
-      { property: "og:description", content: "Understand the QualityReport." },
+      { property: "og:description", content: "Understand the AssessmentReport." },
     ],
   }),
   component: Page,
@@ -21,53 +24,67 @@ function Page() {
       <DocPageHeader
         breadcrumbs={[{ label: "Docs", to: "/docs" }, { label: "Assessment" }]}
         title="Assessment"
-        description="edf.assess() produces a QualityReport — a structured, serialisable snapshot of everything EazyDataFix knows about your dataset."
+        description="edf.assess() produces an AssessmentReport: a structured, exportable snapshot of dataset quality."
       />
       <div id="doc-content" className="prose-doc">
         <h2 id="what-is-assessed">What is assessed</h2>
         <ul>
-          <li>Row and column counts</li>
-          <li>Missing values (per column and overall rate)</li>
-          <li>Duplicate rows (exact match)</li>
-          <li>Dtype consistency (values that don&rsquo;t match the declared type)</li>
-          <li>Cardinality per column</li>
-          <li>Composite quality score (0–100)</li>
+          <li>Dataset name, row and column counts, and memory use</li>
+          <li>Overall missing-value count and completeness score</li>
+          <li>Exact duplicate rows and uniqueness score</li>
+          <li>Completeness, uniqueness, validity, consistency, accuracy and timeliness</li>
+          <li>Composite quality score and grade</li>
+          <li>Recommendations and validation results</li>
         </ul>
 
         <h2 id="running-an-assessment">Running an assessment</h2>
         <CodeBlock
-          code={`import eazydatafix as edf\n\nreport = edf.assess("employees.csv")\nreport.summary()`}
+          code={`import eazydatafix as edf
+
+report = edf.assess("employees.csv")
+report.summary()`}
           filename="assessment.py"
         />
 
         <ReplBlock
           lines={[
-            { kind: "in", text: "report.summary()" },
-            { kind: "out", text: "QualityReport(employees.csv)" },
-            { kind: "out", text: "  rows           1,204" },
-            { kind: "out", text: "  columns           12" },
-            { kind: "out", text: "  quality_score   94.0" },
+            { kind: "in", text: "report.dataset_info.rows, report.dataset_info.columns" },
+            { kind: "out", text: "(12, 8)" },
+            { kind: "in", text: "report.completeness.total_missing_values" },
+            { kind: "out", text: "5" },
+            { kind: "in", text: "report.quality.score" },
+            { kind: "out", text: "82.76" },
           ]}
         />
 
-        <h2 id="custom-thresholds">Custom thresholds</h2>
-        <p>Override the default warning levels for your domain:</p>
+        <h2 id="reading-the-report">Reading structured metrics</h2>
+        <p>Use the report fields directly when a pipeline needs to make a decision:</p>
         <CodeBlock
-          code={`report = edf.assess(\n    "sales.xlsx",\n    thresholds={"missing": 0.02, "duplicates": 0.01},\n    verbose=True,\n)`}
-          filename="thresholds.py"
+          code={`missing = report.completeness.total_missing_values
+duplicates = report.uniqueness.duplicate_rows
+score = report.quality.score
+
+if score < 80:
+    raise SystemExit(f"quality gate failed: {score}")`}
+          filename="quality_gate.py"
         />
 
-        <h2 id="reading-the-report">Reading the report</h2>
+        <h2 id="exporting">Exporting</h2>
         <p>
-          <code>report.summary()</code> prints a REPL-friendly overview.{" "}
-          <code>report.to_dict()</code> returns a nested dict suitable for JSON logging.{" "}
-          <code>report.to_html()</code> writes an HTML report for CI artefacts.
+          Export methods write directly to a file. Reports support HTML, JSON, Markdown, CSV, Excel
+          and PDF.
         </p>
+        <CodeBlock
+          code={`report.to_html("quality.html")
+report.to_json("quality.json")
+report.to_markdown("quality.md")`}
+          filename="export_report.py"
+        />
 
         <h2 id="next">Next</h2>
         <p>
-          Once you know what&rsquo;s wrong, use <Link to="/docs/fixing">edf.fix()</Link> to apply
-          the cleaning pipeline.
+          Once you know what is wrong, use <Link to="/docs/fixing">edf.fix()</Link> to apply a
+          controlled cleaning pipeline.
         </p>
       </div>
     </div>

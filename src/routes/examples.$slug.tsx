@@ -61,19 +61,17 @@ function ExamplePage() {
               </span>
             ))}
           </div>
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{ex.dataset.note}</p>
           <div className="mt-4">
-            <button
-              type="button"
-              disabled
-              className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground"
-              title="Placeholder — dataset download coming soon"
+            <a
+              href={ex.dataset.downloadUrl}
+              download={ex.dataset.name}
+              className="inline-flex items-center gap-1.5 rounded-md border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent transition-colors hover:bg-accent/15"
+              title={`Download ${ex.dataset.name}`}
             >
               <Download className="h-3 w-3" />
               Download dataset
-              <span className="rounded bg-background px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider">
-                placeholder
-              </span>
-            </button>
+            </a>
           </div>
         </div>
 
