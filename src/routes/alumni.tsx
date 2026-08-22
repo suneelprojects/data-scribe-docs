@@ -39,12 +39,48 @@ type AlumniDirectoryClient = {
 };
 const alumniDirectory = supabase as unknown as AlumniDirectoryClient;
 
+const starterProfiles: AlumniProfile[] = [
+  {
+    id: "mahesh-babu-channa",
+    display_name: "Mahesh Babu Channa",
+    headline: "Building Vajra.ai & Ziro.Digital",
+    company_name: "Vajra.ai & Ziro.Digital",
+    location: null,
+    program_name: "SocialPrachar Team",
+    batch_label: "Leadership",
+    linkedin_url: "https://in.linkedin.com/in/mahibaabu",
+    avatar_url: null,
+  },
+  {
+    id: "madhav-reddy-challa",
+    display_name: "Madhav Reddy Challa",
+    headline: "QA Automation Engineer",
+    company_name: "DXC Technology",
+    location: "Hyderabad, Telangana, India",
+    program_name: "SocialPrachar Team",
+    batch_label: "Team",
+    linkedin_url: "https://in.linkedin.com/in/madhav-reddy-challa-a0478522a",
+    avatar_url: null,
+  },
+  {
+    id: "suneel-kumar-kola",
+    display_name: "Suneel Kumar Kola",
+    headline: "Senior AI Engineer | Creator & Maintainer of EazyDataFix",
+    company_name: "SocialPrachar.com",
+    location: null,
+    program_name: "SocialPrachar Team",
+    batch_label: "Team",
+    linkedin_url: "https://in.linkedin.com/in/suneelkumarkola",
+    avatar_url: null,
+  },
+];
+
 function initials(name: string) {
   return name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 }
 
 function AlumniPage() {
-  const [profiles, setProfiles] = useState<AlumniProfile[]>([]);
+  const [profiles, setProfiles] = useState<AlumniProfile[]>(starterProfiles);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -58,7 +94,7 @@ function AlumniPage() {
         .in("publication_status", ["approved", "claimed"])
         .order("display_name", { ascending: true });
       if (active) {
-        setProfiles(data ?? []);
+        setProfiles(data && data.length > 0 ? data : starterProfiles);
         setLoading(false);
       }
     }
