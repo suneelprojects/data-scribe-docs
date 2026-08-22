@@ -19,7 +19,11 @@ ALTER TABLE public.instagram_generation_runs
 
 ALTER TABLE public.instagram_generation_runs
   ADD CONSTRAINT instagram_generation_runs_run_type_check
-  CHECK (run_type IN ('manual', 'daily', 'reel_manual', 'reel_alternate'));
+  CHECK (run_type IN ('manual', 'daily', 'education_daily', 'reel_manual', 'reel_alternate'));
+
+CREATE UNIQUE INDEX IF NOT EXISTS instagram_generation_education_daily_once_idx
+  ON public.instagram_generation_runs (run_type, run_date)
+  WHERE run_type = 'education_daily' AND run_date IS NOT NULL;
 
 CREATE UNIQUE INDEX IF NOT EXISTS instagram_generation_reel_alternate_once_idx
   ON public.instagram_generation_runs (run_type, run_date)
@@ -40,3 +44,8 @@ ON CONFLICT (id) DO UPDATE SET
   public = EXCLUDED.public,
   file_size_limit = EXCLUDED.file_size_limit,
   allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+UPDATE public.instagram_studio_settings
+SET default_publish_time = '20:00:00',
+    updated_at = now()
+WHERE id = 1;

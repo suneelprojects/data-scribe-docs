@@ -1,6 +1,6 @@
 # EazyDataFix Content Studio setup
 
-The Content Studio is available at `/admin/content-studio`. It uses Supabase for authentication and durable content storage, OpenAI for structured copy and image generation, Meta's Instagram API for approved publishing, and GitHub Actions for scheduled automation.
+The Content Studio is available at `/admin/content-studio`. It uses Supabase for authentication and durable content storage, OpenAI for structured copy and image generation, Meta's Instagram API for scheduled publishing, and GitHub Actions for automation.
 
 ## 1. Apply the database migration
 
@@ -72,11 +72,12 @@ The endpoint is idempotent by India calendar date, so retries do not create a se
 
 The Instagram workflow uses the same GitHub `CONTENT_STUDIO_CRON_SECRET`. It runs every 30 minutes and calls `/api/cron/instagram-studio-tick`. The server:
 
-- Creates at most one Instagram draft per India calendar date after 08:00 IST
-- Rotates a balanced weekly feed: education, meme, quick tip, original quote, problem story, community prompt and one soft product post
-- Generates every image as a consistent 4:5 EazyDataFix poster with a brand area, category, headline and website footer
-- Leaves every generated post in Draft until an admin approves it
-- Publishes only approved Scheduled posts whose time has arrived
+- Prepares at most one Python education post per India calendar date after 08:00 IST
+- Rotates useful Python tutorials, tips, tricks, mental models, common mistakes, ecosystem maps and practical mini-guides
+- Generates an original 4:5 concept-map or cheat-sheet poster with exact learning rows and EazyDataFix branding
+- Automatically schedules that education post for 20:00 IST without an approval step; deployment after 20:00 publishes it on the next tick
+- Keeps manually generated posts and Reels behind the existing approval gate
+- Publishes every due Scheduled item and records the Meta permalink
 - Verifies and refreshes the long-lived Instagram token server-side
 - Creates one 30-second 9:16 Reel every two days beginning 22 August 2026
 - Builds six timed motion-story scenes and rotates three original EazyDataFix instrumentals
@@ -103,6 +104,8 @@ Publication requires an SEO score of at least 70 and a quality score of at least
 5. Approve a post only after it reaches a quality score of at least 80.
 6. Publish the first post manually and confirm the returned Instagram permalink opens.
 7. Schedule a later approved post and confirm the 30-minute workflow publishes it.
+
+For the automatic education flow, dispatch `instagram-content-studio.yml` once. Confirm exactly one **Daily Python Learning** post is created with status **Scheduled** and time **20:00 IST**. If the test is run after 20:00 IST, confirm it publishes during that same tick. Automatic posts still require a quality score of at least 80; a failed quality check is recorded instead of publishing weak content.
 
 ## 7. First Reel production check
 

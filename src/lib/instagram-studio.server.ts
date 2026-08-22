@@ -21,6 +21,7 @@ const FACEBOOK_GRAPH_URL = `https://graph.facebook.com/${GRAPH_VERSION}`;
 const CONTENT_MODEL = process.env["OPENAI_CONTENT_MODEL"]?.trim() || "gpt-5.6";
 const IMAGE_MODEL = process.env["OPENAI_IMAGE_MODEL"]?.trim() || "gpt-image-2";
 const PROMPT_VERSION = "instagram-v2-branded-mix";
+const DAILY_EDUCATION_PROMPT_VERSION = "instagram-python-daily-v1";
 const STORAGE_BUCKET = "instagram-media";
 const REEL_STORAGE_BUCKET = "instagram-reels";
 const PREVIEW_URL_TTL_SECONDS = 60 * 60;
@@ -32,6 +33,25 @@ const REEL_EVERY_DAYS = 2;
 const REEL_ANCHOR_DATE = "2026-08-22";
 const SHOTSTACK_ENV = process.env["SHOTSTACK_ENV"]?.trim() === "stage" ? "stage" : "v1";
 const SHOTSTACK_URL = `https://api.shotstack.io/edit/${SHOTSTACK_ENV}`;
+const DAILY_EDUCATION_PILLAR = "Daily Python Learning";
+const DAILY_EDUCATION_PUBLISH_HOUR = 20;
+
+const DAILY_EDUCATION_TOPICS = [
+  "Python foundations and mental models",
+  "lists, tuples, sets and dictionaries",
+  "functions, arguments and return values",
+  "comprehensions and expressive Python",
+  "exceptions, debugging and common mistakes",
+  "iterators, generators and memory-aware patterns",
+  "files, paths, JSON and CSV handling",
+  "object-oriented Python in practical projects",
+  "useful standard-library modules",
+  "NumPy essentials for data work",
+  "pandas tips for cleaner analysis",
+  "visualization with Matplotlib and Seaborn",
+  "testing, type hints and maintainable Python",
+  "Python automation for repetitive work",
+] as const;
 
 const REEL_MUSIC = [
   {
@@ -70,6 +90,9 @@ type GeneratedInstagramPost = {
   hashtags: string[];
   image_prompt: string;
   image_alt: string;
+  poster_title?: string;
+  poster_subtitle?: string;
+  poster_points?: Array<{ label: string; outcome: string }>;
 };
 
 type GeneratedInstagramReel = {
@@ -209,6 +232,30 @@ const instagramPostSchema = {
     },
     image_prompt: { type: "string" },
     image_alt: { type: "string" },
+  },
+} as const;
+
+const educationalInstagramPostSchema = {
+  ...instagramPostSchema,
+  required: [...instagramPostSchema.required, "poster_title", "poster_subtitle", "poster_points"],
+  properties: {
+    ...instagramPostSchema.properties,
+    poster_title: { type: "string" },
+    poster_subtitle: { type: "string" },
+    poster_points: {
+      type: "array",
+      minItems: 5,
+      maxItems: 7,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["label", "outcome"],
+        properties: {
+          label: { type: "string" },
+          outcome: { type: "string" },
+        },
+      },
+    },
   },
 } as const;
 
@@ -395,6 +442,17 @@ function istHour() {
   );
 }
 
+function dailyEducationPublishAt(date = istDate()) {
+  return new Date(
+    `${date}T${String(DAILY_EDUCATION_PUBLISH_HOUR).padStart(2, "0")}:00:00+05:30`,
+  ).toISOString();
+}
+
+function dailyEducationTopic(date = istDate()) {
+  const dayNumber = Math.floor(dateOnlyUtc(date) / 86_400_000);
+  return DAILY_EDUCATION_TOPICS[dayNumber % DAILY_EDUCATION_TOPICS.length];
+}
+
 function dateOnlyUtc(value: string) {
   return Date.parse(`${value}T00:00:00.000Z`);
 }
@@ -467,6 +525,18 @@ function selectContentPlan(topic?: string): InstagramContentPlan {
   };
 }
 
+function dailyEducationPlan(date = istDate()): InstagramContentPlan {
+  return {
+    format: "education",
+    pillar: DAILY_EDUCATION_PILLAR,
+    direction: `Teach one genuinely useful lesson from ${dailyEducationTopic(date)}. It must help Python learners or working developers immediately. Rotate tutorials, tips, tricks, comparisons, common mistakes, mini mental models and ecosystem maps. Prefer one focused idea over a broad generic list.`,
+    captionGuide:
+      "Write 300-1,100 characters. Explain the concept simply, include one accurate practical example or short code snippet in the caption, add one takeaway, and never add a sales pitch.",
+    usePublishedArticle: false,
+    requireCta: false,
+  };
+}
+
 async function instagramAudit(
   postId: string | null,
   action: string,
@@ -485,6 +555,7 @@ async function instagramAudit(
 
 async function callOpenAIForPost(options: {
   topic?: string;
+  dailyEducation?: boolean;
   contentPlan: InstagramContentPlan;
   sourceArticle?: {
     title: string;
@@ -499,7 +570,18 @@ async function callOpenAIForPost(options: {
   const recent = options.recentPosts.map((post) => `- ${post.hook} | ${post.pillar}`).join("\n");
   const source = options.sourceArticle
     ? `Use this verified EazyDataFix article as the primary source:\nTitle: ${options.sourceArticle.title}\nKeyword: ${options.sourceArticle.primary_keyword}\nExcerpt: ${options.sourceArticle.excerpt}\nArticle body:\n${options.sourceArticle.content_markdown.slice(0, 7000)}`
-    : "No product article is required for this post. Use accurate, broadly accepted data-analysis knowledge and avoid unsupported claims.";
+    : "No product article is required for this post. Use accurate, broadly accepted Python and data-analysis knowledge and avoid unsupported claims.";
+  const educationalPosterDirection = options.dailyEducation
+    ? `
+- This is the daily Python learning series, not a promotional post.
+- Make the lesson complete enough to be saved and revisited.
+- Return poster_title with 3-7 words and poster_subtitle with 4-10 words.
+- Return 5-7 poster_points. Each label must be 2-24 characters; each outcome must be 2-48 characters.
+- The points must form a clean concept map, comparison, sequence or cheat sheet similar to a premium educational infographic.
+- Keep every poster point factually accurate, visually scannable and understandable without reading the caption.
+- Avoid fragile version-specific claims unless the version is explicitly stated.
+- Do not copy wording, layout labels or branding from another creator's post.`
+    : "";
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
@@ -529,13 +611,16 @@ Create one single-image Instagram post.
 - Keep the lower section visually calm and low-detail for the headline. The image-generation step supplies the exact visible brand, category, headline and footer separately.
 - Do not request any additional readable words, logos, watermarks, UI screenshots or code text inside the artwork.
 - Image alt text must objectively describe the intended visual.
+${educationalPosterDirection}
 `,
       text: {
         format: {
           type: "json_schema",
-          name: "eazydatafix_instagram_post",
+          name: options.dailyEducation
+            ? "eazydatafix_daily_python_post"
+            : "eazydatafix_instagram_post",
           strict: true,
-          schema: instagramPostSchema,
+          schema: options.dailyEducation ? educationalInstagramPostSchema : instagramPostSchema,
         },
       },
     }),
@@ -681,10 +766,47 @@ Create one 30-second vertical Reel that complements the day's static post withou
 
 async function generateImage(
   prompt: string,
-  poster: { hook: string; pillar: string; format: InstagramContentFormat },
+  poster: {
+    hook: string;
+    pillar: string;
+    format: InstagramContentFormat;
+    educationalLayout?: {
+      title: string;
+      subtitle: string;
+      points: Array<{ label: string; outcome: string }>;
+    };
+  },
 ) {
   const apiKey = process.env["OPENAI_API_KEY"];
   if (!apiKey) throw new Error("OPENAI_API_KEY is not configured in Lovable Cloud.");
+  const educationalLayout = poster.educationalLayout;
+  const exactVisibleText = educationalLayout
+    ? `
+REFERENCE-INSPIRED EDUCATIONAL LAYOUT:
+- Use an original, premium concept-map or cheat-sheet composition: a central Python/code hub connected to 5-7 color-coded learning rows.
+- Use a clean warm-white or very pale blue canvas, dark navy typography, cobalt connector lines and restrained cyan, green, amber and violet accents.
+- Make the title and subtitle dominant, then arrange every learning row with generous spacing and strong left-to-right reading order.
+- Do not imitate another creator's branding, portrait, watermark, engagement controls or exact composition.
+- Use simple original geometric/code symbols rather than third-party product logos.
+
+USE ONLY THESE EXACT VISIBLE TEXT STRINGS:
+- Brand: "EazyDataFix"
+- Title: "${educationalLayout.title}"
+- Subtitle: "${educationalLayout.subtitle}"
+${educationalLayout.points
+  .map((point, index) => `- Row ${index + 1}: "${point.label}" → "${point.outcome}"`)
+  .join("\n")}
+- Footer: "eazydatafix.com"
+
+Spell every visible word exactly. Do not invent or add any other words, numbers, logos, watermarks, UI screenshots or code text.`
+    : `
+USE ONLY THESE EXACT VISIBLE TEXT STRINGS:
+- Brand: "EazyDataFix"
+- Category: "${poster.pillar}"
+- Main headline: "${poster.hook}"
+- Footer: "eazydatafix.com"
+
+Spell every visible word exactly. Keep the headline large and readable. Do not invent or add any other words, numbers, logos, watermarks, UI screenshots or code text.`;
   const response = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
     headers: {
@@ -698,20 +820,12 @@ async function generateImage(
 Create a complete premium vertical 4:5 EazyDataFix social poster for the ${poster.format.replace(/-/g, " ")} format.
 
 CONSISTENT BRAND SYSTEM:
-- Deep midnight navy background with cyan, cobalt, white and restrained green accents.
+- Use the educational light concept-map layout when educational rows are supplied; otherwise use a deep midnight navy background with cyan, cobalt, white and restrained green accents.
 - Small clean EazyDataFix brand area at the top-left.
 - Visual storytelling occupies the upper and middle area.
-- Dark low-detail gradient panel in the lower section for the headline.
 - Modern editorial typography, strong hierarchy, generous spacing and safe margins.
 - Premium educational design, not a generic corporate advertisement.
-
-USE ONLY THESE EXACT VISIBLE TEXT STRINGS:
-- Brand: "EazyDataFix"
-- Category: "${poster.pillar}"
-- Main headline: "${poster.hook}"
-- Footer: "eazydatafix.com"
-
-Spell every visible word exactly. Keep the headline large and readable. Do not invent or add any other words, numbers, logos, watermarks, UI screenshots or code text.`,
+${exactVisibleText}`,
       n: 1,
       size: IMAGE_MODEL === "gpt-image-2" ? "1024x1280" : "1024x1536",
       quality: "medium",
@@ -954,40 +1068,74 @@ async function refreshCredentialIfNeeded() {
 export async function generateInstagramDraft(options: {
   topic?: string;
   actorEmail: string;
-  runType: "manual" | "daily";
+  runType: "manual" | "daily" | "education_daily";
 }) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const runDate = options.runType === "daily" ? istDate() : null;
+  const dailyEducation = options.runType === "education_daily";
+  const runDate = options.runType === "manual" ? null : istDate();
+  const promptVersion = dailyEducation ? DAILY_EDUCATION_PROMPT_VERSION : PROMPT_VERSION;
+  let run: { id: string } | null = null;
   if (runDate) {
-    const { data: existing } = await supabaseAdmin
+    const { data: existing, error: existingError } = await supabaseAdmin
       .from("instagram_generation_runs")
       .select("id, status, post_count, post_ids")
-      .eq("run_type", "daily")
+      .eq("run_type", options.runType)
       .eq("run_date", runDate)
       .maybeSingle();
-    if (existing) {
+    if (existingError) throw new Error(existingError.message);
+    if (existing?.status === "completed") {
       return { skipped: true, created: existing.post_count, postIds: existing.post_ids };
+    }
+    if (existing) {
+      const { data: restarted, error: restartError } = await supabaseAdmin
+        .from("instagram_generation_runs")
+        .update({
+          status: "running",
+          post_count: 0,
+          post_ids: [],
+          model: CONTENT_MODEL,
+          image_model: IMAGE_MODEL,
+          prompt_version: promptVersion,
+          requested_by_email: options.actorEmail,
+          error_message: null,
+          input_tokens: null,
+          output_tokens: null,
+          completed_at: null,
+        })
+        .eq("id", existing.id)
+        .select("id")
+        .single();
+      if (restartError || !restarted) {
+        throw new Error(restartError?.message || "Unable to restart Instagram generation.");
+      }
+      run = restarted;
     }
   }
 
-  const { data: run, error: runError } = await supabaseAdmin
-    .from("instagram_generation_runs")
-    .insert({
-      run_type: options.runType,
-      run_date: runDate,
-      model: CONTENT_MODEL,
-      image_model: IMAGE_MODEL,
-      prompt_version: PROMPT_VERSION,
-      requested_by_email: options.actorEmail,
-    })
-    .select("id")
-    .single();
-  if (runError || !run)
-    throw new Error(runError?.message || "Unable to start Instagram generation.");
+  if (!run) {
+    const { data: insertedRun, error: runError } = await supabaseAdmin
+      .from("instagram_generation_runs")
+      .insert({
+        run_type: options.runType,
+        run_date: runDate,
+        model: CONTENT_MODEL,
+        image_model: IMAGE_MODEL,
+        prompt_version: promptVersion,
+        requested_by_email: options.actorEmail,
+      })
+      .select("id")
+      .single();
+    if (runError || !insertedRun) {
+      throw new Error(runError?.message || "Unable to start Instagram generation.");
+    }
+    run = insertedRun;
+  }
 
   let postId: string | null = null;
   try {
-    const contentPlan = selectContentPlan(options.topic);
+    const contentPlan = dailyEducation
+      ? dailyEducationPlan(runDate ?? undefined)
+      : selectContentPlan(options.topic);
     const [recentResult, usedSourcesResult] = await Promise.all([
       supabaseAdmin
         .from("instagram_posts")
@@ -1020,12 +1168,37 @@ export async function generateInstagramDraft(options: {
     }
     const generated = await callOpenAIForPost({
       topic: options.topic,
+      dailyEducation,
       contentPlan,
       sourceArticle,
       recentPosts: recentResult.data ?? [],
     });
     const generatedPost = { ...generated.post, pillar: contentPlan.pillar };
     const evaluated = evaluatePost(generatedPost as InstagramPost);
+    if (dailyEducation && evaluated.qualityScore < 80) {
+      throw new Error("Daily education post did not meet the automatic publishing quality gate.");
+    }
+    const posterPoints = (generatedPost.poster_points ?? []).slice(0, 7).map((point) => ({
+      label: point.label
+        .replace(/["\n\r]/g, "")
+        .trim()
+        .slice(0, 24),
+      outcome: point.outcome
+        .replace(/["\n\r]/g, "")
+        .trim()
+        .slice(0, 48),
+    }));
+    const posterTitle = generatedPost.poster_title
+      ?.replace(/["\n\r]/g, "")
+      .trim()
+      .slice(0, 60);
+    const posterSubtitle = generatedPost.poster_subtitle
+      ?.replace(/["\n\r]/g, "")
+      .trim()
+      .slice(0, 90);
+    if (dailyEducation && (!posterTitle || !posterSubtitle || posterPoints.length < 5)) {
+      throw new Error("Daily education poster did not contain enough scannable learning points.");
+    }
     const { data: inserted, error: insertError } = await supabaseAdmin
       .from("instagram_posts")
       .insert({
@@ -1041,7 +1214,7 @@ export async function generateInstagramDraft(options: {
         quality_checks: evaluated.qualityChecks as unknown as Json,
         model: CONTENT_MODEL,
         image_model: IMAGE_MODEL,
-        prompt_version: PROMPT_VERSION,
+        prompt_version: promptVersion,
         created_by_email: options.actorEmail,
         updated_by_email: options.actorEmail,
       })
@@ -1055,11 +1228,21 @@ export async function generateInstagramDraft(options: {
       hook: generatedPost.hook,
       pillar: contentPlan.pillar,
       format: contentPlan.format,
+      educationalLayout:
+        dailyEducation && posterTitle && posterSubtitle
+          ? { title: posterTitle, subtitle: posterSubtitle, points: posterPoints }
+          : undefined,
     });
     const image = await uploadPostImage(postId, imageBytes);
     const { data: completedPost, error: updateError } = await supabaseAdmin
       .from("instagram_posts")
-      .update({ image_path: image.path, image_url: null, last_error: null })
+      .update({
+        image_path: image.path,
+        image_url: null,
+        status: dailyEducation ? "scheduled" : "draft",
+        scheduled_at: dailyEducation ? dailyEducationPublishAt(runDate ?? undefined) : null,
+        last_error: null,
+      })
       .eq("id", postId)
       .select("*")
       .single();
@@ -1077,7 +1260,20 @@ export async function generateInstagramDraft(options: {
         completed_at: new Date().toISOString(),
       })
       .eq("id", run.id);
-    await instagramAudit(postId, "generated", options.actorEmail, { run_id: run.id });
+    await instagramAudit(
+      postId,
+      dailyEducation ? "auto_scheduled" : "generated",
+      options.actorEmail,
+      {
+        run_id: run.id,
+        ...(dailyEducation
+          ? {
+              scheduled_at: dailyEducationPublishAt(runDate ?? undefined),
+              approval_required: false,
+            }
+          : {}),
+      },
+    );
     const previewUrl = await createSignedImageUrl(image.path);
     return {
       skipped: false,
@@ -1584,6 +1780,13 @@ export async function getInstagramDashboard(claims: unknown): Promise<InstagramD
         process.env["CONTENT_STUDIO_CRON_SECRET"] &&
         (credentialResult.data?.access_token || process.env["INSTAGRAM_ACCESS_TOKEN"]),
       ),
+      educationAutoPublishReady: Boolean(
+        process.env["OPENAI_API_KEY"] &&
+        process.env["CONTENT_STUDIO_CRON_SECRET"] &&
+        (credentialResult.data?.access_token || process.env["INSTAGRAM_ACCESS_TOKEN"]),
+      ),
+      educationAutoPublishTime: "20:00 IST",
+      educationPillar: DAILY_EDUCATION_PILLAR,
       reelAutomationReady: Boolean(
         process.env["OPENAI_API_KEY"] &&
         process.env["SHOTSTACK_API_KEY"] &&
@@ -1947,11 +2150,11 @@ export async function runInstagramTick() {
     try {
       generation = await generateInstagramDraft({
         actorEmail: "automation@eazydatafix.com",
-        runType: "daily",
+        runType: "education_daily",
       });
     } catch (error) {
-      console.error("[instagram-studio] daily generation failed", error);
-      errors.push(error instanceof Error ? error.message : "Daily generation failed");
+      console.error("[instagram-studio] daily Python education generation failed", error);
+      errors.push(error instanceof Error ? error.message : "Daily education generation failed");
     }
     if (isScheduledReelDay()) {
       try {

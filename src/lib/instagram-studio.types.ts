@@ -116,6 +116,9 @@ export type InstagramDashboard = {
     contentModel: string;
     imageModel: string;
     automationReady: boolean;
+    educationAutoPublishReady: boolean;
+    educationAutoPublishTime: string;
+    educationPillar: string;
     reelAutomationReady: boolean;
     reelEveryDays: number;
     reelAnchorDate: string;
