@@ -1777,12 +1777,12 @@ export async function getInstagramDashboard(claims: unknown): Promise<InstagramD
       imageModel: IMAGE_MODEL,
       automationReady: Boolean(
         process.env["OPENAI_API_KEY"] &&
-        process.env["CONTENT_STUDIO_CRON_SECRET"] &&
+        process.env["CONTENT_CRON_SECRET"] &&
         (credentialResult.data?.access_token || process.env["INSTAGRAM_ACCESS_TOKEN"]),
       ),
       educationAutoPublishReady: Boolean(
         process.env["OPENAI_API_KEY"] &&
-        process.env["CONTENT_STUDIO_CRON_SECRET"] &&
+        process.env["CONTENT_CRON_SECRET"] &&
         (credentialResult.data?.access_token || process.env["INSTAGRAM_ACCESS_TOKEN"]),
       ),
       educationAutoPublishTime: "20:00 IST",
@@ -1790,7 +1790,7 @@ export async function getInstagramDashboard(claims: unknown): Promise<InstagramD
       reelAutomationReady: Boolean(
         process.env["OPENAI_API_KEY"] &&
         process.env["SHOTSTACK_API_KEY"] &&
-        process.env["CONTENT_STUDIO_CRON_SECRET"] &&
+        process.env["CONTENT_CRON_SECRET"] &&
         (credentialResult.data?.access_token || process.env["INSTAGRAM_ACCESS_TOKEN"]),
       ),
       reelEveryDays: REEL_EVERY_DAYS,
