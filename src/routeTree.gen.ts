@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
@@ -41,6 +42,11 @@ import { Route as ApiPublicRefreshPackageAnalyticsRouteImport } from './routes/a
 import { Route as ApiCronInstagramStudioTickRouteImport } from './routes/api/cron/instagram-studio-tick'
 import { Route as ApiCronGenerateBlogDraftsRouteImport } from './routes/api/cron/generate-blog-drafts'
 
+const AlumniRoute = AlumniRouteImport.update({
+  id: '/alumni',
+  path: '/alumni',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -676,6 +682,7 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AlumniRoute: AlumniRoute,
   AnalyticsRoute: AnalyticsRoute,
   BenchmarksRoute: BenchmarksRoute,
   ChangelogRoute: ChangelogRoute,
