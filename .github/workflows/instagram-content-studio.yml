@@ -21,11 +21,11 @@ jobs:
     steps:
       - name: Generate daily education, refresh Reels, publish due items
         env:
-          CONTENT_STUDIO_CRON_SECRET: ${{ secrets.CONTENT_STUDIO_CRON_SECRET }}
+          CONTENT_CRON_SECRET: ${{ secrets.CONTENT_CRON_SECRET }}
         run: |
-          test -n "$CONTENT_STUDIO_CRON_SECRET"
+          test -n "$CONTENT_CRON_SECRET"
           curl --fail-with-body --silent --show-error \
             --max-time 540 \
             --request POST \
-            --header "Authorization: Bearer $CONTENT_STUDIO_CRON_SECRET" \
+            --header "Authorization: Bearer $CONTENT_CRON_SECRET" \
             https://eazydatafix.com/api/cron/instagram-studio-tick
