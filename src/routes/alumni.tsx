@@ -59,7 +59,7 @@ const starterProfiles: AlumniProfile[] = [
     location: "Hyderabad, Telangana, India",
     program_name: "SocialPrachar Team",
     batch_label: "Team",
-    linkedin_url: "https://in.linkedin.com/in/madhav-reddy-challa-a0478522a",
+    linkedin_url: "https://www.linkedin.com/in/madhavareddych",
     avatar_url: null,
   },
   {
