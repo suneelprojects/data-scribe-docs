@@ -34,7 +34,7 @@ OPENAI_API_KEY
 OPENAI_CONTENT_MODEL=gpt-5.6
 OPENAI_IMAGE_MODEL=gpt-image-2
 CONTENT_ADMIN_EMAILS=approved-admin@example.com
-CONTENT_STUDIO_CRON_SECRET=<a-long-random-value>
+CONTENT_CRON_SECRET=<a-long-random-value>
 SUPABASE_SERVICE_ROLE_KEY=<existing-project-secret>
 INSTAGRAM_ACCESS_TOKEN=<generated-long-lived-token>
 INSTAGRAM_APP_ID=<instagram-app-id>
@@ -66,11 +66,11 @@ Authentication identifies the user. Server-side `CONTENT_ADMIN_EMAILS` authoriza
 
 ## 4. Enable the schedules
 
-Create a GitHub Actions repository secret named `CONTENT_STUDIO_CRON_SECRET` with the exact same value used in Lovable Cloud. The workflow runs every day at 08:00 Asia/Kolkata and creates two drafts. It does not publish them.
+Create a GitHub Actions repository secret named `CONTENT_CRON_SECRET` with the exact same value used in Lovable Cloud. The workflow runs every day at 08:00 Asia/Kolkata and creates two drafts. It does not publish them.
 
 The endpoint is idempotent by India calendar date, so retries do not create a second daily batch.
 
-The Instagram workflow uses the same GitHub `CONTENT_STUDIO_CRON_SECRET`. It runs every 30 minutes and calls `/api/cron/instagram-studio-tick`. The server:
+The Instagram workflow uses the same GitHub `CONTENT_CRON_SECRET`. It runs every 30 minutes and calls `/api/cron/instagram-studio-tick`. The server:
 
 - Prepares at most one Python education post per India calendar date after 08:00 IST
 - Rotates useful Python tutorials, tips, tricks, mental models, common mistakes, ecosystem maps and practical mini-guides
