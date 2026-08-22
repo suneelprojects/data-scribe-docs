@@ -368,6 +368,7 @@ export type Database = {
           caption: string
           created_at: string
           created_by_email: string
+          duration_seconds: number
           hashtags: string[]
           hook: string
           id: string
@@ -379,23 +380,34 @@ export type Database = {
           instagram_media_id: string | null
           instagram_permalink: string | null
           last_error: string | null
+          media_type: string
           meta_creation_id: string | null
           model: string | null
+          music_license: string | null
+          music_track: string | null
           pillar: string
           prompt_version: string | null
           published_at: string | null
           quality_checks: Json
           quality_score: number
+          reel_scenes: Json
+          render_job_id: string | null
+          render_provider: string | null
+          render_status: string | null
           scheduled_at: string | null
+          share_to_feed: boolean
           source_article_id: string | null
           status: string
           updated_at: string
           updated_by_email: string
+          video_path: string | null
+          video_url: string | null
         }
         Insert: {
           caption: string
           created_at?: string
           created_by_email: string
+          duration_seconds?: number
           hashtags?: string[]
           hook: string
           id?: string
@@ -407,23 +419,34 @@ export type Database = {
           instagram_media_id?: string | null
           instagram_permalink?: string | null
           last_error?: string | null
+          media_type?: string
           meta_creation_id?: string | null
           model?: string | null
+          music_license?: string | null
+          music_track?: string | null
           pillar: string
           prompt_version?: string | null
           published_at?: string | null
           quality_checks?: Json
           quality_score?: number
+          reel_scenes?: Json
+          render_job_id?: string | null
+          render_provider?: string | null
+          render_status?: string | null
           scheduled_at?: string | null
+          share_to_feed?: boolean
           source_article_id?: string | null
           status?: string
           updated_at?: string
           updated_by_email: string
+          video_path?: string | null
+          video_url?: string | null
         }
         Update: {
           caption?: string
           created_at?: string
           created_by_email?: string
+          duration_seconds?: number
           hashtags?: string[]
           hook?: string
           id?: string
@@ -435,18 +458,28 @@ export type Database = {
           instagram_media_id?: string | null
           instagram_permalink?: string | null
           last_error?: string | null
+          media_type?: string
           meta_creation_id?: string | null
           model?: string | null
+          music_license?: string | null
+          music_track?: string | null
           pillar?: string
           prompt_version?: string | null
           published_at?: string | null
           quality_checks?: Json
           quality_score?: number
+          reel_scenes?: Json
+          render_job_id?: string | null
+          render_provider?: string | null
+          render_status?: string | null
           scheduled_at?: string | null
+          share_to_feed?: boolean
           source_article_id?: string | null
           status?: string
           updated_at?: string
           updated_by_email?: string
+          video_path?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {
