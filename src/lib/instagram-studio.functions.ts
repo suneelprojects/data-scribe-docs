@@ -33,19 +33,6 @@ export const generateInstagramPostDraft = createServerFn({ method: "POST" })
     });
   });
 
-export const generateInstagramReelDraft = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator(z.object({ topic: z.string().max(500).optional() }))
-  .handler(async ({ data, context }) => {
-    const { generateInstagramReelDraft: generateReel } = await import("./instagram-studio.server");
-    const { readAdminEmail } = await import("./content-studio.server");
-    return generateReel({
-      topic: data.topic,
-      actorEmail: readAdminEmail(context.claims),
-      runType: "reel_manual",
-    });
-  });
-
 export const saveInstagramPostDraft = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator(postInputSchema)
@@ -74,14 +61,6 @@ export const regenerateInstagramPostImage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { regenerateInstagramImage } = await import("./instagram-studio.server");
     return regenerateInstagramImage(data.id, context.claims);
-  });
-
-export const rerenderInstagramReel = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator(z.object({ id: z.string().uuid() }))
-  .handler(async ({ data, context }) => {
-    const { rerenderInstagramReel: rerender } = await import("./instagram-studio.server");
-    return rerender(data.id, context.claims);
   });
 
 export const publishInstagramPostNow = createServerFn({ method: "POST" })
