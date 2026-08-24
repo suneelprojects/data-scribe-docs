@@ -7,7 +7,6 @@ import {
   BookOpen,
   CalendarClock,
   Check,
-  Clapperboard,
   CircleAlert,
   Clock3,
   Edit3,
@@ -16,7 +15,6 @@ import {
   ImageIcon,
   Instagram,
   Loader2,
-  Music2,
   RefreshCw,
   Rocket,
   Save,
@@ -24,7 +22,6 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
-  Video,
   Zap,
   X,
 } from "lucide-react";
@@ -33,11 +30,9 @@ import {
   changeInstagramPostStatus,
   checkInstagramConnection,
   generateInstagramPostDraft,
-  generateInstagramReelDraft,
   getInstagramStudioDashboard,
   publishInstagramPostNow,
   regenerateInstagramPostImage,
-  rerenderInstagramReel,
   saveInstagramPostDraft,
 } from "@/lib/instagram-studio.functions";
 import type {
@@ -56,17 +51,13 @@ export function InstagramStudio() {
   const queryClient = useQueryClient();
   const getDashboard = useServerFn(getInstagramStudioDashboard);
   const generate = useServerFn(generateInstagramPostDraft);
-  const generateReel = useServerFn(generateInstagramReelDraft);
   const changeStatus = useServerFn(changeInstagramPostStatus);
   const publish = useServerFn(publishInstagramPostNow);
   const regenerate = useServerFn(regenerateInstagramPostImage);
-  const rerenderReel = useServerFn(rerenderInstagramReel);
   const verify = useServerFn(checkInstagramConnection);
   const [topic, setTopic] = useState("");
-  const [reelTopic, setReelTopic] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"all" | InstagramPostStatus>("all");
-  const [mediaType, setMediaType] = useState<"all" | "post" | "reel">("all");
   const [editing, setEditing] = useState<InstagramPost | null>(null);
   const [scheduling, setScheduling] = useState<InstagramPost | null>(null);
 
@@ -82,15 +73,6 @@ export function InstagramStudio() {
     onSuccess: () => {
       toast.success("Instagram copy and image generated as a draft.");
       setTopic("");
-      refresh();
-    },
-    onError: (error) => toast.error(errorMessage(error)),
-  });
-  const reelGenerationMutation = useMutation({
-    mutationFn: () => generateReel({ data: { topic: reelTopic.trim() || undefined } }),
-    onSuccess: () => {
-      toast.success("30-second Reel script, cover and video render queued.");
-      setReelTopic("");
       refresh();
     },
     onError: (error) => toast.error(errorMessage(error)),
@@ -126,14 +108,6 @@ export function InstagramStudio() {
     },
     onError: (error) => toast.error(errorMessage(error)),
   });
-  const rerenderMutation = useMutation({
-    mutationFn: (id: string) => rerenderReel({ data: { id } }),
-    onSuccess: () => {
-      toast.success("Reel render restarted. Refresh in a few minutes.");
-      refresh();
-    },
-    onError: (error) => toast.error(errorMessage(error)),
-  });
   const verifyMutation = useMutation({
     mutationFn: () => verify(),
     onSuccess: (connection) => {
@@ -147,7 +121,7 @@ export function InstagramStudio() {
   const posts = useMemo(() => {
     const needle = search.toLowerCase().trim();
     return (dashboard.data?.posts ?? []).filter((post) => {
-      if (mediaType !== "all" && post.media_type !== mediaType) return false;
+      if (post.media_type !== "post") return false;
       if (status !== "all" && post.status !== status) return false;
       if (!needle) return true;
       return [post.hook, post.caption, post.pillar, ...post.hashtags]
@@ -155,7 +129,7 @@ export function InstagramStudio() {
         .toLowerCase()
         .includes(needle);
     });
-  }, [dashboard.data?.posts, mediaType, search, status]);
+  }, [dashboard.data?.posts, search, status]);
 
   if (dashboard.isPending) {
     return (
@@ -179,11 +153,9 @@ export function InstagramStudio() {
   const data = dashboard.data;
   const busy =
     generationMutation.isPending ||
-    reelGenerationMutation.isPending ||
     statusMutation.isPending ||
     publishMutation.isPending ||
-    regenerateMutation.isPending ||
-    rerenderMutation.isPending;
+    regenerateMutation.isPending;
   return (
     <>
       <InstagramStats dashboard={data} />
@@ -198,23 +170,21 @@ export function InstagramStudio() {
               <span
                 className={cn(
                   "rounded-full px-2.5 py-1 text-[11px] font-medium",
-                  data.settings.educationAutoPublishReady
+                  data.settings.automationReady
                     ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                     : "bg-amber-500/10 text-amber-700 dark:text-amber-400",
                 )}
               >
-                {data.settings.educationAutoPublishReady
-                  ? "Auto-publishing active"
-                  : "Setup incomplete"}
+                {data.settings.automationReady ? "Draft automation active" : "Setup incomplete"}
               </span>
             </div>
             <h2 className="mt-3 text-xl font-semibold">
-              One useful Python post, every day at 8 PM IST
+              One useful Python draft, every day after 8 AM IST
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
               Tutorials, tips, tricks, common mistakes, ecosystem maps and practical mini-guides are
-              generated as original branded 4:5 educational posters. These daily posts pass the
-              automatic quality gate and publish without approval.
+              generated as original branded 4:5 educational posters. Every post stays in Draft
+              until you review, approve and schedule it.
             </p>
           </div>
           <div className="flex min-w-48 items-center gap-3 rounded-2xl border border-blue-500/15 bg-background/75 p-4">
@@ -222,8 +192,8 @@ export function InstagramStudio() {
               <Zap className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-xs text-muted-foreground">Next daily slot</div>
-              <div className="mt-0.5 font-semibold">{data.settings.educationAutoPublishTime}</div>
+              <div className="text-xs text-muted-foreground">Approval</div>
+              <div className="mt-0.5 font-semibold">Always required</div>
             </div>
           </div>
         </div>
@@ -289,78 +259,6 @@ export function InstagramStudio() {
         />
       </section>
 
-      <section className="mt-6 overflow-hidden rounded-2xl border border-cyan-500/25 bg-gradient-to-br from-cyan-500/5 via-card to-blue-500/5">
-        <div className="grid gap-6 p-5 lg:grid-cols-[minmax(0,1fr)_340px] sm:p-6">
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-2 text-sm font-semibold">
-                <Clapperboard className="h-4 w-4 text-cyan-500" /> 30-second Reel Studio
-              </span>
-              <span
-                className={cn(
-                  "rounded-full px-2.5 py-1 text-[11px] font-medium",
-                  data.settings.reelAutomationReady
-                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                    : "bg-amber-500/10 text-amber-700 dark:text-amber-400",
-                )}
-              >
-                {data.settings.reelAutomationReady ? "Automation ready" : "Renderer setup required"}
-              </span>
-            </div>
-            <p className="mt-2 max-w-3xl text-xs leading-5 text-muted-foreground">
-              Generates one vertical motion-story Reel every two days from 22 August 2026. Six
-              scenes, branded cover, original South-Indian-cinematic instrumental and human approval
-              are included before Meta publishing.
-            </p>
-            <textarea
-              value={reelTopic}
-              onChange={(event) => setReelTopic(event.target.value)}
-              placeholder="Optional Reel direction, for example: show why duplicate labels can mislead a dashboard…"
-              className="mt-5 min-h-24 w-full resize-y rounded-xl border border-input bg-background p-3 text-sm outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/15"
-            />
-            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-muted-foreground">
-                {data.settings.reelDurationSeconds}s · every {data.settings.reelEveryDays} days ·{" "}
-                {data.settings.reelRenderer}
-              </p>
-              <button
-                type="button"
-                disabled={reelGenerationMutation.isPending || !data.settings.reelAutomationReady}
-                onClick={() => reelGenerationMutation.mutate()}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-4 text-sm font-medium text-white disabled:opacity-50"
-              >
-                {reelGenerationMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Video className="h-4 w-4" />
-                )}
-                {reelGenerationMutation.isPending ? "Preparing Reel…" : "Generate Reel now"}
-              </button>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-border bg-background/80 p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <Music2 className="h-4 w-4 text-cyan-500" /> Music policy
-            </div>
-            <p className="mt-3 text-xs leading-5 text-muted-foreground">
-              Automatically rotates original instrumental tracks created for EazyDataFix. Commercial
-              movie songs are excluded unless separately licensed; an Instagram-library track can be
-              added manually when required.
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-              <div className="rounded-xl bg-muted/60 p-3">
-                <div className="text-muted-foreground">Reels</div>
-                <div className="mt-1 text-xl font-semibold">{data.stats.reels}</div>
-              </div>
-              <div className="rounded-xl bg-muted/60 p-3">
-                <div className="text-muted-foreground">Rendering</div>
-                <div className="mt-1 text-xl font-semibold">{data.stats.reelsRendering}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex flex-col gap-4 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -368,8 +266,7 @@ export function InstagramStudio() {
               <Instagram className="h-5 w-5 text-pink-500" /> Instagram queue
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Daily Python posts auto-publish at 8 PM IST. Manual posts and Reels keep the existing
-              edit → approve → schedule flow.
+              Every post follows the same controlled flow: edit → approve → schedule or publish.
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -382,15 +279,6 @@ export function InstagramStudio() {
                 className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm outline-none focus:border-pink-500 sm:w-60"
               />
             </label>
-            <select
-              value={mediaType}
-              onChange={(event) => setMediaType(event.target.value as "all" | "post" | "reel")}
-              className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus:border-pink-500"
-            >
-              <option value="all">Posts + Reels</option>
-              <option value="post">Static posts</option>
-              <option value="reel">Reels</option>
-            </select>
             <select
               value={status}
               onChange={(event) => setStatus(event.target.value as "all" | InstagramPostStatus)}
@@ -426,11 +314,7 @@ export function InstagramStudio() {
                 onReview={() => statusMutation.mutate({ id: post.id, status: "review" })}
                 onSchedule={() => setScheduling(post)}
                 onPublish={() => publishMutation.mutate(post.id)}
-                onRegenerate={() =>
-                  post.media_type === "reel"
-                    ? rerenderMutation.mutate(post.id)
-                    : regenerateMutation.mutate(post.id)
-                }
+                onRegenerate={() => regenerateMutation.mutate(post.id)}
                 onArchive={() => statusMutation.mutate({ id: post.id, status: "archived" })}
               />
             ))}
@@ -581,40 +465,17 @@ function InstagramPostCard({
   onRegenerate: () => void;
   onArchive: () => void;
 }) {
-  const canApprove =
-    post.quality_score >= 80 &&
-    (post.media_type === "reel"
-      ? post.render_status === "ready" && Boolean(post.video_url)
-      : Boolean(post.image_url));
+  const canApprove = post.quality_score >= 80 && Boolean(post.image_url);
   const locked =
     post.status === "publishing" || post.status === "published" || post.status === "archived";
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
-      <div
-        className={cn(
-          "relative bg-muted",
-          post.media_type === "reel" ? "aspect-[9/16]" : "aspect-[4/5]",
-        )}
-      >
-        {post.media_type === "reel" && post.video_url ? (
-          <video
-            src={post.video_url}
-            poster={post.image_url ?? undefined}
-            controls
-            playsInline
-            preload="metadata"
-            className="h-full w-full object-cover"
-          />
-        ) : post.image_url ? (
+      <div className="relative aspect-[4/5] bg-muted">
+        {post.image_url ? (
           <img src={post.image_url} alt={post.image_alt} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-            {post.media_type === "reel" ? (
-              <Video className="mr-2 h-4 w-4" />
-            ) : (
-              <ImageIcon className="mr-2 h-4 w-4" />
-            )}
-            {post.media_type === "reel" ? "Reel rendering…" : "Image unavailable"}
+            <ImageIcon className="mr-2 h-4 w-4" /> Image unavailable
           </div>
         )}
         <span
@@ -631,11 +492,11 @@ function InstagramPostCard({
       </div>
       <div className="p-4">
         <div className="text-[11px] font-medium uppercase tracking-wider text-pink-600 dark:text-pink-400">
-          {post.media_type === "reel" ? "30-second Reel" : "Static post"} · {post.pillar}
+          Static post · {post.pillar}
         </div>
         {post.pillar === "Daily Python Learning" && (
           <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-1 text-[10px] font-semibold text-blue-700 dark:text-blue-300">
-            <Zap className="h-3 w-3" /> Automatic · 8 PM IST
+            <Zap className="h-3 w-3" /> Daily draft · approval required
           </div>
         )}
         <h3 className="mt-2 line-clamp-2 text-sm font-semibold leading-5">{post.hook}</h3>
@@ -650,16 +511,6 @@ function InstagramPostCard({
         {post.last_error && (
           <div className="mt-3 rounded-lg bg-red-500/10 p-2 text-[11px] leading-4 text-red-700 dark:text-red-300">
             {post.last_error}
-          </div>
-        )}
-        {post.media_type === "reel" && (
-          <div className="mt-3 flex items-center justify-between rounded-lg bg-cyan-500/8 px-2.5 py-2 text-[11px]">
-            <span className="flex items-center gap-1.5 text-muted-foreground">
-              <Music2 className="h-3.5 w-3.5" /> {post.music_track ?? "Original instrumental"}
-            </span>
-            <span className="capitalize text-cyan-700 dark:text-cyan-300">
-              {post.render_status ?? "preparing"}
-            </span>
           </div>
         )}
         {post.scheduled_at && post.status === "scheduled" && (
@@ -741,12 +592,7 @@ function InstagramPostCard({
               onClick={onRegenerate}
               className="ig-action-button"
             >
-              {post.media_type === "reel" ? (
-                <Video className="h-3.5 w-3.5" />
-              ) : (
-                <ImageIcon className="h-3.5 w-3.5" />
-              )}
-              {post.media_type === "reel" ? "Render again" : "New image"}
+              <ImageIcon className="h-3.5 w-3.5" /> New image
             </button>
           )}
           {post.status === "published" && post.instagram_permalink && (
@@ -897,15 +743,7 @@ function InstagramEditor({
               Preview
             </div>
             <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-background">
-              {post.media_type === "reel" && post.video_url ? (
-                <video
-                  src={post.video_url}
-                  poster={post.image_url ?? undefined}
-                  controls
-                  playsInline
-                  className="aspect-[9/16] w-full object-cover"
-                />
-              ) : post.image_url ? (
+              {post.image_url ? (
                 <img
                   src={post.image_url}
                   alt={draft.image_alt}
@@ -922,13 +760,6 @@ function InstagramEditor({
                 </div>
               </div>
             </div>
-            {post.media_type === "reel" && (
-              <div className="mt-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3 text-xs leading-5 text-muted-foreground">
-                Editing copy does not change the rendered frames automatically. Save first, then use
-                <span className="font-medium text-foreground"> Render again</span> from the Reel
-                card.
-              </div>
-            )}
             <div className="mt-5 space-y-2">
               {post.quality_checks.map((check) => (
                 <div key={check.id} className="flex items-start gap-2 text-xs">
