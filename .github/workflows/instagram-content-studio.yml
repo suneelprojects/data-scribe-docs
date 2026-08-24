@@ -2,8 +2,8 @@ name: EazyDataFix Instagram Content Studio
 
 on:
   schedule:
-    # Every 30 minutes. The server prepares one daily Python education post for
-    # automatic publishing at 20:00 IST, plus an approval-gated Reel every two days.
+    # Every 30 minutes. The server prepares one daily Python education post as a draft
+    # for human review and manual approval.
     - cron: "*/30 * * * *"
   workflow_dispatch:
 
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Generate daily education, refresh Reels, publish due items
+      - name: Generate daily education draft and publish approved scheduled posts
         env:
           CONTENT_CRON_SECRET: ${{ secrets.CONTENT_CRON_SECRET }}
         run: |
