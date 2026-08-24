@@ -19,16 +19,9 @@ export type InstagramQualityCheck = {
   detail: string;
 };
 
-export type InstagramReelScene = {
-  label: string;
-  text: string;
-  start: number;
-  length: number;
-};
-
 export type InstagramPost = {
   id: string;
-  media_type: "post" | "reel";
+  media_type: "post";
   status: InstagramPostStatus;
   source_article_id: string | null;
   pillar: string;
@@ -39,16 +32,6 @@ export type InstagramPost = {
   image_alt: string;
   image_path: string | null;
   image_url: string | null;
-  reel_scenes: InstagramReelScene[];
-  music_track: string | null;
-  music_license: string | null;
-  video_path: string | null;
-  video_url: string | null;
-  render_provider: string | null;
-  render_job_id: string | null;
-  render_status: "queued" | "rendering" | "ready" | "failed" | null;
-  duration_seconds: number;
-  share_to_feed: boolean;
   quality_score: number;
   quality_checks: InstagramQualityCheck[];
   model: string | null;
@@ -105,8 +88,6 @@ export type InstagramDashboard = {
     published: number;
     failed: number;
     posts: number;
-    reels: number;
-    reelsRendering: number;
   };
   settings: {
     dailyDraftCount: number;
@@ -116,33 +97,9 @@ export type InstagramDashboard = {
     contentModel: string;
     imageModel: string;
     automationReady: boolean;
-    educationAutoPublishReady: boolean;
-    educationAutoPublishTime: string;
-    educationPillar: string;
-    reelAutomationReady: boolean;
-    reelEveryDays: number;
-    reelAnchorDate: string;
-    reelDurationSeconds: number;
-    reelRenderer: string;
   };
   connection: InstagramConnection;
 };
-
-export function asInstagramReelScenes(
-  value: Json | InstagramReelScene[] | null | undefined,
-): InstagramReelScene[] {
-  if (!Array.isArray(value)) return [];
-  return value.flatMap((item) => {
-    if (!item || typeof item !== "object" || Array.isArray(item)) return [];
-    const { label, text, start, length } = item;
-    return typeof label === "string" &&
-      typeof text === "string" &&
-      typeof start === "number" &&
-      typeof length === "number"
-      ? [{ label, text, start, length }]
-      : [];
-  });
-}
 
 export function asInstagramQualityChecks(
   value: Json | InstagramQualityCheck[] | null | undefined,
