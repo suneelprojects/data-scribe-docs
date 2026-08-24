@@ -1,13 +1,10 @@
-import { Buffer } from "node:buffer";
 import type { Database, Json } from "@/integrations/supabase/types";
 import { readAdminEmail } from "./content-studio.server";
 import {
   asInstagramQualityChecks,
-  asInstagramReelScenes,
   type InstagramDashboard,
   type InstagramPost,
   type InstagramPostInput,
-  type InstagramReelScene,
   type InstagramPostStatus,
   type InstagramQualityCheck,
 } from "./instagram-studio.types";
@@ -23,18 +20,9 @@ const IMAGE_MODEL = process.env["OPENAI_IMAGE_MODEL"]?.trim() || "gpt-image-2";
 const PROMPT_VERSION = "instagram-v2-branded-mix";
 const DAILY_EDUCATION_PROMPT_VERSION = "instagram-python-daily-v1";
 const STORAGE_BUCKET = "instagram-media";
-const REEL_STORAGE_BUCKET = "instagram-reels";
 const PREVIEW_URL_TTL_SECONDS = 60 * 60;
 const META_FETCH_URL_TTL_SECONDS = 60 * 60;
-const SITE_URL = "https://eazydatafix.com";
-const REEL_PROMPT_VERSION = "instagram-reel-v1-motion-story";
-const REEL_DURATION_SECONDS = 30;
-const REEL_EVERY_DAYS = 2;
-const REEL_ANCHOR_DATE = "2026-08-22";
-const SHOTSTACK_ENV = process.env["SHOTSTACK_ENV"]?.trim() === "stage" ? "stage" : "v1";
-const SHOTSTACK_URL = `https://api.shotstack.io/edit/${SHOTSTACK_ENV}`;
 const DAILY_EDUCATION_PILLAR = "Daily Python Learning";
-const DAILY_EDUCATION_PUBLISH_HOUR = 20;
 
 const DAILY_EDUCATION_TOPICS = [
   "Python foundations and mental models",
@@ -51,24 +39,6 @@ const DAILY_EDUCATION_TOPICS = [
   "visualization with Matplotlib and Seaborn",
   "testing, type hints and maintainable Python",
   "Python automation for repetitive work",
-] as const;
-
-const REEL_MUSIC = [
-  {
-    title: "Coastal Pulse",
-    url: `${SITE_URL}/music/eazydatafix-coastal-pulse.mp3`,
-    license: "Original EazyDataFix instrumental — cleared for commercial use",
-  },
-  {
-    title: "Deccan Drive",
-    url: `${SITE_URL}/music/eazydatafix-deccan-drive.mp3`,
-    license: "Original EazyDataFix instrumental — cleared for commercial use",
-  },
-  {
-    title: "Monsoon Code",
-    url: `${SITE_URL}/music/eazydatafix-monsoon-code.mp3`,
-    license: "Original EazyDataFix instrumental — cleared for commercial use",
-  },
 ] as const;
 
 const EAZYDATAFIX_FACTS = `
@@ -93,17 +63,6 @@ type GeneratedInstagramPost = {
   poster_title?: string;
   poster_subtitle?: string;
   poster_points?: Array<{ label: string; outcome: string }>;
-};
-
-type GeneratedInstagramReel = {
-  pillar: string;
-  hook: string;
-  caption: string;
-  hashtags: string[];
-  scenes: Array<{ label: string; text: string }>;
-  image_prompt: string;
-  image_alt: string;
-  music_mood: string;
 };
 
 type InstagramContentFormat =
@@ -259,64 +218,14 @@ const educationalInstagramPostSchema = {
   },
 } as const;
 
-const instagramReelSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: [
-    "pillar",
-    "hook",
-    "caption",
-    "hashtags",
-    "scenes",
-    "image_prompt",
-    "image_alt",
-    "music_mood",
-  ],
-  properties: {
-    pillar: { type: "string" },
-    hook: { type: "string" },
-    caption: { type: "string" },
-    hashtags: {
-      type: "array",
-      minItems: 4,
-      maxItems: 8,
-      items: { type: "string" },
-    },
-    scenes: {
-      type: "array",
-      minItems: 6,
-      maxItems: 6,
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["label", "text"],
-        properties: {
-          label: { type: "string" },
-          text: { type: "string" },
-        },
-      },
-    },
-    image_prompt: { type: "string" },
-    image_alt: { type: "string" },
-    music_mood: { type: "string" },
-  },
-} as const;
-
-function normalizePost(
-  row: PostRow,
-  imageUrl: string | null = row.image_url,
-  videoUrl: string | null = row.video_url,
-): InstagramPost {
+function normalizePost(row: PostRow, imageUrl: string | null = row.image_url): InstagramPost {
   return {
     ...row,
-    media_type: row.media_type as "post" | "reel",
+    media_type: "post",
     image_url: imageUrl,
-    video_url: videoUrl,
     status: row.status as InstagramPostStatus,
     hashtags: row.hashtags ?? [],
     quality_checks: asInstagramQualityChecks(row.quality_checks),
-    reel_scenes: asInstagramReelScenes(row.reel_scenes),
-    render_status: row.render_status as InstagramPost["render_status"],
   };
 }
 
@@ -442,12 +351,6 @@ function istHour() {
   );
 }
 
-function dailyEducationPublishAt(date = istDate()) {
-  return new Date(
-    `${date}T${String(DAILY_EDUCATION_PUBLISH_HOUR).padStart(2, "0")}:00:00+05:30`,
-  ).toISOString();
-}
-
 function dailyEducationTopic(date = istDate()) {
   const dayNumber = Math.floor(dateOnlyUtc(date) / 86_400_000);
   return DAILY_EDUCATION_TOPICS[dayNumber % DAILY_EDUCATION_TOPICS.length];
@@ -455,35 +358,6 @@ function dailyEducationTopic(date = istDate()) {
 
 function dateOnlyUtc(value: string) {
   return Date.parse(`${value}T00:00:00.000Z`);
-}
-
-function isScheduledReelDay(date = istDate()) {
-  const days = Math.floor((dateOnlyUtc(date) - dateOnlyUtc(REEL_ANCHOR_DATE)) / 86_400_000);
-  return days >= 0 && days % REEL_EVERY_DAYS === 0;
-}
-
-function reelMusicForDate(date = istDate()) {
-  const days = Math.max(
-    0,
-    Math.floor((dateOnlyUtc(date) - dateOnlyUtc(REEL_ANCHOR_DATE)) / 86_400_000),
-  );
-  return REEL_MUSIC[Math.floor(days / REEL_EVERY_DAYS) % REEL_MUSIC.length] ?? REEL_MUSIC[0];
-}
-
-function timedReelScenes(scenes: GeneratedInstagramReel["scenes"]): InstagramReelScene[] {
-  const timing = [
-    { start: 0, length: 4 },
-    { start: 4, length: 5 },
-    { start: 9, length: 5 },
-    { start: 14, length: 5 },
-    { start: 19, length: 6 },
-    { start: 25, length: 5 },
-  ];
-  return scenes.slice(0, 6).map((scene, index) => ({
-    label: scene.label.trim().slice(0, 50),
-    text: scene.text.trim().slice(0, 180),
-    ...(timing[index] ?? { start: index * 5, length: 5 }),
-  }));
 }
 
 function istWeekdayIndex() {
@@ -640,130 +514,6 @@ ${educationalPosterDirection}
   };
 }
 
-function evaluateReel(reel: GeneratedInstagramReel) {
-  const hashtags = normalizeHashtags(reel.hashtags);
-  const unsupportedClaim =
-    /\b(?:\d+(?:\.\d+)?\s*(?:x|times)\s+faster|saves?\s+\d+\s*(?:hours?|minutes?)|\d+%\s+(?:faster|better|less|more))\b/i.test(
-      `${reel.hook} ${reel.caption} ${reel.scenes.map((scene) => scene.text).join(" ")}`,
-    );
-  const sceneQuality =
-    reel.scenes.length === 6 &&
-    reel.scenes.every(
-      (scene) =>
-        scene.label.trim().length >= 2 &&
-        scene.text.trim().length >= 12 &&
-        scene.text.length <= 180,
-    );
-  const checks: Array<[boolean, number, string, string, string]> = [
-    [
-      reel.hook.trim().length >= 20 && reel.hook.trim().length <= 110,
-      20,
-      "reel-hook",
-      "Hook fits the opening four seconds",
-      "Keep the Reel hook between 20 and 110 characters",
-    ],
-    [
-      reel.caption.trim().length >= 160 && reel.caption.trim().length <= 1800,
-      15,
-      "reel-caption",
-      "Caption is useful and scannable",
-      "Keep the Reel caption between 160 and 1,800 characters",
-    ],
-    [
-      hashtags.length >= 4 && hashtags.length <= 8,
-      15,
-      "reel-hashtags",
-      "Hashtags are focused",
-      "Use four to eight relevant hashtags",
-    ],
-    [
-      sceneQuality,
-      25,
-      "reel-scenes",
-      "Six scenes fit the 30-second story",
-      "Provide six concise scenes with one idea per scene",
-    ],
-    [
-      !unsupportedClaim,
-      15,
-      "reel-evidence",
-      "No unsupported performance claims",
-      "Remove numerical performance or time-saving claims without evidence",
-    ],
-    [
-      reel.image_alt.trim().length >= 20 && reel.image_alt.trim().length <= 220,
-      10,
-      "reel-alt",
-      "Cover alt text is descriptive",
-      "Use descriptive cover alt text between 20 and 220 characters",
-    ],
-  ];
-  return {
-    hashtags,
-    qualityScore: checks.reduce((score, [passed, weight]) => score + (passed ? weight : 0), 0),
-    qualityChecks: checks.map(([passed, , id, label, failure]) => ({
-      id,
-      label,
-      passed,
-      detail: passed ? "Passed" : failure,
-    })),
-  };
-}
-
-async function callOpenAIForReel(options: {
-  topic?: string;
-  recentPosts: Array<{ hook: string; pillar: string }>;
-}) {
-  const apiKey = process.env["OPENAI_API_KEY"];
-  if (!apiKey) throw new Error("OPENAI_API_KEY is not configured in Lovable Cloud.");
-  const recent = options.recentPosts.map((post) => `- ${post.hook} | ${post.pillar}`).join("\n");
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: CONTENT_MODEL,
-      store: false,
-      max_output_tokens: 3200,
-      instructions: `You are the short-form video editor for EazyDataFix. Create accurate, useful 30-second Instagram Reels for data analysts and Python learners. Return only the requested structured output. ${EAZYDATAFIX_FACTS}`,
-      input: `${options.topic?.trim() ? `Admin direction: ${options.topic.trim()}\n` : ""}
-Create one 30-second vertical Reel that complements the day's static post without repeating it.
-- Use exactly six scenes in this order: Hook, Problem, Why it matters, Practical fix, Takeaway, EazyDataFix close.
-- Each scene must contain one short on-screen message that can be read in four to six seconds.
-- Keep every scene text under 180 characters and avoid code blocks.
-- The final scene may mention eazydatafix.com, but do not turn the whole Reel into an advertisement.
-- Write a useful caption of 160-1,000 characters and four to eight focused hashtags without #.
-- Suggest an original South-Indian-cinema-inspired instrumental mood using percussion, strings or flute. Never name or imitate a movie, composer, song or performer.
-- Create one cinematic vertical cover-art prompt using EazyDataFix navy, cyan, cobalt and restrained green. Do not request additional readable words, logos, watermarks, UI screenshots or code inside the artwork.
-- Do not invent benchmarks, customers, testimonials, numerical performance claims or time savings.
-- Avoid these recent ideas:\n${recent || "- No recent Instagram ideas."}`,
-      text: {
-        format: {
-          type: "json_schema",
-          name: "eazydatafix_instagram_reel",
-          strict: true,
-          schema: instagramReelSchema,
-        },
-      },
-    }),
-  });
-  const payload = (await response.json()) as OpenAITextPayload;
-  if (!response.ok) {
-    throw new Error(
-      payload.error?.message || `Instagram Reel generation failed with status ${response.status}.`,
-    );
-  }
-  const text = extractOutputText(payload);
-  if (!text) throw new Error("OpenAI returned no Instagram Reel script.");
-  return {
-    reel: JSON.parse(text) as GeneratedInstagramReel,
-    inputTokens: payload.usage?.input_tokens ?? null,
-    outputTokens: payload.usage?.output_tokens ?? null,
-  };
-}
-
 async function generateImage(
   prompt: string,
   poster: {
@@ -869,56 +619,21 @@ async function createSignedImageUrl(path: string, expiresIn = PREVIEW_URL_TTL_SE
   return data.signedUrl;
 }
 
-async function createSignedVideoUrl(path: string, expiresIn = PREVIEW_URL_TTL_SECONDS) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin.storage
-    .from(REEL_STORAGE_BUCKET)
-    .createSignedUrl(path, expiresIn);
-  if (error || !data?.signedUrl) {
-    throw new Error(error?.message || "Unable to create a temporary Instagram Reel URL.");
-  }
-  return data.signedUrl;
-}
-
 async function normalizePostsWithSignedImages(rows: PostRow[]) {
   const imagePaths = [...new Set(rows.flatMap((row) => (row.image_path ? [row.image_path] : [])))];
-  const videoPaths = [...new Set(rows.flatMap((row) => (row.video_path ? [row.video_path] : [])))];
-  if (imagePaths.length === 0 && videoPaths.length === 0)
-    return rows.map((row) => normalizePost(row));
+  if (imagePaths.length === 0) return rows.map((row) => normalizePost(row));
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const [images, videos] = await Promise.all([
-    imagePaths.length
-      ? supabaseAdmin.storage
-          .from(STORAGE_BUCKET)
-          .createSignedUrls(imagePaths, PREVIEW_URL_TTL_SECONDS)
-      : Promise.resolve({ data: [], error: null }),
-    videoPaths.length
-      ? supabaseAdmin.storage
-          .from(REEL_STORAGE_BUCKET)
-          .createSignedUrls(videoPaths, PREVIEW_URL_TTL_SECONDS)
-      : Promise.resolve({ data: [], error: null }),
-  ]);
-  if (images.error || videos.error) {
-    throw new Error(
-      images.error?.message || videos.error?.message || "Unable to create Instagram preview URLs.",
-    );
-  }
+  const images = await supabaseAdmin.storage
+    .from(STORAGE_BUCKET)
+    .createSignedUrls(imagePaths, PREVIEW_URL_TTL_SECONDS);
+  if (images.error) throw new Error(images.error.message || "Unable to create Instagram preview URLs.");
   const signedImages = new Map(
     (images.data ?? []).flatMap((item) =>
       item.path && item.signedUrl ? [[item.path, item.signedUrl] as const] : [],
     ),
   );
-  const signedVideos = new Map(
-    (videos.data ?? []).flatMap((item) =>
-      item.path && item.signedUrl ? [[item.path, item.signedUrl] as const] : [],
-    ),
-  );
   return rows.map((row) =>
-    normalizePost(
-      row,
-      row.image_path ? (signedImages.get(row.image_path) ?? null) : row.image_url,
-      row.video_path ? (signedVideos.get(row.video_path) ?? null) : row.video_url,
-    ),
+    normalizePost(row, row.image_path ? (signedImages.get(row.image_path) ?? null) : row.image_url),
   );
 }
 
@@ -1176,7 +891,7 @@ export async function generateInstagramDraft(options: {
     const generatedPost = { ...generated.post, pillar: contentPlan.pillar };
     const evaluated = evaluatePost(generatedPost as InstagramPost);
     if (dailyEducation && evaluated.qualityScore < 80) {
-      throw new Error("Daily education post did not meet the automatic publishing quality gate.");
+      throw new Error("Daily education post did not meet the draft quality gate.");
     }
     const posterPoints = (generatedPost.poster_points ?? []).slice(0, 7).map((point) => ({
       label: point.label
@@ -1203,6 +918,7 @@ export async function generateInstagramDraft(options: {
       .from("instagram_posts")
       .insert({
         source_article_id: sourceArticle?.id ?? null,
+        media_type: "post",
         status: "draft",
         pillar: contentPlan.pillar,
         hook: generatedPost.hook.trim(),
@@ -1239,8 +955,9 @@ export async function generateInstagramDraft(options: {
       .update({
         image_path: image.path,
         image_url: null,
-        status: dailyEducation ? "scheduled" : "draft",
-        scheduled_at: dailyEducation ? dailyEducationPublishAt(runDate ?? undefined) : null,
+        // Daily posts are generated for human review. Only an approved post can be scheduled.
+        status: "draft",
+        scheduled_at: null,
         last_error: null,
       })
       .eq("id", postId)
@@ -1262,16 +979,11 @@ export async function generateInstagramDraft(options: {
       .eq("id", run.id);
     await instagramAudit(
       postId,
-      dailyEducation ? "auto_scheduled" : "generated",
+      "generated",
       options.actorEmail,
       {
         run_id: run.id,
-        ...(dailyEducation
-          ? {
-              scheduled_at: dailyEducationPublishAt(runDate ?? undefined),
-              approval_required: false,
-            }
-          : {}),
+        approval_required: true,
       },
     );
     const previewUrl = await createSignedImageUrl(image.path);
@@ -1295,415 +1007,6 @@ export async function generateInstagramDraft(options: {
     }
     throw error;
   }
-}
-
-type ShotstackRenderPayload = {
-  success?: boolean;
-  message?: string;
-  response?: {
-    id?: string;
-    status?: string;
-    url?: string;
-    poster?: string;
-    error?: string;
-  };
-};
-
-function shotstackKey() {
-  const key = process.env["SHOTSTACK_API_KEY"]?.trim();
-  if (!key) throw new Error("SHOTSTACK_API_KEY is not configured in Lovable Cloud.");
-  return key;
-}
-
-function reelTextAsset(text: string, size: number, color = "#ffffff") {
-  return {
-    type: "text",
-    text,
-    width: 920,
-    height: 440,
-    font: {
-      family: "Open Sans",
-      color,
-      size,
-      weight: 700,
-      lineHeight: 1.05,
-    },
-    background: {
-      color: "#061126",
-      opacity: 0.78,
-      padding: 34,
-      borderRadius: 28,
-      wrap: false,
-    },
-    alignment: { horizontal: "center", vertical: "center" },
-  };
-}
-
-function buildReelEdit(options: {
-  imageUrl: string;
-  hook: string;
-  scenes: InstagramReelScene[];
-  musicUrl: string;
-  postId: string;
-}) {
-  return {
-    timeline: {
-      background: "#030817",
-      soundtrack: {
-        src: options.musicUrl,
-        effect: "fadeInFadeOut",
-        volume: 0.72,
-      },
-      tracks: [
-        {
-          clips: [
-            {
-              asset: { type: "image", src: options.imageUrl },
-              start: 0,
-              length: REEL_DURATION_SECONDS,
-              fit: "cover",
-              opacity: 0.48,
-              effect: "zoomIn",
-            },
-          ],
-        },
-        {
-          clips: options.scenes.map((scene, index) => ({
-            asset: reelTextAsset(
-              scene.text,
-              index === 0 ? 76 : 62,
-              index === 5 ? "#67e8f9" : "#ffffff",
-            ),
-            start: scene.start,
-            length: scene.length,
-            position: "center",
-            transition: { in: index === 0 ? "fade" : "slideLeft", out: "fade" },
-          })),
-        },
-        {
-          clips: [
-            {
-              asset: reelTextAsset("EazyDataFix", 34, "#67e8f9"),
-              start: 0,
-              length: REEL_DURATION_SECONDS,
-              position: "top",
-              offset: { x: 0, y: -0.38 },
-              scale: 0.42,
-            },
-            {
-              asset: reelTextAsset(options.hook, 30, "#cbd5e1"),
-              start: 0,
-              length: REEL_DURATION_SECONDS,
-              position: "bottom",
-              offset: { x: 0, y: 0.38 },
-              scale: 0.54,
-            },
-          ],
-        },
-      ],
-    },
-    output: {
-      format: "mp4",
-      resolution: "hd",
-      aspectRatio: "9:16",
-      fps: 30,
-      quality: "high",
-      poster: { capture: 1 },
-      destinations: [{ provider: "shotstack", exclude: false }],
-    },
-  };
-}
-
-async function submitReelRender(options: {
-  imageUrl: string;
-  hook: string;
-  scenes: InstagramReelScene[];
-  musicUrl: string;
-  postId: string;
-}) {
-  const response = await fetch(`${SHOTSTACK_URL}/render`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "x-api-key": shotstackKey(),
-    },
-    body: JSON.stringify(buildReelEdit(options)),
-  });
-  const payload = (await response.json()) as ShotstackRenderPayload;
-  const id = payload.response?.id;
-  if (!response.ok || !id) {
-    throw new Error(
-      payload.message || payload.response?.error || "Reel render could not be queued.",
-    );
-  }
-  return id;
-}
-
-async function readReelRender(renderId: string) {
-  const response = await fetch(`${SHOTSTACK_URL}/render/${renderId}`, {
-    headers: { Accept: "application/json", "x-api-key": shotstackKey() },
-  });
-  const payload = (await response.json()) as ShotstackRenderPayload;
-  if (!response.ok || !payload.response) {
-    throw new Error(payload.message || "Reel render status could not be read.");
-  }
-  return payload.response;
-}
-
-async function storeRenderedReel(postId: string, sourceUrl: string) {
-  const response = await fetch(sourceUrl);
-  if (!response.ok) throw new Error(`Rendered Reel download failed with ${response.status}.`);
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  if (bytes.byteLength > 52_428_800) throw new Error("Rendered Reel exceeds the 50 MB limit.");
-  const date = new Date();
-  const path = `${date.getUTCFullYear()}/${String(date.getUTCMonth() + 1).padStart(2, "0")}/${postId}.mp4`;
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { error } = await supabaseAdmin.storage.from(REEL_STORAGE_BUCKET).upload(path, bytes, {
-    contentType: "video/mp4",
-    cacheControl: "3600",
-    upsert: true,
-  });
-  if (error) throw new Error(`Unable to store the rendered Reel: ${error.message}`);
-  return path;
-}
-
-export async function generateInstagramReelDraft(options: {
-  topic?: string;
-  actorEmail: string;
-  runType: "reel_manual" | "reel_alternate";
-}) {
-  shotstackKey();
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const runDate = options.runType === "reel_alternate" ? istDate() : null;
-  if (runDate) {
-    const { data: existing } = await supabaseAdmin
-      .from("instagram_generation_runs")
-      .select("id, status, post_count, post_ids")
-      .eq("run_type", "reel_alternate")
-      .eq("run_date", runDate)
-      .maybeSingle();
-    if (existing)
-      return { skipped: true, created: existing.post_count, postIds: existing.post_ids };
-  }
-
-  const { data: run, error: runError } = await supabaseAdmin
-    .from("instagram_generation_runs")
-    .insert({
-      run_type: options.runType,
-      run_date: runDate,
-      model: CONTENT_MODEL,
-      image_model: IMAGE_MODEL,
-      prompt_version: REEL_PROMPT_VERSION,
-      requested_by_email: options.actorEmail,
-    })
-    .select("id")
-    .single();
-  if (runError || !run) throw new Error(runError?.message || "Unable to start Reel generation.");
-
-  let postId: string | null = null;
-  try {
-    const { data: recentPosts, error: recentError } = await supabaseAdmin
-      .from("instagram_posts")
-      .select("hook, pillar")
-      .neq("status", "archived")
-      .order("created_at", { ascending: false })
-      .limit(30);
-    if (recentError) throw new Error(recentError.message);
-    const generated = await callOpenAIForReel({
-      topic: options.topic,
-      recentPosts: recentPosts ?? [],
-    });
-    const evaluated = evaluateReel(generated.reel);
-    const scenes = timedReelScenes(generated.reel.scenes);
-    const music = reelMusicForDate();
-    const { data: inserted, error: insertError } = await supabaseAdmin
-      .from("instagram_posts")
-      .insert({
-        media_type: "reel",
-        status: "draft",
-        pillar: generated.reel.pillar.trim().slice(0, 100),
-        hook: generated.reel.hook.trim(),
-        caption: generated.reel.caption.trim(),
-        hashtags: evaluated.hashtags,
-        image_prompt: generated.reel.image_prompt.trim(),
-        image_alt: generated.reel.image_alt.trim(),
-        reel_scenes: scenes as unknown as Json,
-        music_track: music.title,
-        music_license: music.license,
-        render_provider: "shotstack",
-        render_status: "queued",
-        duration_seconds: REEL_DURATION_SECONDS,
-        quality_score: evaluated.qualityScore,
-        quality_checks: evaluated.qualityChecks as unknown as Json,
-        model: CONTENT_MODEL,
-        image_model: IMAGE_MODEL,
-        prompt_version: REEL_PROMPT_VERSION,
-        created_by_email: options.actorEmail,
-        updated_by_email: options.actorEmail,
-      })
-      .select("*")
-      .single();
-    if (insertError || !inserted)
-      throw new Error(insertError?.message || "Instagram Reel draft could not be saved.");
-    postId = inserted.id;
-
-    const imageBytes = await generateImage(generated.reel.image_prompt, {
-      hook: generated.reel.hook,
-      pillar: generated.reel.pillar,
-      format: "education",
-    });
-    const image = await uploadPostImage(postId, imageBytes);
-    const imageUrl = await createSignedImageUrl(image.path, META_FETCH_URL_TTL_SECONDS);
-    const renderId = await submitReelRender({
-      imageUrl,
-      hook: generated.reel.hook,
-      scenes,
-      musicUrl: music.url,
-      postId,
-    });
-    const { data: queued, error: updateError } = await supabaseAdmin
-      .from("instagram_posts")
-      .update({
-        image_path: image.path,
-        image_url: null,
-        render_job_id: renderId,
-        render_status: "rendering",
-        last_error: null,
-      })
-      .eq("id", postId)
-      .select("*")
-      .single();
-    if (updateError || !queued)
-      throw new Error(updateError?.message || "Reel render job could not be recorded.");
-    await supabaseAdmin
-      .from("instagram_generation_runs")
-      .update({
-        status: "completed",
-        post_count: 1,
-        post_ids: [postId],
-        input_tokens: generated.inputTokens,
-        output_tokens: generated.outputTokens,
-        completed_at: new Date().toISOString(),
-      })
-      .eq("id", run.id);
-    await instagramAudit(postId, "reel_render_queued", options.actorEmail, {
-      run_id: run.id,
-      render_id: renderId,
-      music: music.title,
-    });
-    return { skipped: false, created: 1, postIds: [postId], renderId };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown Reel generation error";
-    await supabaseAdmin
-      .from("instagram_generation_runs")
-      .update({ status: "failed", error_message: message, completed_at: new Date().toISOString() })
-      .eq("id", run.id);
-    if (postId) {
-      await supabaseAdmin
-        .from("instagram_posts")
-        .update({ status: "failed", render_status: "failed", last_error: message })
-        .eq("id", postId);
-    }
-    throw error;
-  }
-}
-
-export async function refreshPendingReelRenders() {
-  if (!process.env["SHOTSTACK_API_KEY"]?.trim()) return { checked: 0, ready: 0, failed: 0 };
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
-    .from("instagram_posts")
-    .select("id, render_job_id")
-    .eq("media_type", "reel")
-    .in("render_status", ["queued", "rendering"])
-    .not("render_job_id", "is", null)
-    .limit(10);
-  if (error) throw new Error(error.message);
-  let ready = 0;
-  let failed = 0;
-  for (const reel of data ?? []) {
-    if (!reel.render_job_id) continue;
-    try {
-      const render = await readReelRender(reel.render_job_id);
-      if (["queued", "fetching", "rendering", "saving"].includes(render.status ?? "")) continue;
-      if (render.status !== "done" || !render.url) {
-        const message =
-          render.error || `Reel render ended with status ${render.status ?? "unknown"}.`;
-        await supabaseAdmin
-          .from("instagram_posts")
-          .update({ status: "failed", render_status: "failed", last_error: message })
-          .eq("id", reel.id);
-        failed += 1;
-        continue;
-      }
-      const videoPath = await storeRenderedReel(reel.id, render.url);
-      await supabaseAdmin
-        .from("instagram_posts")
-        .update({
-          video_path: videoPath,
-          video_url: null,
-          render_status: "ready",
-          last_error: null,
-        })
-        .eq("id", reel.id);
-      await instagramAudit(reel.id, "reel_render_ready", "automation@eazydatafix.com", {
-        render_id: reel.render_job_id,
-      });
-      ready += 1;
-    } catch (renderError) {
-      const message =
-        renderError instanceof Error ? renderError.message : "Reel render check failed";
-      await supabaseAdmin.from("instagram_posts").update({ last_error: message }).eq("id", reel.id);
-    }
-  }
-  return { checked: data?.length ?? 0, ready, failed };
-}
-
-export async function rerenderInstagramReel(postId: string, claims: unknown) {
-  const actorEmail = readAdminEmail(claims);
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: reel, error } = await supabaseAdmin
-    .from("instagram_posts")
-    .select("*")
-    .eq("id", postId)
-    .eq("media_type", "reel")
-    .single();
-  if (error || !reel) throw new Error(error?.message || "Instagram Reel not found.");
-  if (["publishing", "published", "archived"].includes(reel.status)) {
-    throw new Error("This Reel cannot be rendered again in its current status.");
-  }
-  if (!reel.image_path && !reel.image_url) throw new Error("The Reel cover image is unavailable.");
-  const imageUrl = reel.image_path
-    ? await createSignedImageUrl(reel.image_path, META_FETCH_URL_TTL_SECONDS)
-    : reel.image_url;
-  if (!imageUrl) throw new Error("The Reel cover image URL could not be prepared.");
-  const music = REEL_MUSIC.find((track) => track.title === reel.music_track) ?? REEL_MUSIC[0];
-  const renderId = await submitReelRender({
-    imageUrl,
-    hook: reel.hook,
-    scenes: asInstagramReelScenes(reel.reel_scenes),
-    musicUrl: music.url,
-    postId,
-  });
-  const { data, error: updateError } = await supabaseAdmin
-    .from("instagram_posts")
-    .update({
-      status: "draft",
-      render_job_id: renderId,
-      render_status: "rendering",
-      video_path: null,
-      video_url: null,
-      last_error: null,
-      updated_by_email: actorEmail,
-    })
-    .eq("id", postId)
-    .select("*")
-    .single();
-  if (updateError || !data)
-    throw new Error(updateError?.message || "The Reel render could not be restarted.");
-  await instagramAudit(postId, "reel_render_restarted", actorEmail, { render_id: renderId });
-  return normalizePost(data, imageUrl);
 }
 
 function credentialSummary(credential: CredentialRow | null, lastError: string | null = null) {
@@ -1734,6 +1037,7 @@ export async function getInstagramDashboard(claims: unknown): Promise<InstagramD
     supabaseAdmin
       .from("instagram_posts")
       .select("*")
+      .eq("media_type", "post")
       .order("updated_at", { ascending: false })
       .limit(200),
     supabaseAdmin
@@ -1762,11 +1066,6 @@ export async function getInstagramDashboard(claims: unknown): Promise<InstagramD
       published: posts.filter((post) => post.status === "published").length,
       failed: posts.filter((post) => post.status === "failed").length,
       posts: posts.filter((post) => post.media_type === "post").length,
-      reels: posts.filter((post) => post.media_type === "reel").length,
-      reelsRendering: posts.filter(
-        (post) =>
-          post.media_type === "reel" && ["queued", "rendering"].includes(post.render_status ?? ""),
-      ).length,
     },
     settings: {
       dailyDraftCount: settingsResult.data?.daily_draft_count ?? 1,
@@ -1780,23 +1079,6 @@ export async function getInstagramDashboard(claims: unknown): Promise<InstagramD
         process.env["CONTENT_CRON_SECRET"] &&
         (credentialResult.data?.access_token || process.env["INSTAGRAM_ACCESS_TOKEN"]),
       ),
-      educationAutoPublishReady: Boolean(
-        process.env["OPENAI_API_KEY"] &&
-        process.env["CONTENT_CRON_SECRET"] &&
-        (credentialResult.data?.access_token || process.env["INSTAGRAM_ACCESS_TOKEN"]),
-      ),
-      educationAutoPublishTime: "20:00 IST",
-      educationPillar: DAILY_EDUCATION_PILLAR,
-      reelAutomationReady: Boolean(
-        process.env["OPENAI_API_KEY"] &&
-        process.env["SHOTSTACK_API_KEY"] &&
-        process.env["CONTENT_CRON_SECRET"] &&
-        (credentialResult.data?.access_token || process.env["INSTAGRAM_ACCESS_TOKEN"]),
-      ),
-      reelEveryDays: REEL_EVERY_DAYS,
-      reelAnchorDate: REEL_ANCHOR_DATE,
-      reelDurationSeconds: REEL_DURATION_SECONDS,
-      reelRenderer: `Shotstack ${SHOTSTACK_ENV}`,
     },
     connection: credentialSummary(credentialResult.data),
   };
@@ -1915,18 +1197,10 @@ export async function setInstagramPostStatus(
   }
   if (
     (input.status === "review" || input.status === "scheduled") &&
-    current.media_type === "post" &&
     !current.image_path &&
     !current.image_url
   ) {
     throw new Error("Generate an image before approving this post.");
-  }
-  if (
-    (input.status === "review" || input.status === "scheduled") &&
-    current.media_type === "reel" &&
-    (current.render_status !== "ready" || (!current.video_path && !current.video_url))
-  ) {
-    throw new Error("Wait for the 30-second Reel render to finish before approval.");
   }
   let scheduledAt: string | null = null;
   if (input.status === "scheduled") {
@@ -1997,14 +1271,8 @@ export async function publishInstagramPostById(postId: string, actorEmail: strin
   }
   if (current.quality_score < 80)
     throw new Error("Quality score must be at least 80 before publishing.");
-  if (current.media_type === "post" && !current.image_path && !current.image_url) {
+  if (!current.image_path && !current.image_url) {
     throw new Error("The Instagram post has no stored image.");
-  }
-  if (
-    current.media_type === "reel" &&
-    (current.render_status !== "ready" || (!current.video_path && !current.video_url))
-  ) {
-    throw new Error("The Instagram Reel is not rendered and ready.");
   }
 
   await supabaseAdmin
@@ -2021,21 +1289,11 @@ export async function publishInstagramPostById(postId: string, actorEmail: strin
         caption: publishCaption(current),
         access_token: credential.access_token,
       });
-      if (current.media_type === "reel") {
-        const videoUrl = current.video_path
-          ? await createSignedVideoUrl(current.video_path, META_FETCH_URL_TTL_SECONDS)
-          : current.video_url;
-        if (!videoUrl) throw new Error("The Instagram Reel URL could not be prepared.");
-        body.set("media_type", "REELS");
-        body.set("video_url", videoUrl);
-        body.set("share_to_feed", current.share_to_feed ? "true" : "false");
-      } else {
-        const imageUrl = current.image_path
-          ? await createSignedImageUrl(current.image_path, META_FETCH_URL_TTL_SECONDS)
-          : current.image_url;
-        if (!imageUrl) throw new Error("The Instagram image URL could not be prepared.");
-        body.set("image_url", imageUrl);
-      }
+      const imageUrl = current.image_path
+        ? await createSignedImageUrl(current.image_path, META_FETCH_URL_TTL_SECONDS)
+        : current.image_url;
+      if (!imageUrl) throw new Error("The Instagram image URL could not be prepared.");
+      body.set("image_url", imageUrl);
       const created = await metaRequest<{ id?: string }>(
         `${GRAPH_URL}/${credential.instagram_user_id}/media`,
         { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body },
@@ -2145,7 +1403,6 @@ export async function runInstagramTick() {
     errors.push(error instanceof Error ? error.message : "Credential maintenance failed");
   }
   let generation: Awaited<ReturnType<typeof generateInstagramDraft>> | null = null;
-  let reelGeneration: Awaited<ReturnType<typeof generateInstagramReelDraft>> | null = null;
   if (istHour() >= 8) {
     try {
       generation = await generateInstagramDraft({
@@ -2156,24 +1413,6 @@ export async function runInstagramTick() {
       console.error("[instagram-studio] daily Python education generation failed", error);
       errors.push(error instanceof Error ? error.message : "Daily education generation failed");
     }
-    if (isScheduledReelDay()) {
-      try {
-        reelGeneration = await generateInstagramReelDraft({
-          actorEmail: "automation@eazydatafix.com",
-          runType: "reel_alternate",
-        });
-      } catch (error) {
-        console.error("[instagram-studio] alternate-day Reel generation failed", error);
-        errors.push(error instanceof Error ? error.message : "Reel generation failed");
-      }
-    }
-  }
-  let rendering = { checked: 0, ready: 0, failed: 0 };
-  try {
-    rendering = await refreshPendingReelRenders();
-  } catch (error) {
-    console.error("[instagram-studio] Reel render maintenance failed", error);
-    errors.push(error instanceof Error ? error.message : "Reel render maintenance failed");
   }
   const publishing = await publishDueInstagramPosts();
   errors.push(...publishing.errors.map((item) => `${item.id}: ${item.error}`));
@@ -2182,8 +1421,6 @@ export async function runInstagramTick() {
   return {
     connection,
     generation: summarize(generation),
-    reelGeneration: summarize(reelGeneration),
-    rendering,
     publishing,
     errors,
   };
