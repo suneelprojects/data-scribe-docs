@@ -341,19 +341,45 @@ function istDate() {
   }).format(new Date());
 }
 
-function istHour() {
-  return Number(
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Kolkata",
-      hour: "2-digit",
-      hour12: false,
-    }).format(new Date()),
-  );
+/** Minutes since midnight in Asia/Kolkata, independent of the host timezone. */
+function istMinutesOfDay(now = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(now);
+  const [hour, minute] = parts.split(":").map(Number);
+  return hour * 60 + minute;
 }
 
-function dailyEducationTopic(date = istDate()) {
+export const INSTAGRAM_DAILY_SLOTS = [
+  { key: "slot_0700", label: "07:00", minutes: 7 * 60 },
+  { key: "slot_1230", label: "12:30", minutes: 12 * 60 + 30 },
+  { key: "slot_1800", label: "18:00", minutes: 18 * 60 },
+  { key: "slot_2300", label: "23:00", minutes: 23 * 60 },
+] as const;
+
+export type InstagramSlotKey = (typeof INSTAGRAM_DAILY_SLOTS)[number]["key"];
+
+/**
+ * Every slot whose IST time has already passed today, oldest first. Retries are
+ * safe because each slot is deduplicated by the stable (run_type, run_date) key.
+ */
+function dueInstagramSlots(now = new Date()) {
+  const minutes = istMinutesOfDay(now);
+  return INSTAGRAM_DAILY_SLOTS.filter((slot) => minutes >= slot.minutes);
+}
+
+function slotIndex(key: string) {
+  const index = INSTAGRAM_DAILY_SLOTS.findIndex((slot) => slot.key === key);
+  return index < 0 ? 0 : index;
+}
+
+function dailyEducationTopic(date = istDate(), slot = 0) {
   const dayNumber = Math.floor(dateOnlyUtc(date) / 86_400_000);
-  return DAILY_EDUCATION_TOPICS[dayNumber % DAILY_EDUCATION_TOPICS.length];
+  const cursor = dayNumber * INSTAGRAM_DAILY_SLOTS.length + slot;
+  return DAILY_EDUCATION_TOPICS[cursor % DAILY_EDUCATION_TOPICS.length];
 }
 
 function dateOnlyUtc(value: string) {
