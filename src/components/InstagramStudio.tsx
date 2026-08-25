@@ -212,8 +212,8 @@ export function InstagramStudio() {
               </div>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
                 AI rotates education, tips, memes, quotes, community and occasional product content,
-                then creates a branded 4:5 poster. Manually generated drafts still require your
-                approval.
+                then creates a branded 4:5 poster. Manual generations are saved as drafts for exceptional
+                use; the four daily slots publish on their own.
               </p>
             </div>
             <span
@@ -270,7 +270,7 @@ export function InstagramStudio() {
               <Instagram className="h-5 w-5 text-pink-500" /> Instagram queue
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Every post follows the same controlled flow: edit → approve → schedule or publish.
+              Scheduled slot posts publish automatically. Manual edit, image regeneration, publish now and archive stay available for exceptional use.
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -500,7 +500,7 @@ function InstagramPostCard({
         </div>
         {post.pillar === "Daily Python Learning" && (
           <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-1 text-[10px] font-semibold text-blue-700 dark:text-blue-300">
-            <Zap className="h-3 w-3" /> Daily draft · approval required
+            <Zap className="h-3 w-3" /> Automatic daily slot post
           </div>
         )}
         <h3 className="mt-2 line-clamp-2 text-sm font-semibold leading-5">{post.hook}</h3>
