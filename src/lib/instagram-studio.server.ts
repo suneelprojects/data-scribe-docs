@@ -830,7 +830,21 @@ export async function generateInstagramDraft(options: {
       .maybeSingle();
     if (existingError) throw new Error(existingError.message);
     if (existing?.status === "completed") {
-      return { skipped: true, created: existing.post_count, postIds: existing.post_ids };
+      let published = false;
+      let publishError: string | null = null;
+      if (options.autoPublish) {
+        // A retry must never create a second post; only finish an unpublished one.
+        const result = await ensureSlotPostsPublished(existing.post_ids, options.actorEmail);
+        published = result.published > 0;
+        publishError = result.error;
+      }
+      return {
+        skipped: true,
+        created: existing.post_count,
+        postIds: existing.post_ids,
+        published,
+        publishError,
+      };
     }
     if (existing) {
       const { data: restarted, error: restartError } = await supabaseAdmin
