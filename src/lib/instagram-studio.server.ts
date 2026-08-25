@@ -880,7 +880,7 @@ export async function generateInstagramDraft(options: {
   let postId: string | null = null;
   try {
     const contentPlan = dailyEducation
-      ? dailyEducationPlan(runDate ?? undefined)
+      ? dailyEducationPlan(runDate ?? undefined, slot)
       : selectContentPlan(options.topic);
     const [recentResult, usedSourcesResult] = await Promise.all([
       supabaseAdmin
