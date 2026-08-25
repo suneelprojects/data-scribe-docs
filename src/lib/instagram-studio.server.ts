@@ -809,11 +809,16 @@ async function refreshCredentialIfNeeded() {
 export async function generateInstagramDraft(options: {
   topic?: string;
   actorEmail: string;
-  runType: "manual" | "daily" | "education_daily";
+  runType: "manual" | "daily" | "education_daily" | InstagramSlotKey;
+  /** Publish to Instagram immediately after generation instead of waiting for review. */
+  autoPublish?: boolean;
+  runDate?: string;
 }) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const dailyEducation = options.runType === "education_daily";
-  const runDate = options.runType === "manual" ? null : istDate();
+  const slot = options.runType.startsWith("slot_") ? slotIndex(options.runType) : 0;
+  const dailyEducation =
+    options.runType === "education_daily" || options.runType.startsWith("slot_");
+  const runDate = options.runType === "manual" ? null : (options.runDate ?? istDate());
   const promptVersion = dailyEducation ? DAILY_EDUCATION_PROMPT_VERSION : PROMPT_VERSION;
   let run: { id: string } | null = null;
   if (runDate) {
