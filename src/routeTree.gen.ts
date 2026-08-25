@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
@@ -20,6 +19,7 @@ import { Route as ContributingRouteImport } from './routes/contributing'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as BenchmarksRouteImport } from './routes/benchmarks'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
@@ -42,11 +42,6 @@ import { Route as ApiPublicRefreshPackageAnalyticsRouteImport } from './routes/a
 import { Route as ApiCronInstagramStudioTickRouteImport } from './routes/api/cron/instagram-studio-tick'
 import { Route as ApiCronGenerateBlogDraftsRouteImport } from './routes/api/cron/generate-blog-drafts'
 
-const AlumniRoute = AlumniRouteImport.update({
-  id: '/alumni',
-  path: '/alumni',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -95,6 +90,11 @@ const BenchmarksRoute = BenchmarksRouteImport.update({
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlumniRoute = AlumniRouteImport.update({
+  id: '/alumni',
+  path: '/alumni',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -208,6 +208,7 @@ const ApiCronGenerateBlogDraftsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alumni': typeof AlumniRoute
   '/analytics': typeof AnalyticsRoute
   '/benchmarks': typeof BenchmarksRoute
   '/changelog': typeof ChangelogRoute
@@ -241,6 +242,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alumni': typeof AlumniRoute
   '/analytics': typeof AnalyticsRoute
   '/benchmarks': typeof BenchmarksRoute
   '/changelog': typeof ChangelogRoute
@@ -274,6 +276,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/alumni': typeof AlumniRoute
   '/analytics': typeof AnalyticsRoute
   '/benchmarks': typeof BenchmarksRoute
   '/changelog': typeof ChangelogRoute
@@ -309,6 +312,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/alumni'
     | '/analytics'
     | '/benchmarks'
     | '/changelog'
@@ -342,6 +346,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/alumni'
     | '/analytics'
     | '/benchmarks'
     | '/changelog'
@@ -374,6 +379,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/alumni'
     | '/analytics'
     | '/benchmarks'
     | '/changelog'
@@ -408,6 +414,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AlumniRoute: typeof AlumniRoute
   AnalyticsRoute: typeof AnalyticsRoute
   BenchmarksRoute: typeof BenchmarksRoute
   ChangelogRoute: typeof ChangelogRoute
@@ -500,6 +507,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alumni': {
+      id: '/alumni'
+      path: '/alumni'
+      fullPath: '/alumni'
+      preLoaderRoute: typeof AlumniRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
