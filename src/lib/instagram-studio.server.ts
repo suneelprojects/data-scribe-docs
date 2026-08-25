@@ -1444,8 +1444,39 @@ export async function publishDueInstagramPosts() {
   return { due: data?.length ?? 0, published, errors };
 }
 
+/** Publish any already-generated slot post that is not live yet. Never generates. */
+async function ensureSlotPostsPublished(postIds: string[], actorEmail: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  let published = 0;
+  let error: string | null = null;
+  for (const id of postIds) {
+    const { data } = await supabaseAdmin
+      .from("instagram_posts")
+      .select("id, status")
+      .eq("id", id)
+      .maybeSingle();
+    if (!data) continue;
+    if (data.status === "published" || data.status === "publishing") continue;
+    if (data.status === "archived") continue;
+    try {
+      if (data.status === "draft") {
+        await supabaseAdmin
+          .from("instagram_posts")
+          .update({ status: "review", updated_by_email: actorEmail })
+          .eq("id", id);
+      }
+      await publishInstagramPostById(id, actorEmail);
+      published += 1;
+    } catch (publishError) {
+      error = publishError instanceof Error ? publishError.message : "Instagram publishing failed";
+    }
+  }
+  return { published, error };
+}
+
 export async function runInstagramTick() {
   const errors: string[] = [];
+  const actorEmail = "automation@eazydatafix.com";
   let connection: { username: string | null; refreshed: boolean } | null = null;
   try {
     const credential = await refreshCredentialIfNeeded();
@@ -1457,25 +1488,57 @@ export async function runInstagramTick() {
     console.error("[instagram-studio] credential maintenance failed", error);
     errors.push(error instanceof Error ? error.message : "Credential maintenance failed");
   }
-  let generation: Awaited<ReturnType<typeof generateInstagramDraft>> | null = null;
-  if (istHour() >= 8) {
+
+  const runDate = istDate();
+  const slots: Array<{
+    slot: string;
+    label: string;
+    skipped: boolean;
+    created: number;
+    published: boolean;
+    error: string | null;
+  }> = [];
+
+  for (const slot of dueInstagramSlots()) {
     try {
-      generation = await generateInstagramDraft({
-        actorEmail: "automation@eazydatafix.com",
-        runType: "education_daily",
+      const result = await generateInstagramDraft({
+        actorEmail,
+        runType: slot.key,
+        runDate,
+        autoPublish: true,
+      });
+      if (result.publishError) {
+        errors.push(`${slot.label} IST: ${result.publishError}`);
+      }
+      slots.push({
+        slot: slot.key,
+        label: slot.label,
+        skipped: result.skipped,
+        created: result.created,
+        published: result.published,
+        error: result.publishError,
       });
     } catch (error) {
-      console.error("[instagram-studio] daily Python education generation failed", error);
-      errors.push(error instanceof Error ? error.message : "Daily education generation failed");
+      const message = error instanceof Error ? error.message : "Slot generation failed";
+      console.error(`[instagram-studio] ${slot.label} IST slot failed`, error);
+      errors.push(`${slot.label} IST: ${message}`);
+      slots.push({
+        slot: slot.key,
+        label: slot.label,
+        skipped: false,
+        created: 0,
+        published: false,
+        error: message,
+      });
     }
   }
+
   const publishing = await publishDueInstagramPosts();
   errors.push(...publishing.errors.map((item) => `${item.id}: ${item.error}`));
-  const summarize = (result: { skipped: boolean; created: number; postIds: string[] } | null) =>
-    result ? { skipped: result.skipped, created: result.created, postIds: result.postIds } : null;
   return {
     connection,
-    generation: summarize(generation),
+    date: runDate,
+    slots,
     publishing,
     errors,
   };
