@@ -425,11 +425,11 @@ function selectContentPlan(topic?: string): InstagramContentPlan {
   };
 }
 
-function dailyEducationPlan(date = istDate()): InstagramContentPlan {
+function dailyEducationPlan(date = istDate(), slot = 0): InstagramContentPlan {
   return {
     format: "education",
     pillar: DAILY_EDUCATION_PILLAR,
-    direction: `Teach one genuinely useful lesson from ${dailyEducationTopic(date)}. It must help Python learners or working developers immediately. Rotate tutorials, tips, tricks, comparisons, common mistakes, mini mental models and ecosystem maps. Prefer one focused idea over a broad generic list.`,
+    direction: `Teach one genuinely useful lesson from ${dailyEducationTopic(date, slot)}. It must help Python learners or working developers immediately. Rotate tutorials, tips, tricks, comparisons, common mistakes, mini mental models and ecosystem maps. Prefer one focused idea over a broad generic list.`,
     captionGuide:
       "Write 300-1,100 characters. Explain the concept simply, include one accurate practical example or short code snippet in the caption, add one takeaway, and never add a sales pitch.",
     usePublishedArticle: false,
