@@ -986,8 +986,8 @@ export async function generateInstagramDraft(options: {
       .update({
         image_path: image.path,
         image_url: null,
-        // Daily posts are generated for human review. Only an approved post can be scheduled.
-        status: "draft",
+        // Slot posts are auto-approved and published immediately; manual drafts wait for an editor.
+        status: options.autoPublish ? "review" : "draft",
         scheduled_at: null,
         last_error: null,
       })
@@ -1008,20 +1008,30 @@ export async function generateInstagramDraft(options: {
         completed_at: new Date().toISOString(),
       })
       .eq("id", run.id);
-    await instagramAudit(
-      postId,
-      "generated",
-      options.actorEmail,
-      {
-        run_id: run.id,
-        approval_required: true,
-      },
-    );
+    await instagramAudit(postId, "generated", options.actorEmail, {
+      run_id: run.id,
+      run_type: options.runType,
+      auto_publish: Boolean(options.autoPublish),
+    });
+
+    let published = false;
+    let publishError: string | null = null;
+    if (options.autoPublish) {
+      try {
+        await publishInstagramPostById(postId, options.actorEmail);
+        published = true;
+      } catch (error) {
+        publishError = error instanceof Error ? error.message : "Instagram publishing failed";
+      }
+    }
+
     const previewUrl = await createSignedImageUrl(image.path);
     return {
       skipped: false,
       created: 1,
       postIds: [postId],
+      published,
+      publishError,
       post: normalizePost(completedPost, previewUrl),
     };
   } catch (error) {
