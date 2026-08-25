@@ -845,7 +845,7 @@ function InstagramScheduleDialog({
           />
         </label>
         <p className="mt-3 text-xs leading-5 text-muted-foreground">
-          The automation checks approved scheduled posts every 30 minutes.
+          The automation runs every 15 minutes and posts the 07:00, 12:30, 18:00 and 23:00 IST slots automatically.
         </p>
         <div className="mt-6 flex justify-end gap-2">
           <button
