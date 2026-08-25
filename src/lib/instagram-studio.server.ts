@@ -1321,8 +1321,8 @@ export async function publishInstagramPostById(postId: string, actorEmail: strin
     .single();
   if (error || !current) throw new Error(error?.message || "Instagram post not found.");
   if (current.status === "published") return normalizePost(current);
-  if (!["review", "scheduled", "failed"].includes(current.status)) {
-    throw new Error("Approve the Instagram post before publishing it.");
+  if (!["draft", "review", "scheduled", "failed"].includes(current.status)) {
+    throw new Error("This Instagram post cannot be published in its current status.");
   }
   if (current.quality_score < 80)
     throw new Error("Quality score must be at least 80 before publishing.");
