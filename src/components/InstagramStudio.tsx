@@ -175,16 +175,19 @@ export function InstagramStudio() {
                     : "bg-amber-500/10 text-amber-700 dark:text-amber-400",
                 )}
               >
-                {data.settings.automationReady ? "Draft automation active" : "Setup incomplete"}
+                {data.settings.automationReady
+                  ? "Automatic publishing active"
+                  : "Setup incomplete"}
               </span>
             </div>
             <h2 className="mt-3 text-xl font-semibold">
-              One useful Python draft, every day after 8 AM IST
+              Four automatic posts every day at 07:00, 12:30, 18:00 and 23:00 IST
             </h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
               Tutorials, tips, tricks, common mistakes, ecosystem maps and practical mini-guides are
-              generated as original branded 4:5 educational posters. Every post stays in Draft
-              until you review, approve and schedule it.
+              generated as original branded 4:5 educational posters and published to @eazydatafix
+              automatically at each slot. No review or approval step is required — each date and
+              time slot is posted exactly once, even if the job retries.
             </p>
           </div>
           <div className="flex min-w-48 items-center gap-3 rounded-2xl border border-blue-500/15 bg-background/75 p-4">
@@ -192,8 +195,9 @@ export function InstagramStudio() {
               <Zap className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-xs text-muted-foreground">Approval</div>
-              <div className="mt-0.5 font-semibold">Always required</div>
+              <div className="text-xs text-muted-foreground">Daily schedule (IST)</div>
+              <div className="mt-0.5 font-semibold tabular-nums">07:00 · 12:30</div>
+              <div className="font-semibold tabular-nums">18:00 · 23:00</div>
             </div>
           </div>
         </div>
@@ -208,8 +212,8 @@ export function InstagramStudio() {
               </div>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
                 AI rotates education, tips, memes, quotes, community and occasional product content,
-                then creates a branded 4:5 poster. Manually generated drafts still require your
-                approval.
+                then creates a branded 4:5 poster. Manual generations are saved as drafts for exceptional
+                use; the four daily slots publish on their own.
               </p>
             </div>
             <span
@@ -266,7 +270,7 @@ export function InstagramStudio() {
               <Instagram className="h-5 w-5 text-pink-500" /> Instagram queue
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Every post follows the same controlled flow: edit → approve → schedule or publish.
+              Scheduled slot posts publish automatically. Manual edit, image regeneration, publish now and archive stay available for exceptional use.
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -496,7 +500,7 @@ function InstagramPostCard({
         </div>
         {post.pillar === "Daily Python Learning" && (
           <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-1 text-[10px] font-semibold text-blue-700 dark:text-blue-300">
-            <Zap className="h-3 w-3" /> Daily draft · approval required
+            <Zap className="h-3 w-3" /> Automatic daily slot post
           </div>
         )}
         <h3 className="mt-2 line-clamp-2 text-sm font-semibold leading-5">{post.hook}</h3>
@@ -841,7 +845,7 @@ function InstagramScheduleDialog({
           />
         </label>
         <p className="mt-3 text-xs leading-5 text-muted-foreground">
-          The automation checks approved scheduled posts every 30 minutes.
+          The automation runs every 15 minutes and posts the 07:00, 12:30, 18:00 and 23:00 IST slots automatically.
         </p>
         <div className="mt-6 flex justify-end gap-2">
           <button

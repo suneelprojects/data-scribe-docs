@@ -2,9 +2,10 @@ name: EazyDataFix Instagram Content Studio
 
 on:
   schedule:
-    # Every 30 minutes. The server prepares one daily Python education post as a draft
-    # for human review and manual approval.
-    - cron: "*/30 * * * *"
+    # Every 15 minutes (UTC). The server decides which Asia/Kolkata slot is due
+    # (07:00, 12:30, 18:00, 23:00 IST) and deduplicates by date + slot key, so
+    # extra ticks and GitHub's delayed cron runs never create duplicate posts.
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -17,15 +18,15 @@ concurrency:
 jobs:
   instagram-tick:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Generate daily education draft and publish approved scheduled posts
+      - name: Generate and auto-publish the due Asia/Kolkata Instagram slots
         env:
           CONTENT_CRON_SECRET: ${{ secrets.CONTENT_CRON_SECRET }}
         run: |
           test -n "$CONTENT_CRON_SECRET"
           curl --fail-with-body --silent --show-error \
-            --max-time 540 \
+            --max-time 780 \
             --request POST \
             --header "Authorization: Bearer $CONTENT_CRON_SECRET" \
             https://eazydatafix.com/api/cron/instagram-studio-tick

@@ -341,19 +341,45 @@ function istDate() {
   }).format(new Date());
 }
 
-function istHour() {
-  return Number(
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Kolkata",
-      hour: "2-digit",
-      hour12: false,
-    }).format(new Date()),
-  );
+/** Minutes since midnight in Asia/Kolkata, independent of the host timezone. */
+function istMinutesOfDay(now = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(now);
+  const [hour, minute] = parts.split(":").map(Number);
+  return hour * 60 + minute;
 }
 
-function dailyEducationTopic(date = istDate()) {
+export const INSTAGRAM_DAILY_SLOTS = [
+  { key: "slot_0700", label: "07:00", minutes: 7 * 60 },
+  { key: "slot_1230", label: "12:30", minutes: 12 * 60 + 30 },
+  { key: "slot_1800", label: "18:00", minutes: 18 * 60 },
+  { key: "slot_2300", label: "23:00", minutes: 23 * 60 },
+] as const;
+
+export type InstagramSlotKey = (typeof INSTAGRAM_DAILY_SLOTS)[number]["key"];
+
+/**
+ * Every slot whose IST time has already passed today, oldest first. Retries are
+ * safe because each slot is deduplicated by the stable (run_type, run_date) key.
+ */
+function dueInstagramSlots(now = new Date()) {
+  const minutes = istMinutesOfDay(now);
+  return INSTAGRAM_DAILY_SLOTS.filter((slot) => minutes >= slot.minutes);
+}
+
+function slotIndex(key: string) {
+  const index = INSTAGRAM_DAILY_SLOTS.findIndex((slot) => slot.key === key);
+  return index < 0 ? 0 : index;
+}
+
+function dailyEducationTopic(date = istDate(), slot = 0) {
   const dayNumber = Math.floor(dateOnlyUtc(date) / 86_400_000);
-  return DAILY_EDUCATION_TOPICS[dayNumber % DAILY_EDUCATION_TOPICS.length];
+  const cursor = dayNumber * INSTAGRAM_DAILY_SLOTS.length + slot;
+  return DAILY_EDUCATION_TOPICS[cursor % DAILY_EDUCATION_TOPICS.length];
 }
 
 function dateOnlyUtc(value: string) {
@@ -399,11 +425,11 @@ function selectContentPlan(topic?: string): InstagramContentPlan {
   };
 }
 
-function dailyEducationPlan(date = istDate()): InstagramContentPlan {
+function dailyEducationPlan(date = istDate(), slot = 0): InstagramContentPlan {
   return {
     format: "education",
     pillar: DAILY_EDUCATION_PILLAR,
-    direction: `Teach one genuinely useful lesson from ${dailyEducationTopic(date)}. It must help Python learners or working developers immediately. Rotate tutorials, tips, tricks, comparisons, common mistakes, mini mental models and ecosystem maps. Prefer one focused idea over a broad generic list.`,
+    direction: `Teach one genuinely useful lesson from ${dailyEducationTopic(date, slot)}. It must help Python learners or working developers immediately. Rotate tutorials, tips, tricks, comparisons, common mistakes, mini mental models and ecosystem maps. Prefer one focused idea over a broad generic list.`,
     captionGuide:
       "Write 300-1,100 characters. Explain the concept simply, include one accurate practical example or short code snippet in the caption, add one takeaway, and never add a sales pitch.",
     usePublishedArticle: false,
@@ -783,11 +809,16 @@ async function refreshCredentialIfNeeded() {
 export async function generateInstagramDraft(options: {
   topic?: string;
   actorEmail: string;
-  runType: "manual" | "daily" | "education_daily";
+  runType: "manual" | "daily" | "education_daily" | InstagramSlotKey;
+  /** Publish to Instagram immediately after generation instead of waiting for review. */
+  autoPublish?: boolean;
+  runDate?: string;
 }) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const dailyEducation = options.runType === "education_daily";
-  const runDate = options.runType === "manual" ? null : istDate();
+  const slot = options.runType.startsWith("slot_") ? slotIndex(options.runType) : 0;
+  const dailyEducation =
+    options.runType === "education_daily" || options.runType.startsWith("slot_");
+  const runDate = options.runType === "manual" ? null : (options.runDate ?? istDate());
   const promptVersion = dailyEducation ? DAILY_EDUCATION_PROMPT_VERSION : PROMPT_VERSION;
   let run: { id: string } | null = null;
   if (runDate) {
@@ -799,7 +830,21 @@ export async function generateInstagramDraft(options: {
       .maybeSingle();
     if (existingError) throw new Error(existingError.message);
     if (existing?.status === "completed") {
-      return { skipped: true, created: existing.post_count, postIds: existing.post_ids };
+      let published = false;
+      let publishError: string | null = null;
+      if (options.autoPublish) {
+        // A retry must never create a second post; only finish an unpublished one.
+        const result = await ensureSlotPostsPublished(existing.post_ids, options.actorEmail);
+        published = result.published > 0;
+        publishError = result.error;
+      }
+      return {
+        skipped: true,
+        created: existing.post_count,
+        postIds: existing.post_ids,
+        published,
+        publishError,
+      };
     }
     if (existing) {
       const { data: restarted, error: restartError } = await supabaseAdmin
@@ -849,7 +894,7 @@ export async function generateInstagramDraft(options: {
   let postId: string | null = null;
   try {
     const contentPlan = dailyEducation
-      ? dailyEducationPlan(runDate ?? undefined)
+      ? dailyEducationPlan(runDate ?? undefined, slot)
       : selectContentPlan(options.topic);
     const [recentResult, usedSourcesResult] = await Promise.all([
       supabaseAdmin
@@ -955,8 +1000,8 @@ export async function generateInstagramDraft(options: {
       .update({
         image_path: image.path,
         image_url: null,
-        // Daily posts are generated for human review. Only an approved post can be scheduled.
-        status: "draft",
+        // Slot posts are auto-approved and published immediately; manual drafts wait for an editor.
+        status: options.autoPublish ? "review" : "draft",
         scheduled_at: null,
         last_error: null,
       })
@@ -977,20 +1022,30 @@ export async function generateInstagramDraft(options: {
         completed_at: new Date().toISOString(),
       })
       .eq("id", run.id);
-    await instagramAudit(
-      postId,
-      "generated",
-      options.actorEmail,
-      {
-        run_id: run.id,
-        approval_required: true,
-      },
-    );
+    await instagramAudit(postId, "generated", options.actorEmail, {
+      run_id: run.id,
+      run_type: options.runType,
+      auto_publish: Boolean(options.autoPublish),
+    });
+
+    let published = false;
+    let publishError: string | null = null;
+    if (options.autoPublish) {
+      try {
+        await publishInstagramPostById(postId, options.actorEmail);
+        published = true;
+      } catch (error) {
+        publishError = error instanceof Error ? error.message : "Instagram publishing failed";
+      }
+    }
+
     const previewUrl = await createSignedImageUrl(image.path);
     return {
       skipped: false,
       created: 1,
       postIds: [postId],
+      published,
+      publishError,
       post: normalizePost(completedPost, previewUrl),
     };
   } catch (error) {
@@ -1266,8 +1321,8 @@ export async function publishInstagramPostById(postId: string, actorEmail: strin
     .single();
   if (error || !current) throw new Error(error?.message || "Instagram post not found.");
   if (current.status === "published") return normalizePost(current);
-  if (!["review", "scheduled", "failed"].includes(current.status)) {
-    throw new Error("Approve the Instagram post before publishing it.");
+  if (!["draft", "review", "scheduled", "failed"].includes(current.status)) {
+    throw new Error("This Instagram post cannot be published in its current status.");
   }
   if (current.quality_score < 80)
     throw new Error("Quality score must be at least 80 before publishing.");
@@ -1389,8 +1444,39 @@ export async function publishDueInstagramPosts() {
   return { due: data?.length ?? 0, published, errors };
 }
 
+/** Publish any already-generated slot post that is not live yet. Never generates. */
+async function ensureSlotPostsPublished(postIds: string[], actorEmail: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  let published = 0;
+  let error: string | null = null;
+  for (const id of postIds) {
+    const { data } = await supabaseAdmin
+      .from("instagram_posts")
+      .select("id, status")
+      .eq("id", id)
+      .maybeSingle();
+    if (!data) continue;
+    if (data.status === "published" || data.status === "publishing") continue;
+    if (data.status === "archived") continue;
+    try {
+      if (data.status === "draft") {
+        await supabaseAdmin
+          .from("instagram_posts")
+          .update({ status: "review", updated_by_email: actorEmail })
+          .eq("id", id);
+      }
+      await publishInstagramPostById(id, actorEmail);
+      published += 1;
+    } catch (publishError) {
+      error = publishError instanceof Error ? publishError.message : "Instagram publishing failed";
+    }
+  }
+  return { published, error };
+}
+
 export async function runInstagramTick() {
   const errors: string[] = [];
+  const actorEmail = "automation@eazydatafix.com";
   let connection: { username: string | null; refreshed: boolean } | null = null;
   try {
     const credential = await refreshCredentialIfNeeded();
@@ -1402,25 +1488,57 @@ export async function runInstagramTick() {
     console.error("[instagram-studio] credential maintenance failed", error);
     errors.push(error instanceof Error ? error.message : "Credential maintenance failed");
   }
-  let generation: Awaited<ReturnType<typeof generateInstagramDraft>> | null = null;
-  if (istHour() >= 8) {
+
+  const runDate = istDate();
+  const slots: Array<{
+    slot: string;
+    label: string;
+    skipped: boolean;
+    created: number;
+    published: boolean;
+    error: string | null;
+  }> = [];
+
+  for (const slot of dueInstagramSlots()) {
     try {
-      generation = await generateInstagramDraft({
-        actorEmail: "automation@eazydatafix.com",
-        runType: "education_daily",
+      const result = await generateInstagramDraft({
+        actorEmail,
+        runType: slot.key,
+        runDate,
+        autoPublish: true,
+      });
+      if (result.publishError) {
+        errors.push(`${slot.label} IST: ${result.publishError}`);
+      }
+      slots.push({
+        slot: slot.key,
+        label: slot.label,
+        skipped: result.skipped,
+        created: result.created,
+        published: result.published,
+        error: result.publishError,
       });
     } catch (error) {
-      console.error("[instagram-studio] daily Python education generation failed", error);
-      errors.push(error instanceof Error ? error.message : "Daily education generation failed");
+      const message = error instanceof Error ? error.message : "Slot generation failed";
+      console.error(`[instagram-studio] ${slot.label} IST slot failed`, error);
+      errors.push(`${slot.label} IST: ${message}`);
+      slots.push({
+        slot: slot.key,
+        label: slot.label,
+        skipped: false,
+        created: 0,
+        published: false,
+        error: message,
+      });
     }
   }
+
   const publishing = await publishDueInstagramPosts();
   errors.push(...publishing.errors.map((item) => `${item.id}: ${item.error}`));
-  const summarize = (result: { skipped: boolean; created: number; postIds: string[] } | null) =>
-    result ? { skipped: result.skipped, created: result.created, postIds: result.postIds } : null;
   return {
     connection,
-    generation: summarize(generation),
+    date: runDate,
+    slots,
     publishing,
     errors,
   };
