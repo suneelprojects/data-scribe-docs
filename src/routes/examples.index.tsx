@@ -23,7 +23,7 @@ function Gallery() {
       <DocPageHeader
         breadcrumbs={[{ label: "Examples" }]}
         title="Examples Gallery"
-        description="Every example ships with runnable v1.0.0 Python, verified output, and a real downloadable dataset."
+        description="Every example ships with runnable v1 Python, verified output, and a real downloadable dataset."
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {examples.map((e) => (

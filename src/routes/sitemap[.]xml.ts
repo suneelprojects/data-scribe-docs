@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const staticRoutes = [
   "",
+  "/studio",
+  "/pricing",
   "/blog",
   "/docs",
   "/docs/installation",

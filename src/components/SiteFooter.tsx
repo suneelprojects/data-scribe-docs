@@ -1,36 +1,37 @@
 import { Link } from "@tanstack/react-router";
-import { Github } from "lucide-react";
+import { Github, LockKeyhole } from "lucide-react";
 import { InstallChip } from "./InstallChip";
 
 const cols: { title: string; links: { label: string; to?: string; href?: string }[] }[] = [
   {
-    title: "Documentation",
+    title: "Product",
     links: [
-      { label: "Introduction", to: "/docs" },
-      { label: "Installation", to: "/docs/installation" },
-      { label: "Quick Start", to: "/docs/quickstart" },
-      { label: "API Reference", to: "/docs/reference" },
+      { label: "Data Studio", to: "/studio" },
+      { label: "Launch pricing", to: "/pricing" },
+      { label: "Analysis Ready", to: "/studio" },
+      { label: "Power BI Ready", to: "/studio" },
+      { label: "ML Ready", to: "/studio" },
     ],
   },
   {
-    title: "Project",
+    title: "Resources",
     links: [
       { label: "Blog", to: "/blog" },
-      { label: "Analytics", to: "/analytics" },
-      { label: "Roadmap", to: "/roadmap" },
+      { label: "Documentation", to: "/docs" },
+      { label: "API Reference", to: "/docs/reference" },
+      { label: "Examples", to: "/examples" },
       { label: "Changelog", to: "/changelog" },
-      { label: "Benchmarks", to: "/benchmarks" },
-      { label: "Ecosystem", to: "/ecosystem" },
+      { label: "Roadmap", to: "/roadmap" },
     ],
   },
   {
-    title: "Community",
+    title: "Open Source",
     links: [
       { label: "GitHub", href: "https://github.com/suneelprojects/eazydatafix" },
       { label: "PyPI", href: "https://pypi.org/project/eazydatafix/" },
+      { label: "Package analytics", to: "/analytics" },
       { label: "License", href: "https://opensource.org/licenses/MIT" },
       { label: "Contributing", to: "/contributing" },
-      { label: "RSS feed", href: "/rss.xml" },
     ],
   },
 ];
@@ -48,7 +49,8 @@ export function SiteFooter() {
               <span className="font-semibold">EazyDataFix</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
-              Open-source Python framework for auditable data quality, cleaning, validation and EDA.
+              Turn messy CSV and Excel files into trusted data for analysis, machine learning and
+              Power BI.
             </p>
             <div className="mt-4">
               <InstallChip variant="compact" />
@@ -95,7 +97,14 @@ export function SiteFooter() {
             <span className="font-medium text-foreground">Suneel Kumar Kola</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="font-mono">MIT License</span>
+            <Link
+              to="/admin/content-studio"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+              title="Private editorial workspace"
+            >
+              <LockKeyhole className="h-3 w-3" /> Content Studio
+            </Link>
+            <span className="font-mono">v1.4.0 · MIT</span>
             <a
               href="https://github.com/suneelprojects/eazydatafix"
               target="_blank"

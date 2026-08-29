@@ -5,12 +5,12 @@ import { DocPageHeader } from "@/components/DocPageHeader";
 export const Route = createFileRoute("/docs/quickstart")({
   head: () => ({
     meta: [
-      { title: "EazyDataFix 1.0 Quick Start" },
+      { title: "EazyDataFix 1.4 Quick Start" },
       {
         name: "description",
-        content: "Profile, assess, clean and explore your first dataset with EazyDataFix 1.0.",
+        content: "Clean and prepare your first dataset with EazyDataFix 1.4.",
       },
-      { property: "og:title", content: "EazyDataFix 1.0 Quick Start" },
+      { property: "og:title", content: "EazyDataFix 1.4 Quick Start" },
       {
         property: "og:description",
         content: "Run a complete, auditable data workflow in a few lines of Python.",
@@ -31,7 +31,7 @@ function QuickStart() {
       <div id="doc-content" className="prose-doc">
         <h2 id="install">1. Install</h2>
         <CodeBlock
-          code="pip install eazydatafix==1.0.0"
+          code="pip install eazydatafix==1.4.0"
           language="bash"
           filename="terminal"
           showActions={false}

@@ -17,7 +17,7 @@ const GRAPH_URL = `https://graph.instagram.com/${GRAPH_VERSION}`;
 const FACEBOOK_GRAPH_URL = `https://graph.facebook.com/${GRAPH_VERSION}`;
 const CONTENT_MODEL = process.env["OPENAI_CONTENT_MODEL"]?.trim() || "gpt-5.6";
 const IMAGE_MODEL = process.env["OPENAI_IMAGE_MODEL"]?.trim() || "gpt-image-2";
-const PROMPT_VERSION = "instagram-v2-branded-mix";
+const PROMPT_VERSION = "instagram-v3-product-v1-4";
 const DAILY_EDUCATION_PROMPT_VERSION = "instagram-python-daily-v1";
 const STORAGE_BUCKET = "instagram-media";
 const PREVIEW_URL_TTL_SECONDS = 60 * 60;
@@ -43,8 +43,12 @@ const DAILY_EDUCATION_TOPICS = [
 
 const EAZYDATAFIX_FACTS = `
 Verified EazyDataFix facts:
-- EazyDataFix v1.0.0 is an MIT-licensed Python package for auditable data quality, cleaning, validation and EDA workflows.
+- EazyDataFix v1.4.0 is an MIT-licensed Python package for auditable data transformation, quality, cleaning and validation workflows.
+- The product direction is EazyDataFix Data Studio: upload, scan, review proposed changes and export trusted data. The current public Studio is a browser-local CSV preview.
 - It accepts CSV, Excel, JSON, Parquet and pandas.DataFrame inputs.
+- edf.analysis_ready_with_report() provides before/after scores, changes, warnings and validation evidence.
+- edf.ml_ready() creates leakage-safe train/test inputs and a reusable preprocessing artifact; it does not train a model.
+- edf.powerbi_ready() validates field types, keys and relationships and prepares model inputs; it does not create PBIX dashboards.
 - edf.run() composes profiling, quality assessment, controlled cleaning and deterministic EDA.
 - edf.fix() supports dry-run previews, per-column cleaning rules, a proposed dataset and a structured change log.
 - edf.prepare_with_report() supports controlled conversion, normalization and outlier actions with changes and warnings.
@@ -652,7 +656,8 @@ async function normalizePostsWithSignedImages(rows: PostRow[]) {
   const images = await supabaseAdmin.storage
     .from(STORAGE_BUCKET)
     .createSignedUrls(imagePaths, PREVIEW_URL_TTL_SECONDS);
-  if (images.error) throw new Error(images.error.message || "Unable to create Instagram preview URLs.");
+  if (images.error)
+    throw new Error(images.error.message || "Unable to create Instagram preview URLs.");
   const signedImages = new Map(
     (images.data ?? []).flatMap((item) =>
       item.path && item.signedUrl ? [[item.path, item.signedUrl] as const] : [],

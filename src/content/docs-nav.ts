@@ -21,13 +21,13 @@ export const docsNav: NavGroup[] = [
     ],
   },
   {
-    label: "Production v1",
+    label: "Production v1.4",
     items: [
-      { title: "Unified run() Workflow", url: "/releases/v1-0-0#unified-workflow", badge: "1.0" },
-      { title: "Controlled Cleaning", url: "/releases/v1-0-0#controlled-cleaning", badge: "1.0" },
-      { title: "Preparation Reports", url: "/releases/v1-0-0#preparation-reports", badge: "1.0" },
-      { title: "Data Contracts", url: "/releases/v1-0-0#data-contracts", badge: "1.0" },
-      { title: "Production CLI", url: "/releases/v1-0-0#production-cli", badge: "1.0" },
+      { title: "Analysis Ready", url: "/studio", badge: "1.4" },
+      { title: "ML Ready", url: "/studio", badge: "1.4" },
+      { title: "Power BI Ready", url: "/studio", badge: "1.4" },
+      { title: "Unified run() Workflow", url: "/releases/v1-0-0#unified-workflow", badge: "1.x" },
+      { title: "Controlled Cleaning", url: "/releases/v1-0-0#controlled-cleaning", badge: "1.x" },
     ],
   },
   {
@@ -52,7 +52,8 @@ export const docsNav: NavGroup[] = [
   {
     label: "Meta",
     items: [
-      { title: "v1.0.0 Release Notes", url: "/releases/v1-0-0", badge: "Latest" },
+      { title: "v1.4.0 Current Release", url: "/changelog", badge: "Latest" },
+      { title: "v1.0.0 Release Notes", url: "/releases/v1-0-0" },
       { title: "Roadmap", url: "/roadmap" },
       { title: "Changelog", url: "/changelog" },
       { title: "Benchmarks", url: "/benchmarks", badge: "Preview" },
@@ -63,7 +64,8 @@ export const docsNav: NavGroup[] = [
 ];
 
 export const versions = [
-  { label: "v1.0.0", value: "1.0.0", status: "latest" as const },
+  { label: "v1.4.0", value: "1.4.0", status: "latest" as const },
+  { label: "v1.0.0", value: "1.0.0", status: "previous" as const },
   { label: "v0.5.0", value: "0.5.0", status: "previous" as const },
   { label: "v0.4.0", value: "0.4.0", status: "previous" as const },
   { label: "v0.3.0", value: "0.3.0", status: "previous" as const },

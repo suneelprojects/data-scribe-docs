@@ -60,7 +60,7 @@ function Installation() {
           lines={[
             { kind: "in", text: "import eazydatafix as edf" },
             { kind: "in", text: "edf.__version__" },
-            { kind: "out", text: "'1.0.0'" },
+            { kind: "out", text: "'1.4.0'" },
           ]}
         />
 

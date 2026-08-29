@@ -10,6 +10,23 @@ export type ChangelogEntry = {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "v1.4.0",
+    date: "26 Aug 2026",
+    status: "released",
+    title: "Transformation-first Readiness Workflows",
+    added: [
+      "edf.analysis_ready_with_report() — analysis-ready data with scores, changes, warnings and validations",
+      "edf.ml_ready() — leakage-safe train/test preparation with reusable preprocessing artifacts",
+      "edf.powerbi_ready() — validated single-table and multi-table Power BI model inputs",
+      "Key, relationship and cardinality validation with optional continuous date-table generation",
+    ],
+    changed: [
+      "Product direction now centres Analysis Ready, ML Ready and Power BI Ready outcomes",
+      "All v1 public APIs remain compatible under semantic versioning",
+      "Python 3.10–3.13 support verified for the current production release",
+    ],
+  },
+  {
     version: "v1.0.0",
     date: "8 Aug 2026",
     status: "released",

@@ -1,394 +1,72 @@
-# EazyDataFix Docs
+# EazyDataFix Website
 
-Build a world-class documentation-first website for an open-source Python library called "EazyDataFix".
+This repository powers [eazydatafix.com](https://eazydatafix.com): the customer-facing product website, public Data Studio preview, developer documentation, public blog and private editorial Content Studio for EazyDataFix.
 
-IMPORTANT
+## Product direction
 
-This is NOT a SaaS website.
+EazyDataFix turns messy CSV and Excel files into transparent, reviewable outputs for:
 
-This is NOT a startup landing page.
+- Analysis Ready data
+- Leakage-safe ML Ready inputs
+- Power BI Ready model inputs
 
-Do NOT use oversized hero banners, marketing illustrations, gradients everywhere, or generic AI graphics.
+The primary customer flow is:
 
-The website should feel like browsing FastAPI, Pydantic, Pandas, NumPy, Polars, or Requests documentation.
+1. Upload a file or load a sample.
+2. Select the intended outcome.
+3. Inspect detected issues.
+4. Approve or reject proposed transformations.
+5. Compare the original and cleaned preview.
+6. Export the result with readiness evidence.
 
-The experience should make developers immediately trust the project.
+The public `/studio` route is intentionally an honest browser-local CSV preview. It demonstrates the customer experience without claiming to expose the complete Python engine. The open-source v1.4.0 engine remains available through PyPI and the developer documentation.
 
-=========================================
+## Public routes
 
-Design Style
+- `/` — product-facing homepage
+- `/studio` — customer Data Studio preview
+- `/pricing` — free preview, open-source engine and assisted pilot scope
+- `/blog` — published content generated and reviewed through Content Studio
+- `/docs` — Python documentation
+- `/examples` — runnable examples
+- `/roadmap`, `/changelog`, `/analytics` — project evidence and status
 
-=========================================
+## Private Content Studio
 
-Minimal
+The existing `/admin/content-studio` route remains the secure editorial workspace for:
 
-Documentation-first
+- Blog draft generation and review
+- SEO and quality gates
+- Publishing and scheduling
+- Instagram post generation and publishing
+- Editorial audit history
 
-Developer-focused
+Authentication identifies the user; `CONTENT_ADMIN_EMAILS` performs server-side authorization. Draft and administrative data must never be exposed through public routes.
 
-Excellent typography
+See `CONTENT_STUDIO_SETUP.md` for the Supabase, OpenAI, Instagram and automation configuration.
 
-Large readable code blocks
+## Product principles
 
-Clean spacing
-
-Subtle animations only
-
-Professional
-
-Premium open-source feel
-
-Use white space effectively.
-
-Avoid unnecessary colors.
-
-The code examples should become the visual attraction instead of images.
-
-=========================================
-
-Navigation
-
-=========================================
-
-Home
-
-Documentation
-
-API Reference
-
-Examples
-
-Roadmap
-
-Contributing
-
-GitHub
-
-=========================================
-
-Hero Section
-
-=========================================
-
-Small logo
-
-EazyDataFix
-
-Open Source Python Library for Data Quality Assessment & Automated Data Cleaning
-
-Below that:
-
-pip install eazydatafix
-
-Primary Button
-
-Get Started
-
-Secondary Button
-
-GitHub
-
-Instead of a hero illustration, display a beautiful interactive Python code editor.
-
-Example:
-
-import eazydatafix as edf
-
-report = edf.assess("employees.csv")
-
-report.summary()
-
-result = edf.fix("employees.csv")
-
-result.applied_fixes
-
-result.to_csv("clean.csv")
-
-The code editor should look like VS Code.
-
-=========================================
-
-Problem Statement
-
-=========================================
-
-Title
-
-Why EazyDataFix?
-
-Explain that data scientists spend a significant amount of time cleaning data before analysis.
-
-EazyDataFix simplifies repetitive data preparation by providing automated assessment, cleaning, profiling, and quality reporting through simple Python APIs.
-
-Keep it technical, not marketing.
-
-=========================================
-
-Installation
-
-=========================================
-
-Show only code.
-
-pip install eazydatafix
-
-No unnecessary text.
-
-=========================================
-
-Quick Start
-
-=========================================
-
-Provide a beautiful Python code example.
-
-import pandas as pd
-
-import eazydatafix as edf
-
-df = pd.read_csv("employees.csv")
-
-report = edf.assess(df)
-
-report.summary()
-
-result = edf.fix(df)
-
-cleaned_df = result.dataframe
-
-result.to_csv("clean.csv")
-
-=========================================
-
-Core APIs
-
-=========================================
-
-Display API cards similar to documentation.
-
-Each card contains
-
-Function
-
-Description
-
-Returns
-
-Small code snippet
-
-Include
-
-edf.assess()
-
-edf.fix()
-
-edf.profile()
-
-=========================================
-
-Supported Data Sources
-
-=========================================
-
-Display modern badges.
-
-Supported
-
-CSV
-
-Excel
-
-Pandas DataFrame
-
-Coming Soon
-
-JSON
-
-Parquet
-
-SQL
-
-Spark
-
-Polars
-
-=========================================
-
-Features
-
-=========================================
-
-Technical feature cards.
-
-Automatic Quality Assessment
-
-Missing Value Detection
-
-Duplicate Detection
-
-Data Profiling
-
-Automated Cleaning
-
-Quality Reports
-
-Pythonic API
-
-Open Source
-
-=========================================
-
-Examples
-
-=========================================
-
-Display multiple Python examples.
-
-Reading CSV
-
-Cleaning Excel
-
-Generating Reports
-
-Exporting Cleaned Data
-
-Each example inside beautiful syntax highlighted code blocks.
-
-=========================================
-
-Documentation Preview
-
-=========================================
-
-Create a documentation-style section.
-
-Functions
-
-Parameters
-
-Returns
-
-Examples
-
-Notes
-
-Exactly like Python library documentation.
-
-=========================================
-
-Roadmap
-
-=========================================
-
-Timeline.
-
-Version 0.2
-
-JSON Support
-
-Parquet Support
-
-SQLite
-
-Version 0.3
-
-AI-assisted Cleaning
-
-Smart Recommendations
-
-Version 1.0
-
-Enterprise Connectors
-
-Spark
-
-Cloud Storage
-
-REST API
-
-=========================================
-
-Community
-
-=========================================
-
-GitHub Stars
-
-PyPI Downloads
-
-Contributors
-
-Latest Release
-
-These values should be dynamic placeholders.
-
-=========================================
-
-Footer
-
-=========================================
-
-Documentation
-
-GitHub
-
-PyPI
-
-License
-
-Changelog
-
-Contributing
-
-Created & Maintained by
-
-Suneel Kumar Kola
-
-=========================================
-
-Visual Requirements
-
-=========================================
-
-Use lots of code blocks.
-
-Use API documentation layouts.
-
-Use tabs where appropriate.
-
-Use collapsible examples.
-
-Use copy buttons on every code block.
-
-Support dark mode and light mode.
-
-Fully responsive.
-
-Developer-first experience.
-
-The website should feel like a premium Python documentation portal rather than a marketing website.
-
-Every section should educate developers about the library.
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://data-scribe-docs.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/a1c93004-6948-443f-8cff-90bad9ac84ed).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+- Deterministic transformations before AI explanations
+- No silent modification of important source values
+- Preview and approval before export
+- Explicit limitations instead of invented capabilities
+- No invented customers, testimonials, benchmarks or time-saved claims
+- Documentation remains available but is secondary to the customer product flow
+- Content Studio remains private and separate from customer Data Studio
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+```bash
+bun install
+bun run dev
 ```
+
+Production validation:
+
+```bash
+bun run lint
+bun run build
+```
+
+This project is connected to Lovable. Preserve published Git history and keep the connected branch deployable.

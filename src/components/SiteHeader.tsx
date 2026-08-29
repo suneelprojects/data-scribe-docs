@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Github, Menu, Moon, Sun } from "lucide-react";
+import { ArrowRight, Github, Menu, Moon, Sun } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { VersionSwitcher } from "./VersionSwitcher";
@@ -9,15 +9,11 @@ import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/docs", label: "Documentation" },
-  { to: "/docs/reference", label: "API Reference" },
-  { to: "/examples", label: "Examples" },
-  { to: "/blog", label: "Blog" },
-  { to: "/roadmap", label: "Roadmap" },
-  { to: "/analytics", label: "Analytics" },
-  { to: "/ecosystem", label: "Ecosystem" },
-  { to: "/contributing", label: "Contributing" },
+  { to: "/", label: "Product" },
+  { to: "/studio", label: "Data Studio" },
+  { to: "/pricing", label: "Pricing" },
+  { to: "/blog", label: "Resources" },
+  { to: "/docs", label: "Developers" },
 ] as const;
 
 export function SiteHeader() {
@@ -36,14 +32,16 @@ export function SiteHeader() {
             edf
           </span>
           <span className="font-semibold tracking-tight">EazyDataFix</span>
-          <span className="hidden font-mono text-[11px] text-muted-foreground sm:inline">
-            v1.0.0
+          <span className="hidden rounded bg-accent/10 px-1.5 py-0.5 font-mono text-[10px] text-accent sm:inline">
+            v1.4.0
           </span>
         </Link>
 
-        <div className="hidden xl:block">
-          <VersionSwitcher />
-        </div>
+        {pathname.startsWith("/docs") && (
+          <div className="hidden xl:block">
+            <VersionSwitcher />
+          </div>
+        )}
 
         <nav className="ml-2 hidden items-center gap-1 xl:flex">
           {navLinks.map((l) => (
@@ -64,7 +62,7 @@ export function SiteHeader() {
 
         <div className="ml-auto flex items-center gap-2">
           <div className="hidden md:block">
-            <DocSearch compact />
+            {pathname.startsWith("/docs") && <DocSearch compact />}
           </div>
 
           <a
@@ -87,6 +85,13 @@ export function SiteHeader() {
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
 
+          <Link
+            to="/studio"
+            className="hidden h-8 items-center gap-1.5 rounded-md bg-foreground px-3 text-xs font-semibold text-background transition-opacity hover:opacity-90 sm:inline-flex"
+          >
+            Try Studio <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <button
@@ -100,7 +105,12 @@ export function SiteHeader() {
             <SheetContent side="right" className="w-72 p-0">
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <div className="border-b border-border p-4">
-                <VersionSwitcher />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold">EazyDataFix</span>
+                  <span className="rounded bg-accent/10 px-2 py-1 font-mono text-[10px] text-accent">
+                    v1.4.0
+                  </span>
+                </div>
               </div>
               <nav className="flex flex-col p-2">
                 {navLinks.map((l) => (
@@ -120,6 +130,13 @@ export function SiteHeader() {
                 ))}
               </nav>
               <div className="border-t border-border p-4">
+                <Link
+                  to="/studio"
+                  onClick={() => setOpen(false)}
+                  className="mb-3 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-foreground px-4 text-sm font-semibold text-background"
+                >
+                  Try Data Studio <ArrowRight className="h-4 w-4" />
+                </Link>
                 <InstallChip />
               </div>
             </SheetContent>
@@ -127,9 +144,11 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="border-t border-border bg-muted/30 px-4 py-1.5 md:hidden">
-        <DocSearch />
-      </div>
+      {pathname.startsWith("/docs") && (
+        <div className="border-t border-border bg-muted/30 px-4 py-1.5 md:hidden">
+          <DocSearch />
+        </div>
+      )}
     </header>
   );
 }

@@ -9,10 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StudioRouteImport } from './routes/studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as EcosystemRouteImport } from './routes/ecosystem'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as ContributingRouteImport } from './routes/contributing'
@@ -42,6 +44,11 @@ import { Route as ApiPublicRefreshPackageAnalyticsRouteImport } from './routes/a
 import { Route as ApiCronInstagramStudioTickRouteImport } from './routes/api/cron/instagram-studio-tick'
 import { Route as ApiCronGenerateBlogDraftsRouteImport } from './routes/api/cron/generate-blog-drafts'
 
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -60,6 +67,11 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
   path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EcosystemRoute = EcosystemRouteImport.update({
@@ -215,10 +227,12 @@ export interface FileRoutesByFullPath {
   '/contributing': typeof ContributingRoute
   '/docs': typeof DocsRouteWithChildren
   '/ecosystem': typeof EcosystemRoute
+  '/pricing': typeof PricingRoute
   '/roadmap': typeof RoadmapRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/studio': typeof StudioRoute
   '/admin/content-studio': typeof AdminContentStudioRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/docs/assessment': typeof DocsAssessmentRoute
@@ -248,10 +262,12 @@ export interface FileRoutesByTo {
   '/changelog': typeof ChangelogRoute
   '/contributing': typeof ContributingRoute
   '/ecosystem': typeof EcosystemRoute
+  '/pricing': typeof PricingRoute
   '/roadmap': typeof RoadmapRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/studio': typeof StudioRoute
   '/admin/content-studio': typeof AdminContentStudioRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/docs/assessment': typeof DocsAssessmentRoute
@@ -283,10 +299,12 @@ export interface FileRoutesById {
   '/contributing': typeof ContributingRoute
   '/docs': typeof DocsRouteWithChildren
   '/ecosystem': typeof EcosystemRoute
+  '/pricing': typeof PricingRoute
   '/roadmap': typeof RoadmapRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/studio': typeof StudioRoute
   '/admin/content-studio': typeof AdminContentStudioRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/docs/assessment': typeof DocsAssessmentRoute
@@ -319,10 +337,12 @@ export interface FileRouteTypes {
     | '/contributing'
     | '/docs'
     | '/ecosystem'
+    | '/pricing'
     | '/roadmap'
     | '/robots.txt'
     | '/rss.xml'
     | '/sitemap.xml'
+    | '/studio'
     | '/admin/content-studio'
     | '/blog/$slug'
     | '/docs/assessment'
@@ -352,10 +372,12 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/contributing'
     | '/ecosystem'
+    | '/pricing'
     | '/roadmap'
     | '/robots.txt'
     | '/rss.xml'
     | '/sitemap.xml'
+    | '/studio'
     | '/admin/content-studio'
     | '/blog/$slug'
     | '/docs/assessment'
@@ -386,10 +408,12 @@ export interface FileRouteTypes {
     | '/contributing'
     | '/docs'
     | '/ecosystem'
+    | '/pricing'
     | '/roadmap'
     | '/robots.txt'
     | '/rss.xml'
     | '/sitemap.xml'
+    | '/studio'
     | '/admin/content-studio'
     | '/blog/$slug'
     | '/docs/assessment'
@@ -421,10 +445,12 @@ export interface RootRouteChildren {
   ContributingRoute: typeof ContributingRoute
   DocsRoute: typeof DocsRouteWithChildren
   EcosystemRoute: typeof EcosystemRoute
+  PricingRoute: typeof PricingRoute
   RoadmapRoute: typeof RoadmapRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StudioRoute: typeof StudioRoute
   AdminContentStudioRoute: typeof AdminContentStudioRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ExamplesSlugRoute: typeof ExamplesSlugRoute
@@ -439,6 +465,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -465,6 +498,13 @@ declare module '@tanstack/react-router' {
       path: '/roadmap'
       fullPath: '/roadmap'
       preLoaderRoute: typeof RoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ecosystem': {
@@ -703,10 +743,12 @@ const rootRouteChildren: RootRouteChildren = {
   ContributingRoute: ContributingRoute,
   DocsRoute: DocsRouteWithChildren,
   EcosystemRoute: EcosystemRoute,
+  PricingRoute: PricingRoute,
   RoadmapRoute: RoadmapRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   RssDotxmlRoute: RssDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StudioRoute: StudioRoute,
   AdminContentStudioRoute: AdminContentStudioRoute,
   BlogSlugRoute: BlogSlugRoute,
   ExamplesSlugRoute: ExamplesSlugRoute,

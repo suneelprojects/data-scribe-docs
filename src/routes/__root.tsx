@@ -81,32 +81,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EazyDataFix 1.0 — Auditable Data Cleaning, EDA and Validation" },
+      { title: "EazyDataFix — Messy files in. Decision-ready data out." },
       {
         name: "description",
         content:
-          "EazyDataFix 1.0 provides auditable cleaning, preparation reports, data contracts, deterministic Agentic EDA, reporting and production CLI workflows for Python.",
+          "Clean, validate and prepare CSV or Excel data for analysis, machine learning and Power BI with transparent, reviewable changes.",
       },
       { name: "author", content: "Suneel Kumar Kola" },
       {
         property: "og:title",
-        content: "EazyDataFix 1.0 — From raw data to validated, analysis-ready datasets",
+        content: "EazyDataFix — Turn messy files into decision-ready data",
       },
       {
         property: "og:description",
         content:
-          "Profile, assess, clean, prepare, validate and explore datasets through reproducible Python APIs and a production CLI.",
+          "Upload a file, inspect every issue, approve the fixes and export trusted data with a complete audit trail.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "EazyDataFix 1.0 — Auditable Data Cleaning, EDA and Validation",
+        content: "EazyDataFix — Messy files in. Decision-ready data out.",
       },
       {
         name: "twitter:description",
         content:
-          "Stable Python workflows for controlled cleaning, preparation reports, data contracts, deterministic Agentic EDA and batch CLI processing.",
+          "A product-facing data preparation workflow backed by the open-source EazyDataFix v1.4.0 engine.",
       },
     ],
     links: [

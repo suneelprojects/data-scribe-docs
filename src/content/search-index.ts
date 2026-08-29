@@ -11,14 +11,14 @@ export const searchIndex: SearchEntry[] = [
     title: "Introduction",
     section: "Getting Started",
     url: "/docs",
-    description: "Overview of EazyDataFix 1.0",
+    description: "Overview of EazyDataFix 1.4",
   },
   {
     title: "Installation",
     section: "Getting Started",
     url: "/docs/installation",
-    description: "Install v1.0.0 with pip",
-    keywords: ["pip", "install", "setup", "1.0"],
+    description: "Install v1.4.0 with pip",
+    keywords: ["pip", "install", "setup", "1.4"],
   },
   {
     title: "Quick Start",

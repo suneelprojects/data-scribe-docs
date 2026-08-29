@@ -7,12 +7,14 @@ export const Route = createFileRoute("/roadmap")({
       { title: "Roadmap — EazyDataFix" },
       {
         name: "description",
-        content: "The completed path to EazyDataFix 1.0 and the community-driven direction ahead.",
+        content:
+          "The path from the stable Python engine to product-facing data-readiness workflows.",
       },
       { property: "og:title", content: "Roadmap — EazyDataFix" },
       {
         property: "og:description",
-        content: "From data-quality foundations to the stable EazyDataFix 1.0 production API.",
+        content:
+          "From data-quality foundations to EazyDataFix v1.4.0 and the customer-facing Data Studio.",
       },
     ],
   }),
@@ -83,7 +85,7 @@ const milestones = [
   {
     version: "v1.0.0",
     title: "Stable production API",
-    status: "Current",
+    status: "Shipped",
     items: [
       "Unified edf.run() workflow",
       "Stable result/report objects and package-level errors",
@@ -92,13 +94,24 @@ const milestones = [
     ],
   },
   {
-    version: "Next",
-    title: "Community-driven evolution",
+    version: "v1.4.0",
+    title: "Transformation-first readiness workflows",
+    status: "Current",
+    items: [
+      "Analysis Ready workflow with evidence, warnings and validation",
+      "Leakage-safe ML Ready train/test preparation",
+      "Power BI Ready single-table and multi-table model inputs",
+      "Verified Python 3.10–3.13 release",
+    ],
+  },
+  {
+    version: "Product beta",
+    title: "Customer-facing Data Studio",
     status: "Open",
     items: [
-      "Priorities will be published from real user feedback and GitHub issues",
-      "Documentation, examples and integration quality will continue to improve",
-      "Proposals and contributors are welcome before new milestones are committed",
+      "Public browser preview for transparent CSV inspection and export",
+      "Assisted pilots for Excel, saved recipes and Power BI workflows",
+      "Product priorities driven by repeated customer usage and paid pilot evidence",
     ],
   },
 ] as const;
@@ -115,7 +128,7 @@ function Page() {
       <DocPageHeader
         breadcrumbs={[{ label: "Roadmap" }]}
         title="Roadmap"
-        description="The path to v1.0.0 is complete. Future milestones will be grounded in real usage, issues and contributor feedback."
+        description="The v1.4.0 engine is production-ready. The current phase turns that engine into a customer-facing workflow validated through real usage and paid pilots."
       />
       <div className="relative pl-6">
         <div className="absolute bottom-2 left-2 top-2 w-px bg-border" />

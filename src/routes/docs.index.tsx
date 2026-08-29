@@ -26,7 +26,7 @@ function DocsIndex() {
       <DocPageHeader
         breadcrumbs={[{ label: "Docs" }]}
         title="Documentation"
-        description="EazyDataFix 1.0 is a deterministic-first Python framework for data quality, auditable cleaning, preparation, validation contracts and Agentic EDA."
+        description="EazyDataFix 1.4 is a deterministic-first Python framework for auditable transformation, Analysis Ready, ML Ready and Power BI Ready workflows."
       />
 
       <div id="doc-content" className="prose-doc">
@@ -78,6 +78,17 @@ function DocsIndex() {
             warnings.
           </li>
           <li>
+            <code>edf.analysis_ready_with_report()</code> — analysis-ready data with before/after
+            evidence.
+          </li>
+          <li>
+            <code>edf.ml_ready()</code> — leakage-safe train/test inputs and reusable preprocessing.
+          </li>
+          <li>
+            <code>edf.powerbi_ready()</code> — validated single-table or multi-table Power BI
+            inputs.
+          </li>
+          <li>
             <code>edf.infer_schema()</code> and <code>edf.validate_contract()</code> — pipeline data
             contracts.
           </li>
@@ -94,9 +105,9 @@ function DocsIndex() {
 
         <h2 id="roadmap">Roadmap</h2>
         <p>
-          v1.0.0 is the current stable release. It completes the roadmap from deterministic Agentic
-          EDA through auditable cleaning, feature preparation, contracts and production CLI
-          workflows. Read the full <Link to="/roadmap">roadmap</Link>.
+          v1.4.0 is the current stable release. It focuses the package on Analysis Ready,
+          leakage-safe ML Ready and Power BI Ready outcomes while preserving the stable v1 API. Read
+          the full <Link to="/roadmap">roadmap</Link>.
         </p>
 
         <h2 id="browse">Browse all sections</h2>

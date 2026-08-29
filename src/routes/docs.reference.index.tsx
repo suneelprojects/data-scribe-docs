@@ -5,9 +5,9 @@ import { allDocs } from "@/content/reference";
 export const Route = createFileRoute("/docs/reference/")({
   head: () => ({
     meta: [
-      { title: "API Reference — EazyDataFix 1.0" },
-      { name: "description", content: "Stable public Python APIs in EazyDataFix 1.0." },
-      { property: "og:title", content: "API Reference — EazyDataFix 1.0" },
+      { title: "API Reference — EazyDataFix 1.4" },
+      { name: "description", content: "Stable public Python APIs in EazyDataFix 1.4." },
+      { property: "og:title", content: "API Reference — EazyDataFix 1.4" },
       {
         property: "og:description",
         content: "Profile, assess, clean, prepare, validate and explore datasets with stable APIs.",
@@ -79,6 +79,18 @@ const additionalApis = [
     desc: "Clean and prepare a dataset for analytics and machine learning.",
   },
   {
+    name: "edf.analysis_ready_with_report",
+    desc: "Return analysis-ready data with scores, changes, warnings and validations.",
+  },
+  {
+    name: "edf.ml_ready",
+    desc: "Create leakage-safe train/test inputs and a reusable preprocessing artifact.",
+  },
+  {
+    name: "edf.powerbi_ready",
+    desc: "Prepare validated single-table or multi-table Power BI model inputs.",
+  },
+  {
     name: "edf.generate_agentic_eda_narrative",
     desc: "Generate an optional evidence-cited narrative from deterministic EDA.",
   },
@@ -94,10 +106,10 @@ function ReferenceIndex() {
       <DocPageHeader
         breadcrumbs={[{ label: "Docs", to: "/docs" }, { label: "API Reference" }]}
         title="API Reference"
-        description="EazyDataFix 1.0 exposes stable result objects for every stage of the data-quality and EDA lifecycle."
+        description="EazyDataFix 1.4 exposes stable result objects for transformation, validation and downstream readiness workflows."
       />
       <div id="doc-content" className="prose-doc">
-        <h2 id="v1-workflows">Production workflows (v1.0)</h2>
+        <h2 id="v1-workflows">Production workflows (v1.4)</h2>
         <p>
           These APIs form the stable v1 workflow layer. See the{" "}
           <Link to="/releases/v1-0-0">v1.0.0 release notes</Link> for complete examples.
@@ -113,7 +125,7 @@ function ReferenceIndex() {
                 <ApiName name={api.name} />
                 <span className="font-mono text-[11px] text-muted-foreground">→ {api.returns}</span>
                 <span className="rounded bg-accent/15 px-1.5 py-0.5 text-[10px] font-medium text-accent">
-                  1.0
+                  1.x
                 </span>
               </div>
               <div className="mt-1 text-sm text-muted-foreground">{api.desc}</div>

@@ -19,8 +19,10 @@ type ArticleRow = Database["public"]["Tables"]["content_articles"]["Row"];
 
 const SITE_URL = "https://eazydatafix.com";
 const DEFAULT_MODEL = "gpt-5.6";
-const PROMPT_VERSION = "blog-v1";
+const PROMPT_VERSION = "blog-v2-product-v1-4";
 const SAFE_INTERNAL_LINKS = [
+  "/studio",
+  "/pricing",
   "/docs",
   "/docs/quickstart",
   "/docs/assessment",
@@ -34,8 +36,12 @@ const SAFE_INTERNAL_LINKS = [
 
 const EAZYDATAFIX_FACTS = `
 EazyDataFix product facts you may use:
-- Current stable release: v1.0.0, released 8 August 2026, Python 3.10-3.13, MIT licensed.
+- Current stable release: v1.4.0, released 26 August 2026, Python 3.10-3.13, MIT licensed.
+- The customer-facing direction is EazyDataFix Data Studio: upload, scan, review proposed changes and export trusted data. The current public Studio is an honest browser-local CSV preview, not the full hosted engine.
 - It accepts CSV, Excel, JSON, Parquet and pandas.DataFrame inputs.
+- edf.analysis_ready_with_report() returns a prepared dataset with before/after scores, changes, warnings and validations.
+- edf.ml_ready() prepares leakage-safe supervised-learning inputs, requires an explicit target and fits learned transformations only on training data. It does not train or evaluate a model.
+- edf.powerbi_ready() prepares single-table or multi-table model inputs, validates keys and relationship cardinality, can generate a continuous date table and exports readiness evidence. It does not generate PBIX dashboards or visuals.
 - edf.run() composes profiling, quality assessment, controlled cleaning and deterministic EDA. It returns a RunResult whose stages can be inspected.
 - edf.fix(data, config) supports FixConfig, dry-run previews, per-column ColumnCleaningRule values, a proposed_dataset and a structured change_log.
 - edf.prepare_with_report(data, config) supports threshold-gated numeric/date conversion, text normalization and outlier actions. It returns the prepared dataset, changes and warnings.
@@ -45,7 +51,7 @@ EazyDataFix product facts you may use:
 - Never claim EazyDataFix executes faster than pandas. Explain saved developer effort through fewer repetitive steps, reusable rules, audit trails and reproducible reports.
 - Never invent user counts, benchmarks, testimonials, companies, percentages, time saved or performance claims.
 
-Verified v1.0 code patterns:
+Verified v1.x code patterns:
 \`\`\`python
 import eazydatafix as edf
 
