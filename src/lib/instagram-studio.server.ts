@@ -8,6 +8,7 @@ import {
   type InstagramPostStatus,
   type InstagramQualityCheck,
 } from "./instagram-studio.types";
+import { fallbackPosterBytes } from "./instagram-fallback-posters";
 
 type PostRow = Database["public"]["Tables"]["instagram_posts"]["Row"];
 type CredentialRow = Database["public"]["Tables"]["instagram_credentials"]["Row"];
@@ -18,7 +19,7 @@ const FACEBOOK_GRAPH_URL = `https://graph.facebook.com/${GRAPH_VERSION}`;
 const CONTENT_MODEL = process.env["OPENAI_CONTENT_MODEL"]?.trim() || "gpt-5.6";
 const IMAGE_MODEL = process.env["OPENAI_IMAGE_MODEL"]?.trim() || "gpt-image-2";
 const PROMPT_VERSION = "instagram-v3-product-v1-4";
-const DAILY_EDUCATION_PROMPT_VERSION = "instagram-python-daily-v1";
+const DAILY_EDUCATION_PROMPT_VERSION = "instagram-python-daily-v2-resilient";
 const STORAGE_BUCKET = "instagram-media";
 const PREVIEW_URL_TTL_SECONDS = 60 * 60;
 const META_FETCH_URL_TTL_SECONDS = 60 * 60;
@@ -40,6 +41,437 @@ const DAILY_EDUCATION_TOPICS = [
   "testing, type hints and maintainable Python",
   "Python automation for repetitive work",
 ] as const;
+
+type FallbackLesson = {
+  hook: string;
+  caption: string;
+  title: string;
+  subtitle: string;
+  points: Array<{ label: string; outcome: string }>;
+};
+
+const FALLBACK_LESSONS: FallbackLesson[] = [
+  {
+    hook: "A Python variable is a label, not a box holding the value",
+    caption:
+      "Think of a Python variable as a name pointing to an object. Assigning b = a does not always create a fresh copy; both names can point to the same mutable object. That is why changing b may appear to change a too. Use copy() for a shallow copy, or deepcopy() when nested mutable values must be independent. The takeaway: before copying data, ask whether you are copying a value or only another reference.",
+    title: "Names Point to Objects",
+    subtitle: "The mental model behind assignment",
+    points: [
+      { label: "Assign", outcome: "A name points to an object" },
+      { label: "Alias", outcome: "Two names may share one object" },
+      { label: "Mutate", outcome: "Shared objects reflect changes" },
+      { label: "Copy", outcome: "Create an independent container" },
+      { label: "Check", outcome: "Use id() to inspect identity" },
+    ],
+  },
+  {
+    hook: "Mutable and immutable objects explain many Python surprises",
+    caption:
+      "Lists, dictionaries and sets are mutable: their contents can change without creating a new container. Integers, strings and tuples are immutable: an apparent change creates a different object. This distinction explains aliasing, function side effects and why tuples can sometimes be dictionary keys. Practical habit: treat shared mutable objects carefully, especially when passing them into functions.",
+    title: "Mutable vs Immutable",
+    subtitle: "Predict what can change in place",
+    points: [
+      { label: "List", outcome: "Mutable collection" },
+      { label: "Dictionary", outcome: "Mutable key-value mapping" },
+      { label: "Set", outcome: "Mutable unique collection" },
+      { label: "String", outcome: "Immutable text value" },
+      { label: "Tuple", outcome: "Immutable container" },
+    ],
+  },
+  {
+    hook: "Python truthiness can make conditions shorter and clearer",
+    caption:
+      "Python treats empty strings, empty collections, zero and None as falsy. Most non-empty values are truthy. So instead of writing if len(items) > 0, write if items. Use explicit checks when the distinction matters: value is None is different from not value, because zero and an empty string are also falsy. The takeaway: use truthiness for presence, and explicit comparisons for meaning.",
+    title: "Truthiness Made Clear",
+    subtitle: "Short conditions without hidden mistakes",
+    points: [
+      { label: "Empty", outcome: "Usually evaluates to False" },
+      { label: "Non-empty", outcome: "Usually evaluates to True" },
+      { label: "None", outcome: "Check with is None" },
+      { label: "Zero", outcome: "Falsy but still a value" },
+      { label: "Intent", outcome: "Choose the clearest condition" },
+    ],
+  },
+  {
+    hook: "Use == for values and is for object identity in Python",
+    caption:
+      "The == operator asks whether two values are equal. The is operator asks whether both names point to the exact same object. Use is for singleton checks such as value is None. Do not use is to compare strings, numbers or lists; implementation details can make that appear to work and then fail elsewhere. Simple rule: equality for data, identity for object sameness.",
+    title: "Equality vs Identity",
+    subtitle: "Choose == and is correctly",
+    points: [
+      { label: "==", outcome: "Compares values" },
+      { label: "is", outcome: "Compares identity" },
+      { label: "None", outcome: "Use is None" },
+      { label: "Strings", outcome: "Compare using ==" },
+      { label: "Rule", outcome: "Data equality is not identity" },
+    ],
+  },
+  {
+    hook: "Choose a list for change and a tuple for a fixed record",
+    caption:
+      "Lists and tuples both preserve order, but they communicate different intent. Choose a list when items will be added, removed or updated. Choose a tuple for a fixed group such as coordinates or a database-like record. Tuples can also be hashable when all their items are hashable. Good code does not only work; its data structure tells the reader what is allowed to change.",
+    title: "List or Tuple?",
+    subtitle: "Let the structure express intent",
+    points: [
+      { label: "List", outcome: "Designed for updates" },
+      { label: "Tuple", outcome: "Represents a fixed group" },
+      { label: "Order", outcome: "Both preserve position" },
+      { label: "Methods", outcome: "Lists offer mutation tools" },
+      { label: "Intent", outcome: "Choose by expected change" },
+    ],
+  },
+  {
+    hook: "A set is the clean Python tool for uniqueness and membership",
+    caption:
+      "Use a set when you care about unique values or fast membership checks, not position. Converting a list to a set removes duplicates, but it should not be used when the original order must be preserved. Sets also make comparisons expressive through union, intersection and difference. Practical habit: use a list for ordered results and a set for tracking what has already been seen.",
+    title: "Think in Sets",
+    subtitle: "Uniqueness and membership made simple",
+    points: [
+      { label: "Unique", outcome: "Duplicates are removed" },
+      { label: "Membership", outcome: "Check whether a value exists" },
+      { label: "Union", outcome: "Combine distinct values" },
+      { label: "Intersection", outcome: "Keep shared values" },
+      { label: "Order", outcome: "Do not rely on positions" },
+    ],
+  },
+  {
+    hook: "dict.get() handles optional dictionary keys without noise",
+    caption:
+      "Accessing data[key] raises KeyError when the key is missing. data.get(key) returns None, or a default you provide, which is useful for optional fields. But do not hide required-data problems with defaults everywhere. Use square brackets when a key must exist; use get() when absence is expected and meaningful. The best access style documents whether the field is required or optional.",
+    title: "Safer Dictionary Access",
+    subtitle: "Required keys versus optional keys",
+    points: [
+      { label: "data[key]", outcome: "Required key access" },
+      { label: "data.get", outcome: "Optional key access" },
+      { label: "Default", outcome: "Choose an explicit fallback" },
+      { label: "KeyError", outcome: "Signals missing required data" },
+      { label: "Intent", outcome: "Make absence meaningful" },
+    ],
+  },
+  {
+    hook: "A comprehension is useful only while the idea stays readable",
+    caption:
+      "List comprehensions are excellent for a simple transform, filter or both: [x * 2 for x in values if x > 0]. When conditions become nested or side effects appear, a normal loop is easier to debug and maintain. Avoid compressing an entire workflow into one line. The takeaway: comprehensions should reduce ceremony, not reduce understanding.",
+    title: "Readable Comprehensions",
+    subtitle: "Compact code without cleverness",
+    points: [
+      { label: "Transform", outcome: "Create a derived value" },
+      { label: "Filter", outcome: "Keep matching items" },
+      { label: "Combine", outcome: "Use one clear condition" },
+      { label: "Complex", outcome: "Switch back to a loop" },
+      { label: "Goal", outcome: "Optimize for readability" },
+    ],
+  },
+  {
+    hook: "Never use a mutable object as a Python default argument",
+    caption:
+      "Default argument values are created once when the function is defined, not every time it is called. That means def add(item, items=[]) can reuse the same list across calls. Use None as the default, then create a new list inside the function. This tiny rule prevents state from leaking between calls and removes one of Python's most famous surprises.",
+    title: "Safe Default Arguments",
+    subtitle: "Stop state leaking across calls",
+    points: [
+      { label: "Created", outcome: "Defaults are evaluated once" },
+      { label: "Risk", outcome: "Mutable state is reused" },
+      { label: "Use None", outcome: "Signal no value supplied" },
+      { label: "Create", outcome: "Build a fresh object inside" },
+      { label: "Result", outcome: "Calls stay independent" },
+    ],
+  },
+  {
+    hook: "*args and **kwargs collect different kinds of arguments",
+    caption:
+      "Inside a function, *args collects extra positional arguments into a tuple, while **kwargs collects extra named arguments into a dictionary. They are useful for wrappers and flexible APIs, but a clear explicit signature is better when the accepted inputs are known. Flexibility should not make a function mysterious. Use them when forwarding or truly collecting variable inputs.",
+    title: "args and kwargs",
+    subtitle: "Flexible inputs with clear intent",
+    points: [
+      { label: "*args", outcome: "Extra positional values" },
+      { label: "**kwargs", outcome: "Extra named values" },
+      { label: "Type", outcome: "Tuple and dictionary" },
+      { label: "Use", outcome: "Wrappers and flexible APIs" },
+      { label: "Prefer", outcome: "Explicit parameters when known" },
+    ],
+  },
+  {
+    hook: "print() displays a value; return sends it back to the caller",
+    caption:
+      "Printing is useful while learning and debugging, but it does not make a result reusable. return hands a value back to the caller, where it can be stored, tested or passed to another function. A function with no explicit return gives None. Practical habit: return the result from reusable logic and let the outermost layer decide whether to print it.",
+    title: "Print vs Return",
+    subtitle: "Display output or produce a result",
+    points: [
+      { label: "print", outcome: "Displays information" },
+      { label: "return", outcome: "Produces a reusable value" },
+      { label: "Caller", outcome: "Receives the returned result" },
+      { label: "No return", outcome: "Python returns None" },
+      { label: "Design", outcome: "Separate logic from display" },
+    ],
+  },
+  {
+    hook: "Pure functions make Python logic easier to test and trust",
+    caption:
+      "A pure function depends on its inputs and returns a result without secretly changing outside state. Not every function can be pure, but calculations and transformations often can. Passing dependencies explicitly makes tests simpler and behaviour predictable. Keep file access, database calls and printing near the edges; keep core transformations focused on inputs and outputs.",
+    title: "Prefer Pure Functions",
+    subtitle: "Predictable inputs and outputs",
+    points: [
+      { label: "Input", outcome: "Dependencies are explicit" },
+      { label: "Output", outcome: "Return the computed result" },
+      { label: "State", outcome: "Avoid hidden mutation" },
+      { label: "Tests", outcome: "Assertions become simple" },
+      { label: "Edges", outcome: "Keep I/O outside the core" },
+    ],
+  },
+  {
+    hook: "Catch the exception you can actually handle in Python",
+    caption:
+      "A broad except Exception can hide programming mistakes and make debugging harder. Catch specific exceptions such as ValueError or FileNotFoundError, then provide a meaningful recovery or message. Keep the try block small so you know which operation failed. If you cannot recover responsibly, let the error propagate rather than pretending everything succeeded.",
+    title: "Narrow Exception Handling",
+    subtitle: "Recover without hiding real bugs",
+    points: [
+      { label: "Catch", outcome: "Use a specific exception" },
+      { label: "Try block", outcome: "Keep the risky code small" },
+      { label: "Recover", outcome: "Handle only known outcomes" },
+      { label: "Message", outcome: "Explain the useful context" },
+      { label: "Unknown", outcome: "Allow unexpected bugs to surface" },
+    ],
+  },
+  {
+    hook: "Use logging when a message must survive beyond your terminal",
+    caption:
+      "print() is convenient for a quick check, but logging gives levels, timestamps and configurable destinations. Use debug for diagnostic detail, info for normal milestones, warning for unusual but recoverable events, and error for failed operations. Log context that helps investigation, but never log passwords, tokens or sensitive user data.",
+    title: "Logging That Helps",
+    subtitle: "Useful signals without sensitive noise",
+    points: [
+      { label: "DEBUG", outcome: "Detailed diagnostics" },
+      { label: "INFO", outcome: "Normal milestones" },
+      { label: "WARNING", outcome: "Recoverable concern" },
+      { label: "ERROR", outcome: "Operation failed" },
+      { label: "Safety", outcome: "Never log secrets" },
+    ],
+  },
+  {
+    hook: "Generators produce Python values lazily, one at a time",
+    caption:
+      "A generator uses yield to produce the next value only when requested. This is useful for large files, streams and pipelines where building the entire result in memory is unnecessary. A generator is consumed as you iterate, so convert it to a list only when you truly need all values at once. Think sequence behaviour without sequence storage.",
+    title: "Generators Are Lazy",
+    subtitle: "Produce values only when requested",
+    points: [
+      { label: "yield", outcome: "Produces the next value" },
+      { label: "Lazy", outcome: "Work happens on demand" },
+      { label: "Memory", outcome: "Avoid storing every result" },
+      { label: "Iterate", outcome: "Consume values in sequence" },
+      { label: "Reuse", outcome: "Create a new generator again" },
+    ],
+  },
+  {
+    hook: "enumerate() and zip() remove manual indexing from loops",
+    caption:
+      "Use enumerate(items) when you need both the position and the value. Use zip(names, scores) when related sequences should be processed together. These tools express the relationship directly and avoid fragile index arithmetic. Remember that zip stops at the shortest input by default, so validate lengths when missing pairs would be a data problem.",
+    title: "Cleaner Python Loops",
+    subtitle: "Use enumerate and zip",
+    points: [
+      { label: "enumerate", outcome: "Index plus value" },
+      { label: "zip", outcome: "Pair related sequences" },
+      { label: "Clarity", outcome: "Remove manual counters" },
+      { label: "Length", outcome: "Zip stops at the shortest" },
+      { label: "Validate", outcome: "Check missing pairs when needed" },
+    ],
+  },
+  {
+    hook: "A context manager closes files even when an error occurs",
+    caption:
+      "The with statement manages setup and cleanup for you. With open(path) as file ensures the file is closed when the block ends, including when an exception occurs. Context managers also appear in locks, database transactions and temporary resources. Use them whenever a resource has a clear acquire-and-release lifecycle.",
+    title: "Use Context Managers",
+    subtitle: "Reliable setup and cleanup",
+    points: [
+      { label: "with", outcome: "Defines a managed scope" },
+      { label: "Open", outcome: "Acquire the resource" },
+      { label: "Block", outcome: "Perform the required work" },
+      { label: "Exit", outcome: "Cleanup happens reliably" },
+      { label: "Use", outcome: "Files, locks and transactions" },
+    ],
+  },
+  {
+    hook: "pathlib makes file paths readable across operating systems",
+    caption:
+      "Instead of building paths with manual slashes, use pathlib.Path and the / operator: Path('data') / 'sales.csv'. Path objects can test existence, create folders, inspect suffixes and iterate through files. This keeps path logic readable and portable between Windows, macOS and Linux. Treat a path as a structured object, not a fragile string.",
+    title: "Modern Paths with pathlib",
+    subtitle: "Portable file handling in Python",
+    points: [
+      { label: "Path", outcome: "Represent a filesystem location" },
+      { label: "/", outcome: "Join path components" },
+      { label: "exists", outcome: "Check before reading" },
+      { label: "suffix", outcome: "Inspect the file type" },
+      { label: "Portable", outcome: "Avoid manual separators" },
+    ],
+  },
+  {
+    hook: "JSON and CSV solve different data-exchange problems",
+    caption:
+      "CSV is simple tabular text: rows and columns, usually without nested structure or strong types. JSON represents objects, arrays and nested relationships. Use the csv module for row-oriented files and json for structured API-like data. Always open text files with an explicit encoding, and validate required fields instead of assuming every incoming file is clean.",
+    title: "JSON vs CSV",
+    subtitle: "Choose by the shape of data",
+    points: [
+      { label: "CSV", outcome: "Flat rows and columns" },
+      { label: "JSON", outcome: "Nested objects and arrays" },
+      { label: "Types", outcome: "Validate after loading" },
+      { label: "Encoding", outcome: "Open text explicitly" },
+      { label: "Schema", outcome: "Check required fields" },
+    ],
+  },
+  {
+    hook: "A dataclass removes boilerplate from simple Python records",
+    caption:
+      "Use @dataclass when a class mainly stores related values. Python can generate the initializer, representation and equality behaviour, while type hints document the fields. Add methods when the record owns useful behaviour, but avoid turning every dictionary into a class. Dataclasses work best when the data has a stable, meaningful shape.",
+    title: "Practical Dataclasses",
+    subtitle: "Clear records with less boilerplate",
+    points: [
+      { label: "Fields", outcome: "Declare named values" },
+      { label: "Init", outcome: "Generated automatically" },
+      { label: "repr", outcome: "Readable object display" },
+      { label: "Types", outcome: "Document field intent" },
+      { label: "Use", outcome: "Stable record-like data" },
+    ],
+  },
+  {
+    hook: "NumPy vectorization expresses array work without Python loops",
+    caption:
+      "NumPy operations such as values * 2 or values.mean() apply across arrays using concise array semantics. The goal is not merely fewer lines; it is expressing the calculation at the data level. Confirm shapes before combining arrays because broadcasting can produce valid but unintended results. Read shape errors as clues about how dimensions align.",
+    title: "Vectorized NumPy Thinking",
+    subtitle: "Operate on arrays as arrays",
+    points: [
+      { label: "Array", outcome: "One typed data structure" },
+      { label: "Vectorize", outcome: "Apply operations across values" },
+      { label: "Shape", outcome: "Inspect dimensions first" },
+      { label: "Broadcast", outcome: "Align compatible dimensions" },
+      { label: "Check", outcome: "Verify the resulting shape" },
+    ],
+  },
+  {
+    hook: "In pandas, .loc uses labels while .iloc uses positions",
+    caption:
+      "Use df.loc[row_labels, column_labels] when selecting by index or column names. Use df.iloc[row_positions, column_positions] for integer positions. The end label in a .loc slice is included, while normal positional slicing with .iloc excludes the stop position. Choosing explicitly prevents subtle mistakes when an index happens to contain integers.",
+    title: "pandas loc vs iloc",
+    subtitle: "Labels and positions are different",
+    points: [
+      { label: ".loc", outcome: "Select using labels" },
+      { label: ".iloc", outcome: "Select using positions" },
+      { label: "Columns", outcome: "Specify both axes clearly" },
+      { label: "Slices", outcome: "Label end can be included" },
+      { label: "Habit", outcome: "Be explicit about intent" },
+    ],
+  },
+  {
+    hook: "Missing data needs a reason before it needs a fill value",
+    caption:
+      "Before filling nulls, ask why the value is missing and what the column means. Zero, an empty string, the median and 'Unknown' all encode different assumptions. Inspect missingness by column and by group, then choose an action that preserves meaning. Keep the original data or record the transformation so the decision can be reviewed later.",
+    title: "Handle Missing Data Carefully",
+    subtitle: "Understand absence before filling it",
+    points: [
+      { label: "Measure", outcome: "Count missing values" },
+      { label: "Explain", outcome: "Investigate why they are absent" },
+      { label: "Choose", outcome: "Use a meaningful action" },
+      { label: "Validate", outcome: "Check downstream impact" },
+      { label: "Record", outcome: "Keep the transformation visible" },
+    ],
+  },
+  {
+    hook: "pandas groupby follows split, apply and combine",
+    caption:
+      "A groupby operation splits rows into groups, applies an aggregation or transformation, and combines the results. Use named aggregation when producing several metrics so the output columns stay clear. Before trusting the result, check whether missing group keys were excluded and whether each row belongs to the group you intended.",
+    title: "Understand pandas groupby",
+    subtitle: "Split, apply and combine",
+    points: [
+      { label: "Split", outcome: "Form groups from keys" },
+      { label: "Apply", outcome: "Aggregate or transform" },
+      { label: "Combine", outcome: "Build the result table" },
+      { label: "Name", outcome: "Use clear output columns" },
+      { label: "Validate", outcome: "Check keys and row counts" },
+    ],
+  },
+  {
+    hook: "A good pandas merge begins by stating the expected row count",
+    caption:
+      "Before merging, identify the join keys and whether each side is one-to-one, one-to-many or many-to-many. Use validate= in pandas merge when possible, then compare row counts and unmatched keys. Duplicate keys can multiply rows without raising an obvious error. A successful merge is not one that runs; it is one whose relationships match your expectation.",
+    title: "Safer pandas Merges",
+    subtitle: "Validate keys before trusting rows",
+    points: [
+      { label: "Keys", outcome: "Identify the join columns" },
+      { label: "Cardinality", outcome: "State the relationship" },
+      { label: "validate", outcome: "Enforce the expectation" },
+      { label: "Rows", outcome: "Compare counts before and after" },
+      { label: "Unmatched", outcome: "Inspect missing keys" },
+    ],
+  },
+  {
+    hook: "Create Matplotlib figures explicitly for predictable charts",
+    caption:
+      "Use fig, ax = plt.subplots() and draw through ax methods such as ax.plot and ax.set_title. This object-oriented style is clearer when a figure contains multiple plots or is created inside a function. Label axes, choose an appropriate scale and use tight_layout before saving. The chart should communicate the data without depending on hidden notebook state.",
+    title: "Reliable Matplotlib Figures",
+    subtitle: "Build charts through fig and ax",
+    points: [
+      { label: "Figure", outcome: "Owns the complete canvas" },
+      { label: "Axes", outcome: "Owns one plotting area" },
+      { label: "Labels", outcome: "Explain units and meaning" },
+      { label: "Layout", outcome: "Prevent clipped elements" },
+      { label: "Save", outcome: "Export from the figure" },
+    ],
+  },
+  {
+    hook: "Type hints document intent; tests verify actual behaviour",
+    caption:
+      "Type hints help editors, reviewers and static checkers understand what a function expects and returns, but Python does not enforce them automatically at runtime. Tests execute examples and verify behaviour. Use both: annotations for a clearer contract, and focused tests for important outcomes, edge cases and known failures.",
+    title: "Types and Tests",
+    subtitle: "Documentation plus behavioural evidence",
+    points: [
+      { label: "Hints", outcome: "Describe expected types" },
+      { label: "Checker", outcome: "Find mismatches before runtime" },
+      { label: "Tests", outcome: "Execute expected behaviour" },
+      { label: "Edges", outcome: "Cover boundaries and failures" },
+      { label: "Together", outcome: "Improve confidence and clarity" },
+    ],
+  },
+  {
+    hook: "A useful unit test checks behaviour, not implementation details",
+    caption:
+      "Test a function through its public inputs and outputs. A strong test has a clear arrangement, one meaningful action and assertions that explain the expected result. Avoid tests that break only because internal variable names changed. Include normal cases, boundary cases and failure behaviour that matters to the user of the function.",
+    title: "Tests That Survive Refactoring",
+    subtitle: "Verify outcomes instead of internals",
+    points: [
+      { label: "Arrange", outcome: "Prepare the input state" },
+      { label: "Act", outcome: "Run one behaviour" },
+      { label: "Assert", outcome: "Check the meaningful result" },
+      { label: "Boundary", outcome: "Cover edge conditions" },
+      { label: "Contract", outcome: "Test the public interface" },
+    ],
+  },
+  {
+    hook: "Dry-run data changes before replacing the trusted dataset",
+    caption:
+      "Data cleaning is safer when proposed changes can be inspected before they are applied. Profile the input, preview conversions and replacements, review warnings, then validate the output against explicit expectations. Keep a change log so another person can understand what happened. EazyDataFix follows this auditable pattern through dry-run previews and structured reports.",
+    title: "Preview Before You Change",
+    subtitle: "Build trust into data cleaning",
+    points: [
+      { label: "Profile", outcome: "Understand the input" },
+      { label: "Preview", outcome: "Inspect proposed changes" },
+      { label: "Review", outcome: "Check warnings and impact" },
+      { label: "Validate", outcome: "Test the expected output" },
+      { label: "Record", outcome: "Keep an auditable change log" },
+    ],
+  },
+  {
+    hook: "Validate DataFrame assumptions before the analysis begins",
+    caption:
+      "Many analysis errors start with an unstated assumption: a key should be unique, a date should parse, or an amount should be non-negative. Turn those expectations into checks before calculating results. Validate required columns, types, ranges, uniqueness and relationships. Early validation turns silent data problems into clear, actionable failures.",
+    title: "Validate Data Assumptions",
+    subtitle: "Fail clearly before results drift",
+    points: [
+      { label: "Columns", outcome: "Require the expected fields" },
+      { label: "Types", outcome: "Confirm usable representations" },
+      { label: "Ranges", outcome: "Reject impossible values" },
+      { label: "Keys", outcome: "Check uniqueness" },
+      { label: "Links", outcome: "Validate relationships" },
+    ],
+  },
+];
 
 const EAZYDATAFIX_FACTS = `
 Verified EazyDataFix facts:
@@ -70,13 +502,7 @@ type GeneratedInstagramPost = {
 };
 
 type InstagramContentFormat =
-  | "education"
-  | "quick-tip"
-  | "meme"
-  | "quote"
-  | "problem-story"
-  | "community"
-  | "product";
+  "education" | "quick-tip" | "meme" | "quote" | "problem-story" | "community" | "product";
 
 type InstagramContentPlan = {
   format: InstagramContentFormat;
@@ -438,6 +864,31 @@ function dailyEducationPlan(date = istDate(), slot = 0): InstagramContentPlan {
       "Write 300-1,100 characters. Explain the concept simply, include one accurate practical example or short code snippet in the caption, add one takeaway, and never add a sales pitch.",
     usePublishedArticle: false,
     requireCta: false,
+  };
+}
+
+function buildFallbackEducationPost(date: string, slot: number): GeneratedInstagramPost {
+  const dayNumber = Math.floor(dateOnlyUtc(date) / 86_400_000);
+  const cursor = dayNumber * INSTAGRAM_DAILY_SLOTS.length + slot;
+  const lesson = FALLBACK_LESSONS[cursor % FALLBACK_LESSONS.length];
+  return {
+    pillar: DAILY_EDUCATION_PILLAR,
+    hook: lesson.hook,
+    caption: lesson.caption,
+    hashtags: [
+      "Python",
+      "PythonTips",
+      "LearnPython",
+      "DataAnalytics",
+      "Programming",
+      "EazyDataFix",
+    ],
+    image_prompt:
+      "An original premium Python learning poster in deep navy and cyan, featuring geometric code-inspired shapes, strong hierarchy and generous spacing.",
+    image_alt: `${lesson.title}: a branded EazyDataFix daily Python learning poster.`,
+    poster_title: lesson.title,
+    poster_subtitle: lesson.subtitle,
+    poster_points: lesson.points,
   };
 }
 
@@ -931,13 +1382,29 @@ export async function generateInstagramDraft(options: {
       if (sourceError) throw new Error(sourceError.message);
       sourceArticle = data;
     }
-    const generated = await callOpenAIForPost({
-      topic: options.topic,
-      dailyEducation,
-      contentPlan,
-      sourceArticle,
-      recentPosts: recentResult.data ?? [],
-    });
+    let usedFallbackCopy = false;
+    let generated: Awaited<ReturnType<typeof callOpenAIForPost>>;
+    try {
+      generated = await callOpenAIForPost({
+        topic: options.topic,
+        dailyEducation,
+        contentPlan,
+        sourceArticle,
+        recentPosts: recentResult.data ?? [],
+      });
+    } catch (error) {
+      if (!dailyEducation || !runDate) throw error;
+      usedFallbackCopy = true;
+      console.warn(
+        "[instagram-studio] OpenAI copy unavailable; using the reviewed built-in lesson",
+        error,
+      );
+      generated = {
+        post: buildFallbackEducationPost(runDate, slot),
+        inputTokens: null,
+        outputTokens: null,
+      };
+    }
     const generatedPost = { ...generated.post, pillar: contentPlan.pillar };
     const evaluated = evaluatePost(generatedPost as InstagramPost);
     if (dailyEducation && evaluated.qualityScore < 80) {
@@ -978,8 +1445,8 @@ export async function generateInstagramDraft(options: {
         image_alt: generatedPost.image_alt.trim(),
         quality_score: evaluated.qualityScore,
         quality_checks: evaluated.qualityChecks as unknown as Json,
-        model: CONTENT_MODEL,
-        image_model: IMAGE_MODEL,
+        model: usedFallbackCopy ? "built-in-lessons-v1" : CONTENT_MODEL,
+        image_model: usedFallbackCopy ? "built-in-posters-v1" : IMAGE_MODEL,
         prompt_version: promptVersion,
         created_by_email: options.actorEmail,
         updated_by_email: options.actorEmail,
@@ -990,15 +1457,31 @@ export async function generateInstagramDraft(options: {
       throw new Error(insertError?.message || "Instagram draft could not be saved.");
     postId = inserted.id;
 
-    const imageBytes = await generateImage(generatedPost.image_prompt, {
-      hook: generatedPost.hook,
-      pillar: contentPlan.pillar,
-      format: contentPlan.format,
-      educationalLayout:
-        dailyEducation && posterTitle && posterSubtitle
-          ? { title: posterTitle, subtitle: posterSubtitle, points: posterPoints }
-          : undefined,
-    });
+    let usedFallbackImage = usedFallbackCopy;
+    let imageBytes: Uint8Array;
+    if (usedFallbackCopy) {
+      imageBytes = fallbackPosterBytes(slot);
+    } else {
+      try {
+        imageBytes = await generateImage(generatedPost.image_prompt, {
+          hook: generatedPost.hook,
+          pillar: contentPlan.pillar,
+          format: contentPlan.format,
+          educationalLayout:
+            dailyEducation && posterTitle && posterSubtitle
+              ? { title: posterTitle, subtitle: posterSubtitle, points: posterPoints }
+              : undefined,
+        });
+      } catch (error) {
+        if (!dailyEducation) throw error;
+        usedFallbackImage = true;
+        console.warn(
+          "[instagram-studio] OpenAI image unavailable; using the branded built-in poster",
+          error,
+        );
+        imageBytes = fallbackPosterBytes(slot);
+      }
+    }
     const image = await uploadPostImage(postId, imageBytes);
     const { data: completedPost, error: updateError } = await supabaseAdmin
       .from("instagram_posts")
@@ -1022,6 +1505,8 @@ export async function generateInstagramDraft(options: {
         status: "completed",
         post_count: 1,
         post_ids: [postId],
+        model: usedFallbackCopy ? "built-in-lessons-v1" : CONTENT_MODEL,
+        image_model: usedFallbackImage ? "built-in-posters-v1" : IMAGE_MODEL,
         input_tokens: generated.inputTokens,
         output_tokens: generated.outputTokens,
         completed_at: new Date().toISOString(),
@@ -1031,6 +1516,8 @@ export async function generateInstagramDraft(options: {
       run_id: run.id,
       run_type: options.runType,
       auto_publish: Boolean(options.autoPublish),
+      fallback_copy: usedFallbackCopy,
+      fallback_image: usedFallbackImage,
     });
 
     let published = false;
