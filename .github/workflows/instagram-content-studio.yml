@@ -2,10 +2,10 @@ name: EazyDataFix Instagram Content Studio
 
 on:
   schedule:
-    # Every 15 minutes (UTC). The server decides which Asia/Kolkata slot is due
-    # (07:00, 12:30, 18:00, 23:00 IST) and deduplicates by date + slot key, so
-    # extra ticks and GitHub's delayed cron runs never create duplicate posts.
-    - cron: "*/15 * * * *"
+    # Four exact UTC schedules for 07:00, 12:30, 18:00 and 23:00 Asia/Kolkata.
+    # The server also catches up any earlier missed slot and deduplicates by date + slot key.
+    - cron: "30 1,12,17 * * *"
+    - cron: "0 7 * * *"
   workflow_dispatch:
 
 permissions:
