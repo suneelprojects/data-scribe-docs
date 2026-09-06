@@ -19,7 +19,7 @@ const FACEBOOK_GRAPH_URL = `https://graph.facebook.com/${GRAPH_VERSION}`;
 const CONTENT_MODEL = process.env["OPENAI_CONTENT_MODEL"]?.trim() || "gpt-5.6";
 const IMAGE_MODEL = process.env["OPENAI_IMAGE_MODEL"]?.trim() || "gpt-image-2";
 const PROMPT_VERSION = "instagram-v3-product-v1-4";
-const DAILY_EDUCATION_PROMPT_VERSION = "instagram-python-daily-v2-resilient";
+const DAILY_EDUCATION_PROMPT_VERSION = "instagram-python-daily-v3-rich-fallback";
 const STORAGE_BUCKET = "instagram-media";
 const PREVIEW_URL_TTL_SECONDS = 60 * 60;
 const META_FETCH_URL_TTL_SECONDS = 60 * 60;
@@ -1446,7 +1446,7 @@ export async function generateInstagramDraft(options: {
         quality_score: evaluated.qualityScore,
         quality_checks: evaluated.qualityChecks as unknown as Json,
         model: usedFallbackCopy ? "built-in-lessons-v1" : CONTENT_MODEL,
-        image_model: usedFallbackCopy ? "built-in-posters-v1" : IMAGE_MODEL,
+        image_model: usedFallbackCopy ? "built-in-infographics-v2" : IMAGE_MODEL,
         prompt_version: promptVersion,
         created_by_email: options.actorEmail,
         updated_by_email: options.actorEmail,
@@ -1460,7 +1460,7 @@ export async function generateInstagramDraft(options: {
     let usedFallbackImage = usedFallbackCopy;
     let imageBytes: Uint8Array;
     if (usedFallbackCopy) {
-      imageBytes = fallbackPosterBytes(slot);
+      imageBytes = fallbackPosterBytes(runDate ?? istDate(), slot);
     } else {
       try {
         imageBytes = await generateImage(generatedPost.image_prompt, {
@@ -1479,7 +1479,7 @@ export async function generateInstagramDraft(options: {
           "[instagram-studio] OpenAI image unavailable; using the branded built-in poster",
           error,
         );
-        imageBytes = fallbackPosterBytes(slot);
+        imageBytes = fallbackPosterBytes(runDate ?? istDate(), slot);
       }
     }
     const image = await uploadPostImage(postId, imageBytes);
@@ -1506,7 +1506,7 @@ export async function generateInstagramDraft(options: {
         post_count: 1,
         post_ids: [postId],
         model: usedFallbackCopy ? "built-in-lessons-v1" : CONTENT_MODEL,
-        image_model: usedFallbackImage ? "built-in-posters-v1" : IMAGE_MODEL,
+        image_model: usedFallbackImage ? "built-in-infographics-v2" : IMAGE_MODEL,
         input_tokens: generated.inputTokens,
         output_tokens: generated.outputTokens,
         completed_at: new Date().toISOString(),
