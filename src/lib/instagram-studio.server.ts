@@ -1280,7 +1280,7 @@ export async function generateInstagramDraft(options: {
   if (runDate) {
     const { data: existing, error: existingError } = await supabaseAdmin
       .from("instagram_generation_runs")
-      .select("id, status, post_count, post_ids")
+      .select("id, status, post_count, post_ids, model, image_model, prompt_version")
       .eq("run_type", options.runType)
       .eq("run_date", runDate)
       .maybeSingle();
@@ -1300,6 +1300,9 @@ export async function generateInstagramDraft(options: {
         postIds: existing.post_ids,
         published,
         publishError,
+        model: existing.model,
+        imageModel: existing.image_model,
+        promptVersion: existing.prompt_version,
       };
     }
     if (existing) {
@@ -1538,6 +1541,9 @@ export async function generateInstagramDraft(options: {
       postIds: [postId],
       published,
       publishError,
+      model: usedFallbackCopy ? "built-in-lessons-v1" : CONTENT_MODEL,
+      imageModel: usedFallbackImage ? "built-in-infographics-v2" : IMAGE_MODEL,
+      promptVersion,
       post: normalizePost(completedPost, previewUrl),
     };
   } catch (error) {
@@ -1989,6 +1995,9 @@ export async function runInstagramTick() {
     created: number;
     published: boolean;
     error: string | null;
+    model: string | null;
+    imageModel: string | null;
+    promptVersion: string | null;
   }> = [];
 
   for (const slot of dueInstagramSlots()) {
@@ -2009,6 +2018,9 @@ export async function runInstagramTick() {
         created: result.created,
         published: result.published,
         error: result.publishError,
+        model: result.model,
+        imageModel: result.imageModel,
+        promptVersion: result.promptVersion,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Slot generation failed";
@@ -2021,6 +2033,9 @@ export async function runInstagramTick() {
         created: 0,
         published: false,
         error: message,
+        model: null,
+        imageModel: null,
+        promptVersion: null,
       });
     }
   }
