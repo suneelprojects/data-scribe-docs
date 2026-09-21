@@ -447,7 +447,7 @@ function DataStudio() {
 
           <section className="rounded-2xl border border-border bg-card p-5">
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              Step 2
+              Step 1
             </div>
             <h2 className="mt-1 font-semibold">Load a CSV</h2>
             <input
@@ -510,7 +510,7 @@ function DataStudio() {
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Step 3
+                  Step 2
                 </div>
                 <h2 className="mt-1 text-xl font-semibold">Review proposed changes</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -567,7 +567,7 @@ function DataStudio() {
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Step 4
+                  Step 3
                 </div>
                 <h2 className="mt-1 text-xl font-semibold">Compare and export</h2>
               </div>
