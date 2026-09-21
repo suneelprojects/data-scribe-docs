@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   ArrowRight,
   BarChart3,
-  BrainCircuit,
   Check,
   CheckCircle2,
   ChevronRight,
@@ -15,7 +14,6 @@ import {
   RefreshCw,
   ScanSearch,
   ShieldCheck,
-  TableProperties,
   WandSparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -40,7 +38,6 @@ export const Route = createFileRoute("/studio")({
   component: DataStudio,
 });
 
-type DataProfile = "analysis" | "ml" | "powerbi";
 type DataRow = Record<string, string>;
 type IssueKey = "headers" | "whitespace" | "missing" | "currency" | "categories" | "duplicates";
 
@@ -58,27 +55,6 @@ C-102,Rahul,N/A,Hyderabad,08/02/2026
 C-102,Rahul,N/A,hyderabad,08/02/2026
 C-103," Meera ","54,500",Bangalore,2026-03-11
 C-104,John,null,BLR,2026-04-02`;
-
-const profileOptions = [
-  {
-    value: "analysis" as const,
-    label: "Analysis Ready",
-    description: "Typed, consistent data for reporting and exploration",
-    icon: BarChart3,
-  },
-  {
-    value: "powerbi" as const,
-    label: "Power BI Ready",
-    description: "Field and model-input checks for BI workflows",
-    icon: TableProperties,
-  },
-  {
-    value: "ml" as const,
-    label: "ML Ready",
-    description: "Feature-readiness preview with leakage awareness",
-    icon: BrainCircuit,
-  },
-];
 
 function normalizeHeader(value: string) {
   return value
@@ -341,7 +317,6 @@ function DataStudio() {
   const [sourceName, setSourceName] = useState("customer_sample.csv");
   const [headers, setHeaders] = useState(initial.headers);
   const [rows, setRows] = useState(initial.rows);
-  const [profile, setProfile] = useState<DataProfile>("analysis");
   const [selected, setSelected] = useState<Set<IssueKey>>(
     new Set(["headers", "whitespace", "missing", "currency", "categories", "duplicates"]),
   );
@@ -421,8 +396,6 @@ function DataStudio() {
     URL.revokeObjectURL(url);
   };
 
-  const activeProfile = profileOptions.find((option) => option.value === profile)!;
-
   return (
     <div className="min-h-screen bg-muted/20">
       <section className="border-b border-border bg-background">
@@ -433,7 +406,7 @@ function DataStudio() {
                 <WandSparkles className="h-3.5 w-3.5" /> Data Studio · Browser preview
               </div>
               <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Inspect the workflow with real CSV data.
+                Inspect the Analysis Ready workflow with real CSV data.
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
                 This public preview processes the selected file in your browser. It demonstrates
@@ -454,52 +427,27 @@ function DataStudio() {
 
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[320px_minmax(0,1fr)]">
         <aside className="space-y-5">
-          <section className="rounded-2xl border border-border bg-card p-5">
-            <div className="flex items-center justify-between">
+          <section className="rounded-2xl border border-accent/20 bg-accent/[0.055] p-5">
+            <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Step 1
+                  Public preview
                 </div>
-                <h2 className="mt-1 font-semibold">Choose your outcome</h2>
+                <h2 className="mt-1 font-semibold">Analysis Ready</h2>
               </div>
               <span className="grid h-8 w-8 place-items-center rounded-lg bg-accent/10 text-accent">
-                <activeProfile.icon className="h-4 w-4" />
+                <BarChart3 className="h-4 w-4" />
               </span>
             </div>
-            <div className="mt-4 space-y-2">
-              {profileOptions.map((option) => {
-                const Icon = option.icon;
-                const active = profile === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setProfile(option.value)}
-                    className={cn(
-                      "w-full rounded-xl border p-3 text-left transition",
-                      active
-                        ? "border-accent bg-accent/10"
-                        : "border-border bg-background hover:border-accent/35",
-                    )}
-                  >
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <Icon
-                        className={cn("h-4 w-4", active ? "text-accent" : "text-muted-foreground")}
-                      />
-                      {option.label}
-                    </div>
-                    <p className="mt-1.5 pl-6 text-xs leading-5 text-muted-foreground">
-                      {option.description}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
+            <p className="mt-3 text-xs leading-5 text-muted-foreground">
+              This browser demo covers deterministic CSV cleaning and review. The deeper ML Ready
+              and Power BI Ready workflows are available in the Python engine and assisted pilots.
+            </p>
           </section>
 
           <section className="rounded-2xl border border-border bg-card p-5">
             <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              Step 2
+              Step 1
             </div>
             <h2 className="mt-1 font-semibold">Load a CSV</h2>
             <input
@@ -546,7 +494,7 @@ function DataStudio() {
                 <div>
                   <h2 className="font-semibold">{sourceName}</h2>
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {rows.length} rows · {headers.length} columns · {activeProfile.label}
+                    {rows.length} rows · {headers.length} columns · Analysis Ready
                   </div>
                 </div>
               </div>
@@ -562,7 +510,7 @@ function DataStudio() {
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Step 3
+                  Step 2
                 </div>
                 <h2 className="mt-1 text-xl font-semibold">Review proposed changes</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -619,7 +567,7 @@ function DataStudio() {
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Step 4
+                  Step 3
                 </div>
                 <h2 className="mt-1 text-xl font-semibold">Compare and export</h2>
               </div>
