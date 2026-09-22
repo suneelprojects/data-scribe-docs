@@ -105,9 +105,9 @@ function DocsIndex() {
 
         <h2 id="roadmap">Roadmap</h2>
         <p>
-          v1.4.0 is the current stable release. It focuses the package on Analysis Ready,
-          leakage-safe ML Ready and Power BI Ready outcomes while preserving the stable v1 API. Read
-          the full <Link to="/roadmap">roadmap</Link>.
+          v1.4.1 is the current stable maintenance release. It preserves the Analysis Ready,
+          leakage-safe ML Ready and Power BI Ready workflows from v1.4.0 while improving packaging
+          reproducibility. Read the full <Link to="/roadmap">roadmap</Link>.
         </p>
 
         <h2 id="browse">Browse all sections</h2>

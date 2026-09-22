@@ -10,6 +10,20 @@ export type ChangelogEntry = {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "v1.4.1",
+    date: "21 Sep 2026",
+    status: "released",
+    title: "Reproducible Packaging Maintenance",
+    changed: [
+      "Source distributions now include the sample dataset and all packaged test fixtures",
+      "Added a documented dev extra for the complete quality, test, build and validation toolchain",
+      "Analysis Ready, ML Ready and Power BI Ready public APIs remain unchanged from v1.4.0",
+    ],
+    fixed: [
+      "Replaced the deprecated pandas categorical dtype check with the supported CategoricalDtype API",
+    ],
+  },
+  {
     version: "v1.4.0",
     date: "26 Aug 2026",
     status: "released",
@@ -23,7 +37,7 @@ export const changelog: ChangelogEntry[] = [
     changed: [
       "Product direction now centres Analysis Ready, ML Ready and Power BI Ready outcomes",
       "All v1 public APIs remain compatible under semantic versioning",
-      "Python 3.10–3.13 support verified for the current production release",
+      "Python 3.10–3.13 support verified for the transformation-first release",
     ],
   },
   {

@@ -17,7 +17,7 @@ export const searchIndex: SearchEntry[] = [
     title: "Installation",
     section: "Getting Started",
     url: "/docs/installation",
-    description: "Install v1.4.0 with pip",
+    description: "Install v1.4.1 with pip",
     keywords: ["pip", "install", "setup", "1.4"],
   },
   {

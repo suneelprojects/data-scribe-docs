@@ -14,7 +14,7 @@ export const Route = createFileRoute("/roadmap")({
       {
         property: "og:description",
         content:
-          "From data-quality foundations to EazyDataFix v1.4.0 and the customer-facing Data Studio.",
+          "From data-quality foundations to EazyDataFix v1.4.1 and the customer-facing Data Studio.",
       },
     ],
   }),
@@ -96,11 +96,22 @@ const milestones = [
   {
     version: "v1.4.0",
     title: "Transformation-first readiness workflows",
-    status: "Current",
+    status: "Shipped",
     items: [
       "Analysis Ready workflow with evidence, warnings and validation",
       "Leakage-safe ML Ready train/test preparation",
       "Power BI Ready single-table and multi-table model inputs",
+      "Verified Python 3.10–3.13 release",
+    ],
+  },
+  {
+    version: "v1.4.1",
+    title: "Reproducible packaging maintenance",
+    status: "Current",
+    items: [
+      "Source packages include the sample dataset and complete test fixtures",
+      "Documented development extra for quality, test, build and validation tools",
+      "Supported pandas categorical type checks with no public API changes",
       "Verified Python 3.10–3.13 release",
     ],
   },
@@ -128,7 +139,7 @@ function Page() {
       <DocPageHeader
         breadcrumbs={[{ label: "Roadmap" }]}
         title="Roadmap"
-        description="The v1.4.0 engine is production-ready. The current phase turns that engine into a customer-facing workflow validated through real usage and paid pilots."
+        description="The v1.4.1 engine is production-ready. The current phase turns that engine into a customer-facing workflow validated through real usage and paid pilots."
       />
       <div className="relative pl-6">
         <div className="absolute bottom-2 left-2 top-2 w-px bg-border" />

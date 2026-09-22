@@ -52,7 +52,7 @@ export const docsNav: NavGroup[] = [
   {
     label: "Meta",
     items: [
-      { title: "v1.4.0 Current Release", url: "/changelog", badge: "Latest" },
+      { title: "v1.4.1 Current Release", url: "/changelog", badge: "Latest" },
       { title: "v1.0.0 Release Notes", url: "/releases/v1-0-0" },
       { title: "Roadmap", url: "/roadmap" },
       { title: "Changelog", url: "/changelog" },
@@ -64,7 +64,8 @@ export const docsNav: NavGroup[] = [
 ];
 
 export const versions = [
-  { label: "v1.4.0", value: "1.4.0", status: "latest" as const },
+  { label: "v1.4.1", value: "1.4.1", status: "latest" as const },
+  { label: "v1.4.0", value: "1.4.0", status: "previous" as const },
   { label: "v1.0.0", value: "1.0.0", status: "previous" as const },
   { label: "v0.5.0", value: "0.5.0", status: "previous" as const },
   { label: "v0.4.0", value: "0.4.0", status: "previous" as const },

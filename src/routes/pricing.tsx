@@ -81,7 +81,7 @@ const plans = [
       "Install the production engine and integrate deterministic readiness workflows in your own code.",
     icon: Code2,
     features: [
-      "EazyDataFix v1.4.0",
+      "EazyDataFix v1.4.1",
       "Analysis Ready workflow",
       "Leakage-safe ML Ready workflow",
       "Power BI Ready workflow",
@@ -255,7 +255,7 @@ function Pricing() {
             {[
               [
                 "Is the public Studio the full SaaS?",
-                "No. It is a working browser preview for CSV. The v1.4.0 Python engine contains the deeper Analysis Ready, ML Ready and Power BI Ready workflows.",
+                "No. It is a working browser preview for CSV. The v1.4.1 Python engine contains the deeper Analysis Ready, ML Ready and Power BI Ready workflows.",
               ],
               [
                 "Does the pilot include unlimited integrations?",
