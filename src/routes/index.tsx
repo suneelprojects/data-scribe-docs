@@ -231,7 +231,7 @@ function Home() {
       <section className="border-b border-border bg-muted/25">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px px-4 py-6 sm:grid-cols-4 sm:px-6">
           {[
-            ["v1.4.0", "Production engine"],
+            ["v1.4.1", "Production engine"],
             ["3.10–3.13", "Python verified"],
             ["CSV · Excel", "Practical inputs"],
             ["MIT", "Open-source core"],

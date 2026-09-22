@@ -613,7 +613,7 @@ function DataStudio() {
             <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
               <div>
                 <h2 className="font-semibold">
-                  Need the full v1.4.0 engine on a business workflow?
+                  Need the full v1.4.1 engine on a business workflow?
                 </h2>
                 <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground">
                   Assisted pilots add Excel processing, Power BI relationship checks, saved recipes,
