@@ -19,7 +19,7 @@ The primary customer flow is:
 5. Compare the original and cleaned preview.
 6. Export the result with readiness evidence.
 
-The public `/studio` route is intentionally an honest browser-local CSV preview. It demonstrates the customer experience without claiming to expose the complete Python engine. The open-source v1.4.0 engine remains available through PyPI and the developer documentation.
+The public `/studio` route is intentionally an honest browser-local CSV preview. It demonstrates the customer experience without claiming to expose the complete Python engine. The open-source v1.4.1 engine remains available through PyPI and the developer documentation.
 
 ## Public routes
 

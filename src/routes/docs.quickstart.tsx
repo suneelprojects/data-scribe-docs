@@ -31,7 +31,7 @@ function QuickStart() {
       <div id="doc-content" className="prose-doc">
         <h2 id="install">1. Install</h2>
         <CodeBlock
-          code="pip install eazydatafix==1.4.0"
+          code="pip install eazydatafix==1.4.1"
           language="bash"
           filename="terminal"
           showActions={false}

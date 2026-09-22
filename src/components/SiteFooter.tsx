@@ -104,7 +104,7 @@ export function SiteFooter() {
             >
               <LockKeyhole className="h-3 w-3" /> Content Studio
             </Link>
-            <span className="font-mono">v1.4.0 · MIT</span>
+            <span className="font-mono">v1.4.1 · MIT</span>
             <a
               href="https://github.com/suneelprojects/eazydatafix"
               target="_blank"

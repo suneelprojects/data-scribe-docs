@@ -33,7 +33,7 @@ export function SiteHeader() {
           </span>
           <span className="font-semibold tracking-tight">EazyDataFix</span>
           <span className="hidden rounded bg-accent/10 px-1.5 py-0.5 font-mono text-[10px] text-accent sm:inline">
-            v1.4.0
+            v1.4.1
           </span>
         </Link>
 
@@ -108,7 +108,7 @@ export function SiteHeader() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold">EazyDataFix</span>
                   <span className="rounded bg-accent/10 px-2 py-1 font-mono text-[10px] text-accent">
-                    v1.4.0
+                    v1.4.1
                   </span>
                 </div>
               </div>
