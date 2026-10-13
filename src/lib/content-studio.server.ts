@@ -584,30 +584,54 @@ export async function generateDrafts(options: {
   const runDate = options.runType === "daily" ? istDate() : null;
   const model = getModel();
 
+  let retryRunId: string | null = null;
   if (runDate) {
-    const { data: existingRun } = await supabaseAdmin
+    const { data: existingRun, error: existingRunError } = await supabaseAdmin
       .from("content_generation_runs")
       .select("id, status, article_count")
       .eq("run_type", "daily")
       .eq("run_date", runDate)
       .maybeSingle();
-    if (existingRun)
-      return { skipped: true, created: existingRun.article_count, articleIds: [] as string[] };
+    if (existingRunError) throw new Error(existingRunError.message);
+    if (existingRun) {
+      if (existingRun.status !== "failed")
+        return { skipped: true, created: existingRun.article_count, articleIds: [] as string[] };
+      if (existingRun.article_count > 0)
+        throw new Error("The failed daily run already created articles. Review them before retrying.");
+      retryRunId = existingRun.id;
+    }
   }
 
-  const { data: run, error: runError } = await supabaseAdmin
-    .from("content_generation_runs")
-    .insert({
-      run_type: options.runType,
-      run_date: runDate,
-      status: "running",
-      model,
-      prompt_version: PROMPT_VERSION,
-      requested_by_email: options.actorEmail,
-    })
-    .select("id")
-    .single();
-  if (runError || !run) throw new Error(runError?.message || "Unable to start content generation.");
+  const runResult = retryRunId
+    ? await supabaseAdmin
+        .from("content_generation_runs")
+        .update({
+          status: "running",
+          error_message: null,
+          completed_at: null,
+          model,
+          prompt_version: PROMPT_VERSION,
+          requested_by_email: options.actorEmail,
+        })
+        .eq("id", retryRunId)
+        .eq("status", "failed")
+        .select("id")
+        .maybeSingle()
+    : await supabaseAdmin
+        .from("content_generation_runs")
+        .insert({
+          run_type: options.runType,
+          run_date: runDate,
+          status: "running",
+          model,
+          prompt_version: PROMPT_VERSION,
+          requested_by_email: options.actorEmail,
+        })
+        .select("id")
+        .single();
+  const { data: run, error: runError } = runResult;
+  if (runError || !run)
+    throw new Error(runError?.message || "Unable to start content generation; another retry may be running.");
 
   try {
     const { data: existingArticles, error: existingError } = await supabaseAdmin
