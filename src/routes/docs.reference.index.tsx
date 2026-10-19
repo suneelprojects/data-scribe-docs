@@ -5,9 +5,9 @@ import { allDocs } from "@/content/reference";
 export const Route = createFileRoute("/docs/reference/")({
   head: () => ({
     meta: [
-      { title: "API Reference — EazyDataFix 1.4" },
-      { name: "description", content: "Stable public Python APIs in EazyDataFix 1.4." },
-      { property: "og:title", content: "API Reference — EazyDataFix 1.4" },
+      { title: "API Reference — EazyDataFix 2.0" },
+      { name: "description", content: "Stable public Python APIs in EazyDataFix 2.0." },
+      { property: "og:title", content: "API Reference — EazyDataFix 2.0" },
       {
         property: "og:description",
         content: "Profile, assess, clean, prepare, validate and explore datasets with stable APIs.",
@@ -41,6 +41,29 @@ const v1Apis = [
     desc: "Validate schema and reusable quality rules with pass/fail output.",
     hash: "data-contracts",
     returns: "ContractValidationReport",
+  },
+];
+
+const v2Apis = [
+  {
+    name: "edf.PipelineRecipe",
+    desc: "Define and save versioned JSON/YAML preparation rules.",
+    returns: "PipelineRecipe",
+  },
+  {
+    name: "edf.ColumnRule",
+    desc: "Declare an explicit type, mapping, missing-value rule and conversion failure policy.",
+    returns: "ColumnRule",
+  },
+  {
+    name: "edf.Pipeline",
+    desc: "Preview, apply or run a recipe with evidence and guarded exports.",
+    returns: "PipelineResult",
+  },
+  {
+    name: "edf.RecipeMLArtifact",
+    desc: "Replay recipe-bound, training-fitted preprocessing on prediction inputs.",
+    returns: "DataFrame",
   },
 ];
 
@@ -106,10 +129,35 @@ function ReferenceIndex() {
       <DocPageHeader
         breadcrumbs={[{ label: "Docs", to: "/docs" }, { label: "API Reference" }]}
         title="API Reference"
-        description="EazyDataFix 1.4 exposes stable result objects for transformation, validation and downstream readiness workflows."
+        description="EazyDataFix 2.0 adds reusable recipe and pipeline objects while preserving the stable v1 transformation, validation and readiness APIs."
       />
       <div id="doc-content" className="prose-doc">
-        <h2 id="v1-workflows">Production workflows (v1.4)</h2>
+        <h2 id="v2-pipelines">Reusable pipeline API (v2.0)</h2>
+        <p>
+          These additive v2 objects turn explicit preparation rules into a reviewable, repeatable
+          pipeline. See the <Link to="/docs/recipes">pipeline recipe guide</Link> for complete
+          examples and boundaries.
+        </p>
+        <div className="not-prose divide-y divide-border rounded-lg border border-border">
+          {v2Apis.map((api) => (
+            <Link
+              key={api.name}
+              to="/docs/recipes"
+              className="block p-4 transition-colors hover:bg-muted/40"
+            >
+              <div className="flex flex-wrap items-baseline gap-3">
+                <ApiName name={api.name} />
+                <span className="font-mono text-[11px] text-muted-foreground">→ {api.returns}</span>
+                <span className="rounded bg-accent/15 px-1.5 py-0.5 text-[10px] font-medium text-accent">
+                  2.0
+                </span>
+              </div>
+              <div className="mt-1 text-sm text-muted-foreground">{api.desc}</div>
+            </Link>
+          ))}
+        </div>
+
+        <h2 id="v1-workflows">Stable convenience workflows (v1 compatible)</h2>
         <p>
           These APIs form the stable v1 workflow layer. See the{" "}
           <Link to="/releases/v1-0-0">v1.0.0 release notes</Link> for complete examples.

@@ -475,7 +475,7 @@ const FALLBACK_LESSONS: FallbackLesson[] = [
 
 const EAZYDATAFIX_FACTS = `
 Verified EazyDataFix facts:
-- EazyDataFix v1.4.0 is an MIT-licensed Python package for auditable data transformation, quality, cleaning and validation workflows.
+- EazyDataFix v2.0.0 is an MIT-licensed Python package for reusable, reviewable data preparation with recipes, audit evidence, quality, cleaning and validation workflows.
 - The product direction is EazyDataFix Data Studio: upload, scan, review proposed changes and export trusted data. The current public Studio is a browser-local CSV preview.
 - It accepts CSV, Excel, JSON, Parquet and pandas.DataFrame inputs.
 - edf.analysis_ready_with_report() provides before/after scores, changes, warnings and validation evidence.
@@ -502,7 +502,13 @@ type GeneratedInstagramPost = {
 };
 
 type InstagramContentFormat =
-  "education" | "quick-tip" | "meme" | "quote" | "problem-story" | "community" | "product";
+  | "education"
+  | "quick-tip"
+  | "meme"
+  | "quote"
+  | "problem-story"
+  | "community"
+  | "product";
 
 type InstagramContentPlan = {
   format: InstagramContentFormat;

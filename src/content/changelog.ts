@@ -10,6 +10,30 @@ export type ChangelogEntry = {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "v2.0.0",
+    date: "19 Oct 2026",
+    status: "released",
+    title: "Reusable, Reviewable Preparation",
+    added: [
+      "Versioned JSON/YAML PipelineRecipe rules and composable Pipeline workflows",
+      "Explicit string, integer, number, boolean, datetime and category conversion rules",
+      "Preserve, reject and quarantine policies with bounded invalid-value evidence",
+      "Source, recipe and output-bound review plans with selectable processing stages",
+      "Shared reports and guarded exports across Analysis Ready, ML Ready and Power BI Ready",
+      "Recipe-bound ML inference artifacts and named multi-table Power BI recipes",
+      "CLI recipe previews, named tables, validation gates and data/report exports",
+    ],
+    changed: [
+      "Existing v1 convenience APIs retain their defaults and return contracts",
+      "CSV and Excel recipe loading preserves textual identifiers before type inference",
+      "Transformation evidence now includes counts, dtype changes, source positions and optional full audits",
+    ],
+    fixed: [
+      "Duplicate CSV/Excel headings are rejected before pandas can silently rename them",
+      "Audit coverage supports both pandas 2 and pandas 3 text dtypes",
+    ],
+  },
+  {
     version: "v1.4.1",
     date: "21 Sep 2026",
     status: "released",

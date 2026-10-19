@@ -21,11 +21,12 @@ export const docsNav: NavGroup[] = [
     ],
   },
   {
-    label: "Production v1.4",
+    label: "Production v2",
     items: [
-      { title: "Analysis Ready", url: "/studio", badge: "1.4" },
-      { title: "ML Ready", url: "/studio", badge: "1.4" },
-      { title: "Power BI Ready", url: "/studio", badge: "1.4" },
+      { title: "Reusable Pipeline Recipes", url: "/docs/recipes", badge: "2.0" },
+      { title: "Analysis Ready", url: "/studio", badge: "2.0" },
+      { title: "ML Ready", url: "/docs/recipes#readiness", badge: "2.0" },
+      { title: "Power BI Ready", url: "/docs/recipes#readiness", badge: "2.0" },
       { title: "Unified run() Workflow", url: "/releases/v1-0-0#unified-workflow", badge: "1.x" },
       { title: "Controlled Cleaning", url: "/releases/v1-0-0#controlled-cleaning", badge: "1.x" },
     ],
@@ -52,7 +53,7 @@ export const docsNav: NavGroup[] = [
   {
     label: "Meta",
     items: [
-      { title: "v1.4.1 Current Release", url: "/changelog", badge: "Latest" },
+      { title: "v2.0.0 Current Release", url: "/releases/v2-0-0", badge: "Latest" },
       { title: "v1.0.0 Release Notes", url: "/releases/v1-0-0" },
       { title: "Roadmap", url: "/roadmap" },
       { title: "Changelog", url: "/changelog" },
@@ -64,7 +65,8 @@ export const docsNav: NavGroup[] = [
 ];
 
 export const versions = [
-  { label: "v1.4.1", value: "1.4.1", status: "latest" as const },
+  { label: "v2.0.0", value: "2.0.0", status: "latest" as const },
+  { label: "v1.4.1", value: "1.4.1", status: "previous" as const },
   { label: "v1.4.0", value: "1.4.0", status: "previous" as const },
   { label: "v1.0.0", value: "1.0.0", status: "previous" as const },
   { label: "v0.5.0", value: "0.5.0", status: "previous" as const },

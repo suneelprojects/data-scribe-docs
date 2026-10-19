@@ -11,14 +11,14 @@ export const searchIndex: SearchEntry[] = [
     title: "Introduction",
     section: "Getting Started",
     url: "/docs",
-    description: "Overview of EazyDataFix 1.4",
+    description: "Overview of EazyDataFix 2.0",
   },
   {
     title: "Installation",
     section: "Getting Started",
     url: "/docs/installation",
-    description: "Install v1.4.1 with pip",
-    keywords: ["pip", "install", "setup", "1.4"],
+    description: "Install v2.0.0 with pip",
+    keywords: ["pip", "install", "setup", "2.0"],
   },
   {
     title: "Quick Start",
@@ -27,6 +27,13 @@ export const searchIndex: SearchEntry[] = [
     description: "Run a complete data workflow",
   },
 
+  {
+    title: "Pipeline Recipes",
+    section: "Guides",
+    url: "/docs/recipes",
+    description: "Create, preview and replay versioned preparation recipes",
+    keywords: ["recipe", "pipeline", "json", "yaml", "preview", "quarantine", "2.0"],
+  },
   {
     title: "Assessment",
     section: "Guides",
@@ -59,6 +66,20 @@ export const searchIndex: SearchEntry[] = [
     section: "Reference",
     url: "/docs/reference",
     description: "Stable public Python API",
+  },
+  {
+    title: "PipelineRecipe",
+    section: "Reference",
+    url: "/docs/recipes#define",
+    description: "Versioned JSON or YAML data-preparation rules",
+    keywords: ["recipe", "column rule", "mapping", "2.0"],
+  },
+  {
+    title: "Pipeline preview and apply",
+    section: "Reference",
+    url: "/docs/recipes#review",
+    description: "Review transformations before applying a bound pipeline result",
+    keywords: ["pipeline", "preview", "apply", "review plan", "2.0"],
   },
   {
     title: "run()",
@@ -131,6 +152,13 @@ export const searchIndex: SearchEntry[] = [
     keywords: ["AI", "narrative", "citations", "0.5"],
   },
 
+  {
+    title: "v2.0.0 Release Notes",
+    section: "Meta",
+    url: "/releases/v2-0-0",
+    description: "Reusable, reviewable preparation recipes",
+    keywords: ["release", "2.0", "recipe", "pipeline"],
+  },
   {
     title: "v1.0.0 Release Notes",
     section: "Meta",

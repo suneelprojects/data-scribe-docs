@@ -36,7 +36,8 @@ const SAFE_INTERNAL_LINKS = [
 
 const EAZYDATAFIX_FACTS = `
 EazyDataFix product facts you may use:
-- Current stable release: v1.4.0, released 26 August 2026, Python 3.10-3.13, MIT licensed.
+- Current stable release: v2.0.0, released 19 October 2026, Python 3.10-3.13, MIT licensed.
+- v2.0.0 adds reusable JSON/YAML preparation recipes, preview/apply review plans, explicit column types, quarantine policies and transformation evidence.
 - The customer-facing direction is EazyDataFix Data Studio: upload, scan, review proposed changes and export trusted data. The current public Studio is an honest browser-local CSV preview, not the full hosted engine.
 - It accepts CSV, Excel, JSON, Parquet and pandas.DataFrame inputs.
 - edf.analysis_ready_with_report() returns a prepared dataset with before/after scores, changes, warnings and validations.

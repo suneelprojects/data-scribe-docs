@@ -26,10 +26,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExamplesIndexRouteImport } from './routes/examples.index'
 import { Route as DocsIndexRouteImport } from './routes/docs.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as ReleasesV200RouteImport } from './routes/releases.v2-0-0'
 import { Route as ReleasesV100RouteImport } from './routes/releases.v1-0-0'
 import { Route as ReleasesV030RouteImport } from './routes/releases.v0-3-0'
 import { Route as ExamplesSlugRouteImport } from './routes/examples.$slug'
 import { Route as DocsReportsRouteImport } from './routes/docs.reports'
+import { Route as DocsRecipesRouteImport } from './routes/docs.recipes'
 import { Route as DocsQuickstartRouteImport } from './routes/docs.quickstart'
 import { Route as DocsProfilingRouteImport } from './routes/docs.profiling'
 import { Route as DocsInstallationRouteImport } from './routes/docs.installation'
@@ -129,6 +131,11 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReleasesV200Route = ReleasesV200RouteImport.update({
+  id: '/releases/v2-0-0',
+  path: '/releases/v2-0-0',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReleasesV100Route = ReleasesV100RouteImport.update({
   id: '/releases/v1-0-0',
   path: '/releases/v1-0-0',
@@ -147,6 +154,11 @@ const ExamplesSlugRoute = ExamplesSlugRouteImport.update({
 const DocsReportsRoute = DocsReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsRecipesRoute = DocsRecipesRouteImport.update({
+  id: '/recipes',
+  path: '/recipes',
   getParentRoute: () => DocsRoute,
 } as any)
 const DocsQuickstartRoute = DocsQuickstartRouteImport.update({
@@ -241,10 +253,12 @@ export interface FileRoutesByFullPath {
   '/docs/installation': typeof DocsInstallationRoute
   '/docs/profiling': typeof DocsProfilingRoute
   '/docs/quickstart': typeof DocsQuickstartRoute
+  '/docs/recipes': typeof DocsRecipesRoute
   '/docs/reports': typeof DocsReportsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/releases/v0-3-0': typeof ReleasesV030Route
   '/releases/v1-0-0': typeof ReleasesV100Route
+  '/releases/v2-0-0': typeof ReleasesV200Route
   '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
@@ -276,10 +290,12 @@ export interface FileRoutesByTo {
   '/docs/installation': typeof DocsInstallationRoute
   '/docs/profiling': typeof DocsProfilingRoute
   '/docs/quickstart': typeof DocsQuickstartRoute
+  '/docs/recipes': typeof DocsRecipesRoute
   '/docs/reports': typeof DocsReportsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/releases/v0-3-0': typeof ReleasesV030Route
   '/releases/v1-0-0': typeof ReleasesV100Route
+  '/releases/v2-0-0': typeof ReleasesV200Route
   '/blog': typeof BlogIndexRoute
   '/docs': typeof DocsIndexRoute
   '/examples': typeof ExamplesIndexRoute
@@ -313,10 +329,12 @@ export interface FileRoutesById {
   '/docs/installation': typeof DocsInstallationRoute
   '/docs/profiling': typeof DocsProfilingRoute
   '/docs/quickstart': typeof DocsQuickstartRoute
+  '/docs/recipes': typeof DocsRecipesRoute
   '/docs/reports': typeof DocsReportsRoute
   '/examples/$slug': typeof ExamplesSlugRoute
   '/releases/v0-3-0': typeof ReleasesV030Route
   '/releases/v1-0-0': typeof ReleasesV100Route
+  '/releases/v2-0-0': typeof ReleasesV200Route
   '/blog/': typeof BlogIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/examples/': typeof ExamplesIndexRoute
@@ -351,10 +369,12 @@ export interface FileRouteTypes {
     | '/docs/installation'
     | '/docs/profiling'
     | '/docs/quickstart'
+    | '/docs/recipes'
     | '/docs/reports'
     | '/examples/$slug'
     | '/releases/v0-3-0'
     | '/releases/v1-0-0'
+    | '/releases/v2-0-0'
     | '/blog/'
     | '/docs/'
     | '/examples/'
@@ -386,10 +406,12 @@ export interface FileRouteTypes {
     | '/docs/installation'
     | '/docs/profiling'
     | '/docs/quickstart'
+    | '/docs/recipes'
     | '/docs/reports'
     | '/examples/$slug'
     | '/releases/v0-3-0'
     | '/releases/v1-0-0'
+    | '/releases/v2-0-0'
     | '/blog'
     | '/docs'
     | '/examples'
@@ -422,10 +444,12 @@ export interface FileRouteTypes {
     | '/docs/installation'
     | '/docs/profiling'
     | '/docs/quickstart'
+    | '/docs/recipes'
     | '/docs/reports'
     | '/examples/$slug'
     | '/releases/v0-3-0'
     | '/releases/v1-0-0'
+    | '/releases/v2-0-0'
     | '/blog/'
     | '/docs/'
     | '/examples/'
@@ -456,6 +480,7 @@ export interface RootRouteChildren {
   ExamplesSlugRoute: typeof ExamplesSlugRoute
   ReleasesV030Route: typeof ReleasesV030Route
   ReleasesV100Route: typeof ReleasesV100Route
+  ReleasesV200Route: typeof ReleasesV200Route
   BlogIndexRoute: typeof BlogIndexRoute
   ExamplesIndexRoute: typeof ExamplesIndexRoute
   ApiCronGenerateBlogDraftsRoute: typeof ApiCronGenerateBlogDraftsRoute
@@ -584,6 +609,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/releases/v2-0-0': {
+      id: '/releases/v2-0-0'
+      path: '/releases/v2-0-0'
+      fullPath: '/releases/v2-0-0'
+      preLoaderRoute: typeof ReleasesV200RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/releases/v1-0-0': {
       id: '/releases/v1-0-0'
       path: '/releases/v1-0-0'
@@ -610,6 +642,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/docs/reports'
       preLoaderRoute: typeof DocsReportsRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/recipes': {
+      id: '/docs/recipes'
+      path: '/recipes'
+      fullPath: '/docs/recipes'
+      preLoaderRoute: typeof DocsRecipesRouteImport
       parentRoute: typeof DocsRoute
     }
     '/docs/quickstart': {
@@ -713,6 +752,7 @@ interface DocsRouteChildren {
   DocsInstallationRoute: typeof DocsInstallationRoute
   DocsProfilingRoute: typeof DocsProfilingRoute
   DocsQuickstartRoute: typeof DocsQuickstartRoute
+  DocsRecipesRoute: typeof DocsRecipesRoute
   DocsReportsRoute: typeof DocsReportsRoute
   DocsIndexRoute: typeof DocsIndexRoute
   DocsReferenceFnRoute: typeof DocsReferenceFnRoute
@@ -726,6 +766,7 @@ const DocsRouteChildren: DocsRouteChildren = {
   DocsInstallationRoute: DocsInstallationRoute,
   DocsProfilingRoute: DocsProfilingRoute,
   DocsQuickstartRoute: DocsQuickstartRoute,
+  DocsRecipesRoute: DocsRecipesRoute,
   DocsReportsRoute: DocsReportsRoute,
   DocsIndexRoute: DocsIndexRoute,
   DocsReferenceFnRoute: DocsReferenceFnRoute,
@@ -754,6 +795,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExamplesSlugRoute: ExamplesSlugRoute,
   ReleasesV030Route: ReleasesV030Route,
   ReleasesV100Route: ReleasesV100Route,
+  ReleasesV200Route: ReleasesV200Route,
   BlogIndexRoute: BlogIndexRoute,
   ExamplesIndexRoute: ExamplesIndexRoute,
   ApiCronGenerateBlogDraftsRoute: ApiCronGenerateBlogDraftsRoute,

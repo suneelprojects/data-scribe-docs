@@ -8,6 +8,7 @@ const staticRoutes = [
   "/docs",
   "/docs/installation",
   "/docs/quickstart",
+  "/docs/recipes",
   "/docs/assessment",
   "/docs/fixing",
   "/docs/profiling",
@@ -20,6 +21,7 @@ const staticRoutes = [
   "/ecosystem",
   "/contributing",
   "/releases/v1-0-0",
+  "/releases/v2-0-0",
 ];
 
 function escapeXml(value: string) {
