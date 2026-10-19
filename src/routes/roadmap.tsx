@@ -14,7 +14,7 @@ export const Route = createFileRoute("/roadmap")({
       {
         property: "og:description",
         content:
-          "From data-quality foundations to EazyDataFix v1.4.1 and the customer-facing Data Studio.",
+          "From data-quality foundations to reusable EazyDataFix v2.0.0 pipelines and the customer-facing Data Studio.",
       },
     ],
   }),
@@ -107,7 +107,7 @@ const milestones = [
   {
     version: "v1.4.1",
     title: "Reproducible packaging maintenance",
-    status: "Current",
+    status: "Shipped",
     items: [
       "Source packages include the sample dataset and complete test fixtures",
       "Documented development extra for quality, test, build and validation tools",
@@ -116,12 +116,23 @@ const milestones = [
     ],
   },
   {
+    version: "v2.0.0",
+    title: "Reusable, reviewable preparation",
+    status: "Current",
+    items: [
+      "Versioned JSON/YAML recipes with explicit column types and mappings",
+      "Preview/apply review plans bound to source, recipe and proposed output",
+      "Preserve, reject and quarantine conversion policies with audit evidence",
+      "Shared pipeline reports for Analysis Ready, ML Ready and Power BI Ready",
+    ],
+  },
+  {
     version: "Product beta",
     title: "Customer-facing Data Studio",
     status: "Open",
     items: [
       "Public browser preview for transparent CSV inspection and export",
-      "Assisted pilots for Excel, saved recipes and Power BI workflows",
+      "Browser integration for v2 recipes, Excel and Power BI workflows",
       "Product priorities driven by repeated customer usage and paid pilot evidence",
     ],
   },
@@ -139,7 +150,7 @@ function Page() {
       <DocPageHeader
         breadcrumbs={[{ label: "Roadmap" }]}
         title="Roadmap"
-        description="The v1.4.1 engine is production-ready. The current phase turns that engine into a customer-facing workflow validated through real usage and paid pilots."
+        description="The v2.0.0 engine makes preparation rules reusable and reviewable. The current product phase brings those recipes into customer-facing workflows validated through real usage and pilots."
       />
       <div className="relative pl-6">
         <div className="absolute bottom-2 left-2 top-2 w-px bg-border" />

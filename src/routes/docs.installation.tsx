@@ -37,6 +37,7 @@ function Installation() {
           <li>pandas (installed automatically)</li>
           <li>openpyxl (only required for Excel input)</li>
           <li>pyarrow (only required for Parquet input, via the optional extra)</li>
+          <li>PyYAML (only required for YAML pipeline recipes, via the optional extra)</li>
         </ul>
 
         <h2 id="install">Install with pip</h2>
@@ -55,12 +56,20 @@ function Installation() {
           showActions={false}
         />
 
+        <h3 id="install-yaml">With YAML recipe support</h3>
+        <CodeBlock
+          code={'pip install "eazydatafix[yaml]"'}
+          language="bash"
+          filename="terminal"
+          showActions={false}
+        />
+
         <h2 id="verify">Verify the installation</h2>
         <ReplBlock
           lines={[
             { kind: "in", text: "import eazydatafix as edf" },
             { kind: "in", text: "edf.__version__" },
-            { kind: "out", text: "'1.4.1'" },
+            { kind: "out", text: "'2.0.0'" },
           ]}
         />
 

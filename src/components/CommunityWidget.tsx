@@ -2,9 +2,9 @@ import { BadgeCheck, Code2, Package, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const stats = [
-  { label: "Latest Release", value: "v1.4.1", sub: "PyPI", icon: Package },
+  { label: "Latest Release", value: "v2.0.0", sub: "PyPI", icon: Package },
   { label: "Python Support", value: "3.10–3.13", sub: "Tested", icon: BadgeCheck },
-  { label: "Stable Public Exports", value: "79", sub: "v1 API", icon: Code2 },
+  { label: "Public Exports", value: "105", sub: "v2 API", icon: Code2 },
   { label: "Open-source License", value: "MIT", sub: "License", icon: ShieldCheck },
 ];
 

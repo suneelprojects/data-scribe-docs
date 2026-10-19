@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   Code2,
   FileSpreadsheet,
+  FileJson2,
   Github,
   Layers3,
   LockKeyhole,
@@ -16,6 +17,7 @@ import {
   ShieldCheck,
   Sparkles,
   TableProperties,
+  Workflow,
   WandSparkles,
 } from "lucide-react";
 import { InstallChip } from "@/components/InstallChip";
@@ -27,7 +29,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Clean, validate and prepare CSV or Excel data for analysis, machine learning and Power BI with transparent, reviewable changes.",
+          "Create reusable preparation recipes, review every change and export trusted data for analysis, machine learning and Power BI.",
       },
       {
         property: "og:title",
@@ -36,7 +38,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Upload a file, inspect every issue, approve the fixes and export trusted data with a complete audit trail.",
+          "EazyDataFix 2.0 turns explicit rules into reusable, reviewable data-preparation pipelines.",
       },
     ],
     links: [{ rel: "canonical", href: "https://eazydatafix.com/" }],
@@ -164,15 +166,15 @@ function Home() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1.5 text-xs font-medium text-cyan-100">
               <Sparkles className="h-3.5 w-3.5" />
-              EazyDataFix Studio · Public product preview
+              EazyDataFix v2.0.0 · Reusable preparation recipes
             </div>
             <h1 className="mt-7 max-w-2xl text-4xl font-semibold tracking-[-0.045em] sm:text-5xl lg:text-6xl lg:leading-[1.04]">
               Messy files in.
               <span className="block text-cyan-300">Decision-ready data out.</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-              Clean, validate and prepare CSV or Excel data for analysis, machine learning and Power
-              BI. Preview every proposed change before anything is applied.
+              Define preparation once, review every proposed change, then replay the same rules on
+              future CSV or Excel files for analysis, machine learning and Power BI.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -231,9 +233,9 @@ function Home() {
       <section className="border-b border-border bg-muted/25">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px px-4 py-6 sm:grid-cols-4 sm:px-6">
           {[
-            ["v1.4.1", "Production engine"],
+            ["v2.0.0", "Latest stable release"],
             ["3.10–3.13", "Python verified"],
-            ["CSV · Excel", "Practical inputs"],
+            ["JSON · YAML", "Versioned recipes"],
             ["MIT", "Open-source core"],
           ].map(([value, label]) => (
             <div key={label} className="px-4 py-4 text-center">
@@ -241,6 +243,65 @@ function Home() {
               <div className="mt-1 text-xs text-muted-foreground">{label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-b border-border bg-muted/20">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent">
+              <Workflow className="h-3.5 w-3.5" /> New in v2.0.0
+            </div>
+            <h2 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl">
+              Turn one careful cleanup into a reusable pipeline.
+            </h2>
+            <p className="mt-4 text-base leading-7 text-muted-foreground">
+              Save explicit column types, mappings and conversion policies as a versioned recipe.
+              Preview the result, review selected stages and apply only the output you inspected.
+            </p>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              {[
+                "JSON or YAML recipe replay",
+                "Preserve, reject or quarantine invalid values",
+                "Source and recipe integrity checks",
+                "Shared evidence across Analysis, ML and Power BI",
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-2.5 text-sm">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" /> {item}
+                </div>
+              ))}
+            </div>
+            <div className="mt-7 flex flex-wrap gap-4">
+              <Link
+                to="/docs/recipes"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-accent"
+              >
+                Read the recipe guide <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/releases/v2-0-0"
+                className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                View release notes <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
+            <div className="flex items-center gap-3 border-b border-border pb-4">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent/10 text-accent">
+                <FileJson2 className="h-5 w-5" />
+              </span>
+              <div>
+                <div className="font-semibold">monthly_sales.json</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  Portable rules · deterministic replay
+                </div>
+              </div>
+            </div>
+            <pre className="mt-5 overflow-x-auto rounded-xl bg-slate-950 p-4 text-xs leading-6 text-slate-300">
+              <code>{`recipe = edf.PipelineRecipe(\n    name="monthly_sales",\n    columns={\n        "customer_id": edf.ColumnRule(dtype="string"),\n        "amount": edf.ColumnRule(\n            dtype="number", currency_symbols=("₹",)\n        ),\n        "order_date": edf.ColumnRule(\n            dtype="datetime", date_format="%d/%m/%Y"\n        ),\n    },\n)\n\npipeline = edf.Pipeline(recipe)\nplan = pipeline.preview("sales.csv")\nresult = pipeline.apply("sales.csv", plan)`}</code>
+            </pre>
+          </div>
         </div>
       </section>
 
@@ -377,7 +438,7 @@ function Home() {
             <div className="mt-6 rounded-xl border border-border bg-background p-4">
               <InstallChip />
               <pre className="mt-5 overflow-x-auto text-xs leading-6 text-muted-foreground">
-                <code>{`import eazydatafix as edf\n\nresult = edf.powerbi_ready({\n    "sales": "sales.csv",\n    "customers": "customers.csv",\n})\n\nresult.save("powerbi_output")`}</code>
+                <code>{`import eazydatafix as edf\n\nrecipe = edf.PipelineRecipe.load("monthly_sales.json")\npipeline = edf.Pipeline(recipe)\nplan = pipeline.preview("sales.csv")\nresult = pipeline.apply("sales.csv", plan)\n\nif result.is_ready:\n    result.save("sales_output")`}</code>
               </pre>
             </div>
             <div className="mt-5 flex flex-wrap gap-3">

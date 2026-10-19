@@ -89,7 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Clean, validate and prepare CSV or Excel data for analysis, machine learning and Power BI with transparent, reviewable changes.",
+          "Create reusable preparation recipes, review every change and export trusted data for analysis, machine learning and Power BI.",
       },
       { name: "author", content: "Suneel Kumar Kola" },
       {
@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Upload a file, inspect every issue, approve the fixes and export trusted data with a complete audit trail.",
+          "EazyDataFix 2.0 turns explicit rules into reusable, reviewable data-preparation pipelines.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -110,7 +110,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "twitter:description",
         content:
-          "A product-facing data preparation workflow backed by the open-source EazyDataFix v1.4.1 engine.",
+          "Reusable, reviewable data preparation backed by the open-source EazyDataFix v2.0.0 engine.",
       },
     ],
     links: [

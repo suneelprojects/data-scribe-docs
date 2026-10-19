@@ -26,7 +26,7 @@ function DocsIndex() {
       <DocPageHeader
         breadcrumbs={[{ label: "Docs" }]}
         title="Documentation"
-        description="EazyDataFix 1.4 is a deterministic-first Python framework for auditable transformation, Analysis Ready, ML Ready and Power BI Ready workflows."
+        description="EazyDataFix 2.0 is a deterministic-first Python framework for reusable recipes, reviewed transformations and Analysis Ready, ML Ready and Power BI Ready workflows."
       />
 
       <div id="doc-content" className="prose-doc">
@@ -41,8 +41,8 @@ function DocsIndex() {
 
         <h2 id="quick-start">Quick Start</h2>
         <p>
-          Run <code>edf.run()</code> for the complete profile → assess → clean → EDA workflow, or
-          use each stage independently when you need more control. See{" "}
+          Start with a <code>PipelineRecipe</code> when preparation must be reviewed and reused, or
+          run <code>edf.run()</code> for the complete profile → assess → clean → EDA workflow. See{" "}
           <Link to="/docs/quickstart">the quick start guide</Link> for a full walkthrough.
         </p>
 
@@ -52,6 +52,14 @@ function DocsIndex() {
           Agentic EDA:
         </p>
         <ul>
+          <li>
+            <code>edf.PipelineRecipe</code> and <code>edf.ColumnRule</code> — versioned JSON/YAML
+            preparation rules with explicit types and failure policies.
+          </li>
+          <li>
+            <code>edf.Pipeline</code> — preview, apply or deliberately run a recipe with
+            transformation evidence and guarded exports.
+          </li>
           <li>
             <code>edf.run()</code> — unified profile, assessment, controlled cleaning and EDA.
           </li>
@@ -105,9 +113,9 @@ function DocsIndex() {
 
         <h2 id="roadmap">Roadmap</h2>
         <p>
-          v1.4.1 is the current stable maintenance release. It preserves the Analysis Ready,
-          leakage-safe ML Ready and Power BI Ready workflows from v1.4.0 while improving packaging
-          reproducibility. Read the full <Link to="/roadmap">roadmap</Link>.
+          v2.0.0 is the current stable release. It adds reusable preparation recipes, explicit
+          conversions, review plans, quarantine evidence and a shared pipeline interface while
+          preserving the v1 convenience APIs. Read the full <Link to="/roadmap">roadmap</Link>.
         </p>
 
         <h2 id="browse">Browse all sections</h2>
